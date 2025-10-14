@@ -26,6 +26,7 @@ export default function Bureau() {
   const [editingSejour, setEditingSejour] = useState<any>(null);
   const [isCreatingSejour, setIsCreatingSejour] = useState(false);
   const [viewingSejour, setViewingSejour] = useState<any>(null);
+  const [selectedGroupe, setSelectedGroupe] = useState<string>("all");
 
   useEffect(() => {
     fetchInscriptions();
@@ -194,7 +195,7 @@ export default function Bureau() {
             </Button>
           </div>
 
-          <Tabs defaultValue="all" className="w-full">
+          <Tabs value={selectedGroupe} onValueChange={setSelectedGroupe} className="w-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="all">Tous</TabsTrigger>
               <TabsTrigger value="pitchouns">Pitchouns</TabsTrigger>
@@ -289,9 +290,11 @@ export default function Bureau() {
           </Tabs>
         </Card>
 
-        {/* Table des inscriptions */}
+        {/* Table des inscriptions filtrées */}
         <Card className="p-6">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Liste des inscriptions</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">
+            Liste des inscriptions {selectedGroupe !== "all" && `- ${selectedGroupe.charAt(0).toUpperCase() + selectedGroupe.slice(1)}`}
+          </h2>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -306,7 +309,9 @@ export default function Bureau() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {inscriptions.map((inscription) => (
+                {inscriptions
+                  .filter(inscription => selectedGroupe === "all" || inscription.child_age_group === selectedGroupe)
+                  .map((inscription) => (
                   <TableRow key={inscription.id}>
                     <TableCell>
                       <div>
