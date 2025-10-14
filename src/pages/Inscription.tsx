@@ -744,10 +744,10 @@ export default function Inscription() {
                     </p>
                     <ul className="list-disc pl-5 space-y-1 mt-2">
                       <li>
-                        <strong>1 semaine :</strong> Sélectionnez jusqu'à 2 semaines dans la liste et indiquez celle qui est prioritaire.
+                        <strong>1 semaine :</strong> Sélectionnez la semaine prioritaire et une alternative.
                       </li>
                       <li>
-                        <strong>2 semaines :</strong> Choisissez la semaine pour chacun des deux séjours.
+                        <strong>2 semaines :</strong> Sélectionnez les 2 semaines prioritaires et deux alternatives.
                       </li>
                     </ul>
                   </AlertDescription>
