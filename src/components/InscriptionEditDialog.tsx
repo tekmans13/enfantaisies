@@ -30,15 +30,16 @@ export function InscriptionEditDialog({
   onSuccess,
 }: InscriptionEditDialogProps) {
   const [sejours, setSejours] = useState<any[]>([]);
-  const [sejourPreference1, setSejourPreference1] = useState<string>("");
-  const [sejourPreference2, setSejourPreference2] = useState<string>("");
+  const [assignedSejour, setAssignedSejour] = useState<string>("");
+  const [assignedSejour2, setAssignedSejour2] = useState<string>("");
   const { toast } = useToast();
 
   useEffect(() => {
     if (open && inscription) {
       fetchSejours();
-      setSejourPreference1(inscription.sejour_preference_1 || "");
-      setSejourPreference2(inscription.sejour_preference_2 || "");
+      // Initialiser avec le séjour actuellement attribué (ou le choix du parent si pas encore attribué)
+      setAssignedSejour(inscription.sejour_attribue_1 || inscription.sejour_preference_1 || "");
+      setAssignedSejour2(inscription.sejour_attribue_2 || inscription.sejour_preference_2 || "");
     }
   }, [open, inscription]);
 
@@ -55,10 +56,10 @@ export function InscriptionEditDialog({
   };
 
   const handleSave = async () => {
-    if (!sejourPreference1) {
+    if (!assignedSejour) {
       toast({
         title: "Erreur",
-        description: "Veuillez sélectionner au moins le 1er choix de séjour",
+        description: "Veuillez sélectionner au moins un séjour à attribuer",
         variant: "destructive",
       });
       return;
@@ -67,8 +68,8 @@ export function InscriptionEditDialog({
     const { error } = await supabase
       .from('inscriptions')
       .update({ 
-        sejour_preference_1: sejourPreference1,
-        sejour_preference_2: sejourPreference2 || null,
+        sejour_attribue_1: assignedSejour,
+        sejour_attribue_2: assignedSejour2 || null,
       })
       .eq('id', inscription.id);
 
@@ -81,7 +82,7 @@ export function InscriptionEditDialog({
     } else {
       toast({
         title: "Succès",
-        description: "Inscription modifiée avec succès",
+        description: "Séjour(s) attribué(s) avec succès",
       });
       onSuccess();
       onOpenChange(false);
@@ -120,81 +121,89 @@ export function InscriptionEditDialog({
             </div>
           </div>
 
-          {/* Choix actuels */}
-          <div className="space-y-2">
-            <h3 className="font-semibold">Choix de séjour du parent</h3>
-            <div className="flex gap-4">
+          {/* Choix du parent - Lecture seule */}
+          <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+            <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-3 flex items-center gap-2">
+              <Info className="w-4 h-4" />
+              Choix du parent (lecture seule)
+            </h3>
+            <div className="space-y-2">
               <div>
                 <p className="text-sm text-muted-foreground">1er choix</p>
-                <Badge>{inscription?.sejour_preference_1 ? sejours.find(s => s.id === inscription.sejour_preference_1)?.titre || 'N/A' : 'Non renseigné'}</Badge>
+                <Badge className="bg-blue-600">{inscription?.sejour_preference_1 ? sejours.find(s => s.id === inscription.sejour_preference_1)?.titre || 'N/A' : 'Non renseigné'}</Badge>
               </div>
               {inscription?.sejour_preference_2 && (
                 <div>
                   <p className="text-sm text-muted-foreground">2ème choix</p>
-                  <Badge variant="outline">{sejours.find(s => s.id === inscription.sejour_preference_2)?.titre || 'N/A'}</Badge>
+                  <Badge variant="outline" className="border-blue-600">{sejours.find(s => s.id === inscription.sejour_preference_2)?.titre || 'N/A'}</Badge>
                 </div>
               )}
             </div>
           </div>
-
-          {/* Sélection des séjours */}
-          <div className="space-y-4">
-            <div>
-              <Label className="text-base mb-3 block font-semibold">1er choix de séjour *</Label>
-              <RadioGroup value={sejourPreference1} onValueChange={setSejourPreference1}>
-                <div className="space-y-3">
-                  {sejours.map((sejour) => (
-                    <div key={sejour.id} className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
-                      <RadioGroupItem value={sejour.id} id={`pref1-${sejour.id}`} />
-                      <Label htmlFor={`pref1-${sejour.id}`} className="flex-1 cursor-pointer">
-                        <div className="font-semibold">{sejour.titre}</div>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Users className="w-3 h-3" />
-                            {sejour.places_disponibles} places
-                          </span>
-                        </div>
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </RadioGroup>
-            </div>
-
-            <div>
-              <Label className="text-base mb-3 block font-semibold">2ème choix de séjour (optionnel)</Label>
-              <RadioGroup value={sejourPreference2} onValueChange={setSejourPreference2}>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
-                    <RadioGroupItem value="" id="pref2-none" />
-                    <Label htmlFor="pref2-none" className="flex-1 cursor-pointer">
-                      <div className="font-semibold">Aucun 2ème choix</div>
-                    </Label>
+          {/* Séjours attribués par le bureau - Modifiable */}
+          <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg border-2 border-green-200 dark:border-green-800">
+            <h3 className="font-semibold text-green-900 dark:text-green-100 mb-3">
+              Séjour(s) attribué(s) par le bureau
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <Label className="text-base mb-3 block font-semibold">1er séjour attribué *</Label>
+                <RadioGroup value={assignedSejour} onValueChange={setAssignedSejour}>
+                  <div className="space-y-2">
+                    {sejours.map((sejour) => (
+                      <div key={sejour.id} className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
+                        <RadioGroupItem value={sejour.id} id={`assigned1-${sejour.id}`} />
+                        <Label htmlFor={`assigned1-${sejour.id}`} className="flex-1 cursor-pointer">
+                          <div className="font-semibold">{sejour.titre}</div>
+                          <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Users className="w-3 h-3" />
+                              {sejour.places_disponibles} places
+                            </span>
+                          </div>
+                        </Label>
+                      </div>
+                    ))}
                   </div>
-                  {sejours.filter(s => s.id !== sejourPreference1).map((sejour) => (
-                    <div key={sejour.id} className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
-                      <RadioGroupItem value={sejour.id} id={`pref2-${sejour.id}`} />
-                      <Label htmlFor={`pref2-${sejour.id}`} className="flex-1 cursor-pointer">
-                        <div className="font-semibold">{sejour.titre}</div>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Users className="w-3 h-3" />
-                            {sejour.places_disponibles} places
-                          </span>
-                        </div>
+                </RadioGroup>
+              </div>
+
+              <div>
+                <Label className="text-base mb-3 block font-semibold">2ème séjour attribué (optionnel)</Label>
+                <RadioGroup value={assignedSejour2} onValueChange={setAssignedSejour2}>
+                  <div className="space-y-2">
+                    <div className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
+                      <RadioGroupItem value="" id="assigned2-none" />
+                      <Label htmlFor="assigned2-none" className="flex-1 cursor-pointer">
+                        <div className="font-semibold">Aucun 2ème séjour</div>
                       </Label>
                     </div>
-                  ))}
-                </div>
-              </RadioGroup>
+                    {sejours.filter(s => s.id !== assignedSejour).map((sejour) => (
+                      <div key={sejour.id} className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
+                        <RadioGroupItem value={sejour.id} id={`assigned2-${sejour.id}`} />
+                        <Label htmlFor={`assigned2-${sejour.id}`} className="flex-1 cursor-pointer">
+                          <div className="font-semibold">{sejour.titre}</div>
+                          <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Users className="w-3 h-3" />
+                              {sejour.places_disponibles} places
+                            </span>
+                          </div>
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </RadioGroup>
+              </div>
             </div>
           </div>
         </div>
