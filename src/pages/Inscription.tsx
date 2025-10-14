@@ -8,10 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle } from "lucide-react";
-import { useSejours } from "@/hooks/use-sejours";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 const TOTAL_STEPS = 5;
 
@@ -47,7 +47,24 @@ export default function Inscription() {
     sejourPreference2: "",
   });
 
-  const { data: sejours } = useSejours(childAgeGroup || undefined);
+  const { data: sejours } = useQuery({
+    queryKey: ['sejours', childAgeGroup],
+    queryFn: async () => {
+      let query = supabase
+        .from('sejours')
+        .select('*')
+        .order('date_debut', { ascending: true });
+      
+      if (childAgeGroup) {
+        query = query.eq('groupe_age', childAgeGroup as any);
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!childAgeGroup,
+  });
 
   useEffect(() => {
     if (formData.childClass) {
