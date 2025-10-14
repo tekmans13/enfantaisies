@@ -65,6 +65,8 @@ export type Database = {
           no_meat: boolean | null
           no_pork: boolean | null
           nombre_semaines_demandees: number | null
+          paiement_date: string | null
+          paiement_statut: string | null
           parent_address: string
           parent_authority: string
           parent_email: string
@@ -87,6 +89,7 @@ export type Database = {
           sejour_preference_2_alternatif: string | null
           social_security_regime: string
           status: string | null
+          stripe_payment_id: string | null
           updated_at: string | null
           validated_at: string | null
           validated_by: string | null
@@ -109,6 +112,8 @@ export type Database = {
           no_meat?: boolean | null
           no_pork?: boolean | null
           nombre_semaines_demandees?: number | null
+          paiement_date?: string | null
+          paiement_statut?: string | null
           parent_address: string
           parent_authority: string
           parent_email: string
@@ -131,6 +136,7 @@ export type Database = {
           sejour_preference_2_alternatif?: string | null
           social_security_regime: string
           status?: string | null
+          stripe_payment_id?: string | null
           updated_at?: string | null
           validated_at?: string | null
           validated_by?: string | null
@@ -153,6 +159,8 @@ export type Database = {
           no_meat?: boolean | null
           no_pork?: boolean | null
           nombre_semaines_demandees?: number | null
+          paiement_date?: string | null
+          paiement_statut?: string | null
           parent_address?: string
           parent_authority?: string
           parent_email?: string
@@ -175,6 +183,7 @@ export type Database = {
           sejour_preference_2_alternatif?: string | null
           social_security_regime?: string
           status?: string | null
+          stripe_payment_id?: string | null
           updated_at?: string | null
           validated_at?: string | null
           validated_by?: string | null

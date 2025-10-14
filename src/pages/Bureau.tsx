@@ -493,6 +493,7 @@ export default function Bureau() {
                   <TableHead>Choix principal</TableHead>
                   <TableHead>Choix secondaire</TableHead>
                   <TableHead>Statut</TableHead>
+                  <TableHead>Paiement</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -553,6 +554,28 @@ export default function Bureau() {
                         <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500">
                           <XCircle className="w-3 h-3 mr-1" />
                           Refusée
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {inscription.paiement_statut === 'paye' && (
+                        <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500">
+                          ✓ Payé
+                        </Badge>
+                      )}
+                      {inscription.paiement_statut === 'en_attente' && (
+                        <Badge variant="outline" className="bg-gray-500/10 text-gray-500 border-gray-500">
+                          En attente
+                        </Badge>
+                      )}
+                      {inscription.paiement_statut === 'echoue' && (
+                        <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500">
+                          Échoué
+                        </Badge>
+                      )}
+                      {inscription.paiement_statut === 'rembourse' && (
+                        <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500">
+                          Remboursé
                         </Badge>
                       )}
                     </TableCell>
