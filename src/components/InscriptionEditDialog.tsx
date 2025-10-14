@@ -85,6 +85,11 @@ export function InscriptionEditDialog({
       return;
     }
 
+    // Récupérer les anciennes attributions pour gérer les places
+    const oldSejour1 = inscription.sejour_attribue_1;
+    const oldSejour2 = inscription.sejour_attribue_2;
+
+    // Mettre à jour l'inscription
     const { error } = await supabase
       .from('inscriptions')
       .update({ 
@@ -99,14 +104,78 @@ export function InscriptionEditDialog({
         description: "Impossible de modifier l'inscription",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Succès",
-        description: "Séjour(s) attribué(s) avec succès",
-      });
-      onSuccess();
-      onOpenChange(false);
+      return;
     }
+
+    // Gérer les places disponibles
+    // Rendre les places si on enlève des séjours
+    if (oldSejour1 && oldSejour1 !== assignedSejour) {
+      const { data: sejour } = await supabase
+        .from('sejours')
+        .select('places_disponibles')
+        .eq('id', oldSejour1)
+        .single();
+      
+      if (sejour) {
+        await supabase
+          .from('sejours')
+          .update({ places_disponibles: sejour.places_disponibles + 1 })
+          .eq('id', oldSejour1);
+      }
+    }
+
+    if (oldSejour2 && oldSejour2 !== assignedSejour2) {
+      const { data: sejour } = await supabase
+        .from('sejours')
+        .select('places_disponibles')
+        .eq('id', oldSejour2)
+        .single();
+      
+      if (sejour) {
+        await supabase
+          .from('sejours')
+          .update({ places_disponibles: sejour.places_disponibles + 1 })
+          .eq('id', oldSejour2);
+      }
+    }
+
+    // Prendre des places si on ajoute de nouveaux séjours
+    if (assignedSejour && assignedSejour !== oldSejour1) {
+      const { data: sejour } = await supabase
+        .from('sejours')
+        .select('places_disponibles')
+        .eq('id', assignedSejour)
+        .single();
+      
+      if (sejour && sejour.places_disponibles > 0) {
+        await supabase
+          .from('sejours')
+          .update({ places_disponibles: sejour.places_disponibles - 1 })
+          .eq('id', assignedSejour);
+      }
+    }
+
+    if (assignedSejour2 && assignedSejour2 !== oldSejour2) {
+      const { data: sejour } = await supabase
+        .from('sejours')
+        .select('places_disponibles')
+        .eq('id', assignedSejour2)
+        .single();
+      
+      if (sejour && sejour.places_disponibles > 0) {
+        await supabase
+          .from('sejours')
+          .update({ places_disponibles: sejour.places_disponibles - 1 })
+          .eq('id', assignedSejour2);
+      }
+    }
+
+    toast({
+      title: "Succès",
+      description: "Séjour(s) attribué(s) avec succès",
+    });
+    onSuccess();
+    onOpenChange(false);
   };
 
   return (
