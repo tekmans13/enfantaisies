@@ -222,6 +222,20 @@ export default function Inscription() {
   };
 
   const handleSubmit = async () => {
+    // Validation complète de toutes les étapes avant soumission
+    for (let step = 1; step <= TOTAL_STEPS; step++) {
+      const validation = validateStep(step);
+      if (!validation.isValid) {
+        toast({
+          title: `Étape ${step} incomplète`,
+          description: validation.message,
+          variant: "destructive",
+        });
+        setCurrentStep(step); // Rediriger vers l'étape problématique
+        return;
+      }
+    }
+
     try {
       const inscriptionData: any = {
         is_first_inscription: formData.isFirstInscription,
@@ -345,16 +359,19 @@ export default function Inscription() {
 
               return (
                 <div key={step.number} className="flex items-center">
-                  <div className={`flex flex-col items-center ${
+                  <button
+                    onClick={() => setCurrentStep(step.number)}
+                    className={`flex flex-col items-center transition-all hover:scale-105 cursor-pointer ${
                       isActive ? "text-primary" : isCompleted ? "text-secondary" : "text-muted-foreground"
                     }`}
+                    type="button"
                   >
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
                         isActive
                           ? "bg-primary text-primary-foreground shadow-lg scale-110"
                           : isCompleted
                           ? "bg-secondary text-secondary-foreground"
-                          : "bg-muted"
+                          : "bg-muted hover:bg-muted/80"
                       }`}
                     >
                       <Icon className="w-5 h-5" />
@@ -362,7 +379,7 @@ export default function Inscription() {
                     <span className="text-xs font-medium text-center hidden sm:block">
                       {step.title}
                     </span>
-                  </div>
+                  </button>
                   {index < steps.length - 1 && (
                     <div className={`h-0.5 w-8 sm:w-16 mx-2 ${isCompleted ? "bg-secondary" : "bg-border"}`} />
                   )}
