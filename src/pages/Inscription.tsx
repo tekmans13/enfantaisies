@@ -289,6 +289,40 @@ export default function Inscription() {
 
       if (error) throw error;
 
+      // Upload des documents
+      const inscriptionId = data.id;
+      const documentsToUpload = [
+        { file: uploadedFiles.ficheSanitaire1, type: 'fiche_sanitaire_1' },
+        { file: uploadedFiles.ficheSanitaire2, type: 'fiche_sanitaire_2' },
+        { file: uploadedFiles.autorisationParentale, type: 'autorisation_parentale' },
+        { file: uploadedFiles.assuranceRC, type: 'assurance_rc' },
+        { file: uploadedFiles.certificatMedical, type: 'certificat_medical' },
+        { file: uploadedFiles.attestationCAF, type: 'attestation_caf' },
+        { file: uploadedFiles.testAisanceAquatique, type: 'test_aisance_aquatique' },
+      ];
+
+      for (const doc of documentsToUpload) {
+        if (doc.file) {
+          const fileExt = doc.file.name.split('.').pop();
+          const filePath = `${inscriptionId}/${doc.type}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('inscription-documents')
+            .upload(filePath, doc.file);
+
+          if (!uploadError) {
+            // Enregistrer le document dans la table
+            await supabase.from('inscription_documents').insert({
+              inscription_id: inscriptionId,
+              document_type: doc.type,
+              file_path: filePath,
+              file_name: doc.file.name,
+            });
+          }
+        }
+      }
+
+
       // Envoyer l'email de confirmation
       const recapUrl = `${window.location.origin}/recap-inscription/${data.id}`;
       

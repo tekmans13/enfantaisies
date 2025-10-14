@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign, Send } from "lucide-react";
+import { Users, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign, Send, FileDown, FileArchive, FileText, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import {
@@ -24,6 +24,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InscriptionEditDialog } from "@/components/InscriptionEditDialog";
 import { SejourManageDialog } from "@/components/SejourManageDialog";
 import { SejourDetailsDialog } from "@/components/SejourDetailsDialog";
+import { exportInscriptionsToExcel } from "@/lib/excelExport";
+import { downloadAllDocuments } from "@/lib/downloadDocuments";
 
 export default function Bureau() {
   const navigate = useNavigate();
@@ -494,11 +496,20 @@ export default function Bureau() {
           </Tabs>
         </Card>
 
-        {/* Table des inscriptions filtrées */}
         <Card className="p-6">
-          <h2 className="text-2xl font-bold text-foreground mb-6">
-            Liste des inscriptions {selectedGroupe !== "all" && `- ${selectedGroupe.charAt(0).toUpperCase() + selectedGroupe.slice(1)}`}
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-foreground">
+              Liste des inscriptions {selectedGroupe !== "all" && `- ${selectedGroupe.charAt(0).toUpperCase() + selectedGroupe.slice(1)}`}
+            </h2>
+            <Button
+              onClick={() => exportInscriptionsToExcel(inscriptions, sejours)}
+              variant="outline"
+              className="gap-2"
+            >
+              <FileDown className="w-4 h-4" />
+              Exporter Excel
+            </Button>
+          </div>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -511,6 +522,7 @@ export default function Bureau() {
                   <TableHead>Statut</TableHead>
                   <TableHead>Paiement</TableHead>
                   <TableHead>Date</TableHead>
+                  <TableHead>Documents</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -597,6 +609,31 @@ export default function Bureau() {
                     </TableCell>
                     <TableCell>
                       {new Date(inscription.created_at).toLocaleDateString('fr-FR')}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={async () => {
+                            try {
+                              await downloadAllDocuments(inscription.id);
+                              toast({
+                                title: "Téléchargement réussi",
+                                description: "Documents téléchargés en ZIP",
+                              });
+                            } catch (error) {
+                              toast({
+                                title: "Erreur",
+                                description: "Aucun document trouvé",
+                                variant: "destructive",
+                              });
+                            }
+                          }}
+                        >
+                          <FileArchive className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">

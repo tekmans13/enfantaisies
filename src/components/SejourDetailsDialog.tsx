@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -16,7 +17,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, Users, AlertTriangle, Pill } from "lucide-react";
+import { Calendar, Users, AlertTriangle, Pill, FileDown } from "lucide-react";
+import { exportSejourInscriptionsToExcel } from "@/lib/excelExport";
 
 interface SejourDetailsDialogProps {
   sejour: any;
@@ -75,17 +77,27 @@ export function SejourDetailsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-4">
-            <div>
-              <h2 className="text-2xl">{sejour.titre}</h2>
-              {sejour.lieu && (
-                <p className="text-sm text-muted-foreground font-normal">{sejour.lieu}</p>
-              )}
-            </div>
-            <Badge variant="outline" className="capitalize">
-              {sejour.groupe_age}
-            </Badge>
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="flex items-center gap-4">
+              <div>
+                <h2 className="text-2xl">{sejour.titre}</h2>
+                {sejour.lieu && (
+                  <p className="text-sm text-muted-foreground font-normal">{sejour.lieu}</p>
+                )}
+              </div>
+              <Badge variant="outline" className="capitalize">
+                {sejour.groupe_age}
+              </Badge>
+            </DialogTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => exportSejourInscriptionsToExcel(sejour, inscriptions)}
+            >
+              <FileDown className="w-4 h-4 mr-2" />
+              Exporter Excel
+            </Button>
+          </div>
         </DialogHeader>
 
         <div className="space-y-6">

@@ -3,16 +3,20 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { CheckCircle, Calendar, User, Mail, Phone, FileText, Home, Info } from "lucide-react";
+import { CheckCircle, Calendar, User, Mail, Phone, FileText, Home, Info, Download, FileArchive } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { downloadDocument, downloadAllDocuments } from "@/lib/downloadDocuments";
+import { useToast } from "@/hooks/use-toast";
 
 export default function RecapInscription() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [inscription, setInscription] = useState<any>(null);
   const [sejours, setSejours] = useState<any[]>([]);
   const [tarifs, setTarifs] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -56,6 +60,15 @@ export default function RecapInscription() {
 
         if (tarifsError) throw tarifsError;
         setTarifs(tarifsData || []);
+
+        // Récupérer les documents
+        const { data: documentsData, error: documentsError } = await supabase
+          .from('inscription_documents')
+          .select('*')
+          .eq('inscription_id', id);
+
+        if (documentsError) throw documentsError;
+        setDocuments(documentsData || []);
       } catch (error) {
         console.error('Erreur lors du chargement:', error);
       } finally {
@@ -432,6 +445,76 @@ export default function RecapInscription() {
                       Allergies alimentaires
                     </p>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* Documents uploadés */}
+            {documents.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-primary" />
+                    <h2 className="text-xl font-semibold">Documents fournis</h2>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        await downloadAllDocuments(inscription.id);
+                        toast({
+                          title: "Téléchargement réussi",
+                          description: "Tous les documents ont été téléchargés",
+                        });
+                      } catch (error) {
+                        toast({
+                          title: "Erreur",
+                          description: "Impossible de télécharger les documents",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                  >
+                    <FileArchive className="w-4 h-4 mr-2" />
+                    Télécharger tout (ZIP)
+                  </Button>
+                </div>
+                <div className="bg-muted/50 rounded-lg p-6">
+                  <div className="grid md:grid-cols-2 gap-3">
+                    {documents.map((doc) => (
+                      <div
+                        key={doc.id}
+                        className="flex items-center justify-between p-3 bg-background rounded-lg border"
+                      >
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-primary" />
+                          <span className="text-sm">{doc.file_name}</span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={async () => {
+                            try {
+                              await downloadDocument(doc.file_path, doc.file_name);
+                              toast({
+                                title: "Téléchargement réussi",
+                                description: doc.file_name,
+                              });
+                            } catch (error) {
+                              toast({
+                                title: "Erreur",
+                                description: "Impossible de télécharger le document",
+                                variant: "destructive",
+                              });
+                            }
+                          }}
+                        >
+                          <Download className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
