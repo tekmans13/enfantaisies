@@ -132,6 +132,7 @@ export default function Inscription() {
         social_security_regime: formData.socialSecurityRegime,
         sejour_preference_1: formData.sejourPreference1 || null,
         sejour_preference_2: formData.sejourPreference2 || null,
+        nombre_semaines_demandees: parseInt(numberOfWeeks),
       };
 
       const { data, error } = await supabase

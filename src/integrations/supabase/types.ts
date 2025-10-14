@@ -64,6 +64,7 @@ export type Database = {
           is_first_inscription: boolean | null
           no_meat: boolean | null
           no_pork: boolean | null
+          nombre_semaines_demandees: number | null
           parent_address: string
           parent_authority: string
           parent_email: string
@@ -98,6 +99,7 @@ export type Database = {
           is_first_inscription?: boolean | null
           no_meat?: boolean | null
           no_pork?: boolean | null
+          nombre_semaines_demandees?: number | null
           parent_address: string
           parent_authority: string
           parent_email: string
@@ -132,6 +134,7 @@ export type Database = {
           is_first_inscription?: boolean | null
           no_meat?: boolean | null
           no_pork?: boolean | null
+          nombre_semaines_demandees?: number | null
           parent_address?: string
           parent_authority?: string
           parent_email?: string

@@ -35,8 +35,8 @@ export function InscriptionEditDialog({
   const [sejourAttribution, setSejourAttribution] = useState<Map<string, number>>(new Map());
   const { toast } = useToast();
   
-  // Déterminer si l'utilisateur a demandé 1 ou 2 semaines
-  const hasTwoPreferences = inscription?.sejour_preference_1 && inscription?.sejour_preference_2;
+  // Déterminer si l'utilisateur a demandé 2 semaines (et non juste un choix alternatif)
+  const wantsTwoWeeks = inscription?.nombre_semaines_demandees === 2;
 
   useEffect(() => {
     if (open && inscription) {
@@ -357,7 +357,7 @@ export function InscriptionEditDialog({
                   </RadioGroup>
                 </div>
 
-                {hasTwoPreferences && (
+                {wantsTwoWeeks && (
                   <div>
                     <Label className="text-base mb-3 block font-semibold">2ème séjour attribué (optionnel)</Label>
                     <RadioGroup value={assignedSejour2} onValueChange={setAssignedSejour2}>
