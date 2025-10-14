@@ -291,6 +291,16 @@ export default function Inscription() {
 
       // Upload des documents
       const inscriptionId = data.id;
+      
+      // Helper pour créer le nom de fichier formaté
+      const formatFileName = (type: string, originalFile: File) => {
+        const lastName = formData.childLastName.toLowerCase().replace(/\s+/g, '-');
+        const firstName = formData.childFirstName.toLowerCase().replace(/\s+/g, '-');
+        const fileExt = originalFile.name.split('.').pop();
+        const docName = type.replace(/_/g, '-');
+        return `${lastName}_${firstName}_${docName}.${fileExt}`;
+      };
+      
       const documentsToUpload = [
         { file: uploadedFiles.ficheSanitaire1, type: 'fiche_sanitaire_1' },
         { file: uploadedFiles.ficheSanitaire2, type: 'fiche_sanitaire_2' },
@@ -303,8 +313,8 @@ export default function Inscription() {
 
       for (const doc of documentsToUpload) {
         if (doc.file) {
-          const fileExt = doc.file.name.split('.').pop();
-          const filePath = `${inscriptionId}/${doc.type}.${fileExt}`;
+          const formattedFileName = formatFileName(doc.type, doc.file);
+          const filePath = `${inscriptionId}/${formattedFileName}`;
           
           const { error: uploadError } = await supabase.storage
             .from('inscription-documents')
@@ -316,7 +326,7 @@ export default function Inscription() {
               inscription_id: inscriptionId,
               document_type: doc.type,
               file_path: filePath,
-              file_name: doc.file.name,
+              file_name: formattedFileName,
             });
           }
         }
