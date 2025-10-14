@@ -69,19 +69,21 @@ export function SejourDetailsDialog({
     allergies: validatedInscriptions.filter(i => i.has_allergies).length,
   };
 
+  if (!sejour) return null;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-4">
             <div>
-              <h2 className="text-2xl">{sejour?.titre}</h2>
-              {sejour?.lieu && (
+              <h2 className="text-2xl">{sejour.titre}</h2>
+              {sejour.lieu && (
                 <p className="text-sm text-muted-foreground font-normal">{sejour.lieu}</p>
               )}
             </div>
             <Badge variant="outline" className="capitalize">
-              {sejour?.groupe_age}
+              {sejour.groupe_age}
             </Badge>
           </DialogTitle>
         </DialogHeader>
@@ -95,7 +97,7 @@ export function SejourDetailsDialog({
                 Période
               </div>
               <p className="font-semibold">
-                {new Date(sejour?.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour?.date_fin).toLocaleDateString('fr-FR')}
+                {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
               </p>
             </Card>
             <Card className="p-4">
@@ -104,7 +106,7 @@ export function SejourDetailsDialog({
                 Places
               </div>
               <p className="font-semibold">
-                {validatedInscriptions.length} / {sejour?.places_disponibles}
+                {validatedInscriptions.length} / {sejour.places_disponibles}
               </p>
             </Card>
             <Card className="p-4">
