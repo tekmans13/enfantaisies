@@ -155,6 +155,11 @@ export default function Inscription() {
     }));
   };
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const validateStep = (step: number): { isValid: boolean; message?: string } => {
     if (DEBUG_MODE) return { isValid: true }; // Bypass validation en mode debug
 
@@ -169,6 +174,7 @@ export default function Inscription() {
         if (!formData.parentFirstName.trim()) return { isValid: false, message: "Le prénom du responsable légal 1 est requis" };
         if (!formData.parentLastName.trim()) return { isValid: false, message: "Le nom du responsable légal 1 est requis" };
         if (!formData.parentEmail.trim()) return { isValid: false, message: "L'email du responsable légal 1 est requis" };
+        if (!validateEmail(formData.parentEmail)) return { isValid: false, message: "L'email du responsable légal 1 n'est pas valide" };
         if (!formData.parentAuthority) return { isValid: false, message: "L'autorité parentale du responsable légal 1 est requise" };
         if (!formData.parentMobile.trim()) return { isValid: false, message: "Le téléphone portable du responsable légal 1 est requis" };
         if (!formData.parentAddress.trim()) return { isValid: false, message: "L'adresse du domicile est requise" };
