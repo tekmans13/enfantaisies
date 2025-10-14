@@ -11,8 +11,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Calendar, CheckCircle, XCircle, Clock, Edit } from "lucide-react";
+import { Users, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2 } from "lucide-react";
 import { InscriptionEditDialog } from "@/components/InscriptionEditDialog";
+import { SejourManageDialog } from "@/components/SejourManageDialog";
 
 export default function Bureau() {
   const [inscriptions, setInscriptions] = useState<any[]>([]);
@@ -20,6 +21,8 @@ export default function Bureau() {
   const [sejourStats, setSejourStats] = useState<any[]>([]);
   const [sejours, setSejours] = useState<any[]>([]);
   const [editingInscription, setEditingInscription] = useState<any>(null);
+  const [editingSejour, setEditingSejour] = useState<any>(null);
+  const [isCreatingSejour, setIsCreatingSejour] = useState(false);
 
   useEffect(() => {
     fetchInscriptions();
@@ -99,6 +102,20 @@ export default function Bureau() {
     }
   };
 
+  const handleDeleteSejour = async (id: string) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce séjour ?")) return;
+
+    const { error } = await supabase
+      .from('sejours')
+      .delete()
+      .eq('id', id);
+
+    if (!error) {
+      fetchSejours();
+      fetchInscriptions();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
       <div className="max-w-7xl mx-auto">
@@ -164,47 +181,77 @@ export default function Bureau() {
           </Card>
         </div>
 
-        {/* Statistiques par séjour */}
+        {/* Gestion des séjours */}
         <Card className="p-6 mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Statistiques par séjour</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-foreground">Gestion des séjours</h2>
+            <Button onClick={() => setIsCreatingSejour(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nouveau séjour
+            </Button>
+          </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sejourStats.map((stat) => {
-              const sejour = sejours.find(s => s.id === stat.id);
-              if (!sejour) return null;
+            {sejours.map((sejour) => {
+              const stats = sejourStats.find(s => s.id === sejour.id);
               
               return (
-                <Card key={stat.id} className="p-4 border-2">
+                <Card key={sejour.id} className="p-4 border-2">
                   <div className="space-y-2">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h3 className="font-semibold">{sejour.titre}</h3>
+                        {sejour.lieu && (
+                          <p className="text-xs text-muted-foreground">{sejour.lieu}</p>
+                        )}
                         <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                           <Calendar className="w-3 h-3" />
-                          {new Date(sejour.date_debut).toLocaleDateString('fr-FR')}
+                          {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
                         </div>
                       </div>
                       <Badge variant="outline" className="capitalize">
                         {sejour.groupe_age}
                       </Badge>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 pt-2 border-t">
-                      <div className="text-center">
-                        <p className="text-2xl font-bold text-primary">{stat.choix1}</p>
-                        <p className="text-xs text-muted-foreground">1er choix</p>
+                    
+                    {stats && (
+                      <div className="grid grid-cols-3 gap-2 pt-2 border-t">
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-primary">{stats.choix1}</p>
+                          <p className="text-xs text-muted-foreground">1er choix</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-secondary">{stats.choix2}</p>
+                          <p className="text-xs text-muted-foreground">2ème choix</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+                          <p className="text-xs text-muted-foreground">Total</p>
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <p className="text-2xl font-bold text-secondary">{stat.choix2}</p>
-                        <p className="text-xs text-muted-foreground">2ème choix</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-2xl font-bold text-foreground">{stat.total}</p>
-                        <p className="text-xs text-muted-foreground">Total</p>
-                      </div>
-                    </div>
+                    )}
+                    
                     <div className="pt-2 border-t">
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-sm mb-3">
                         <span className="text-muted-foreground">Places disponibles</span>
                         <span className="font-semibold">{sejour.places_disponibles}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => setEditingSejour(sejour)}
+                        >
+                          <Edit className="w-3 h-3 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteSejour(sejour.id)}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -320,6 +367,21 @@ export default function Bureau() {
         open={!!editingInscription}
         onOpenChange={(open) => !open && setEditingInscription(null)}
         onSuccess={fetchInscriptions}
+      />
+
+      <SejourManageDialog
+        sejour={editingSejour}
+        open={isCreatingSejour || !!editingSejour}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsCreatingSejour(false);
+            setEditingSejour(null);
+          }
+        }}
+        onSuccess={() => {
+          fetchSejours();
+          fetchInscriptions();
+        }}
       />
     </div>
   );
