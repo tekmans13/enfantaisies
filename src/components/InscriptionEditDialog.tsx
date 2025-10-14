@@ -129,7 +129,7 @@ export function InscriptionEditDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             Éditer l'inscription - {inscription?.child_first_name} {inscription?.child_last_name}
