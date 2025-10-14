@@ -15,8 +15,6 @@ import { useNavigate } from "react-router-dom";
 
 const TOTAL_STEPS = 5;
 
-
-
 export default function Inscription() {
   const [currentStep, setCurrentStep] = useState(1);
   const [childAgeGroup, setChildAgeGroup] = useState<string | null>(null);
@@ -24,21 +22,18 @@ export default function Inscription() {
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
-    // Étape 2 - Préalables
     isFirstInscription: false,
     hasMedication: false,
     hasAllergies: false,
     hasFoodAllergies: false,
     noPork: false,
     noMeat: false,
-    // Étape 3 - Enfant
     childFirstName: "",
     childLastName: "",
     childBirthDate: "",
     childClass: "",
     childGender: "",
     childSchool: "",
-    // Responsable légal 1
     parentFirstName: "",
     parentLastName: "",
     parentEmail: "",
@@ -48,14 +43,12 @@ export default function Inscription() {
     parentAddress: "",
     cafNumber: "",
     socialSecurityRegime: "",
-    // Étape 4 - Séjours
     sejourPreference1: "",
     sejourPreference2: "",
   });
 
   const { data: sejours } = useSejours(childAgeGroup || undefined);
 
-  // Calculer le groupe d'âge automatiquement
   useEffect(() => {
     if (formData.childClass) {
       let group = null;
@@ -126,7 +119,6 @@ export default function Inscription() {
         description: "Votre inscription a été envoyée au bureau pour validation.",
       });
 
-      // Rediriger vers la page d'accueil
       setTimeout(() => navigate("/"), 2000);
     } catch (error) {
       toast({
@@ -150,7 +142,6 @@ export default function Inscription() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* En-tête */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-2">
             Inscription Centre Aéré
@@ -160,7 +151,6 @@ export default function Inscription() {
           </p>
         </div>
 
-        {/* Indicateur de progression */}
         <Card className="p-6 mb-8 shadow-soft">
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
@@ -174,7 +164,6 @@ export default function Inscription() {
             <Progress value={progressPercentage} className="h-2" />
           </div>
 
-          {/* Navigation des étapes */}
           <div className="flex justify-between items-center">
             {steps.map((step, index) => {
               const Icon = step.icon;
@@ -183,13 +172,11 @@ export default function Inscription() {
 
               return (
                 <div key={step.number} className="flex items-center">
-                  <div
-                    className={`flex flex-col items-center ${
+                  <div className={`flex flex-col items-center ${
                       isActive ? "text-primary" : isCompleted ? "text-secondary" : "text-muted-foreground"
                     }`}
                   >
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
                         isActive
                           ? "bg-primary text-primary-foreground shadow-lg scale-110"
                           : isCompleted
@@ -204,11 +191,7 @@ export default function Inscription() {
                     </span>
                   </div>
                   {index < steps.length - 1 && (
-                    <div
-                      className={`h-0.5 w-8 sm:w-16 mx-2 ${
-                        isCompleted ? "bg-secondary" : "bg-border"
-                      }`}
-                    />
+                    <div className={`h-0.5 w-8 sm:w-16 mx-2 ${isCompleted ? "bg-secondary" : "bg-border"}`} />
                   )}
                 </div>
               );
@@ -216,7 +199,6 @@ export default function Inscription() {
           </div>
         </Card>
 
-        {/* Contenu de l'étape actuelle */}
         <Card className="p-8 shadow-soft">
           <div className="min-h-[400px]">
             {currentStep === 1 && (
@@ -253,89 +235,25 @@ export default function Inscription() {
                   Avant de commencer, merci de cocher les cases correspondantes à votre inscription :
                 </p>
                 <div className="space-y-4">
-                  <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
-                    <Checkbox
-                      id="firstInscription"
-                      checked={formData.isFirstInscription}
-                      onCheckedChange={() => handleCheckboxChange('isFirstInscription')}
-                    />
-                    <Label
-                      htmlFor="firstInscription"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      C'est votre 1ère inscription
-                    </Label>
-                  </div>
-
-                  <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
-                    <Checkbox
-                      id="medication"
-                      checked={formData.hasMedication}
-                      onCheckedChange={() => handleCheckboxChange('hasMedication')}
-                    />
-                    <Label
-                      htmlFor="medication"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      Votre enfant prend un traitement médicamenteux
-                    </Label>
-                  </div>
-
-                  <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
-                    <Checkbox
-                      id="allergies"
-                      checked={formData.hasAllergies}
-                      onCheckedChange={() => handleCheckboxChange('hasAllergies')}
-                    />
-                    <Label
-                      htmlFor="allergies"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      Votre enfant a des allergies
-                    </Label>
-                  </div>
-
-                  <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
-                    <Checkbox
-                      id="foodAllergies"
-                      checked={formData.hasFoodAllergies}
-                      onCheckedChange={() => handleCheckboxChange('hasFoodAllergies')}
-                    />
-                    <Label
-                      htmlFor="foodAllergies"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      Votre enfant a des allergies alimentaires / pratiques alimentaires spécifiques
-                    </Label>
-                  </div>
-
-                  <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
-                    <Checkbox
-                      id="noPork"
-                      checked={formData.noPork}
-                      onCheckedChange={() => handleCheckboxChange('noPork')}
-                    />
-                    <Label
-                      htmlFor="noPork"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      Votre enfant ne mange pas de porc
-                    </Label>
-                  </div>
-
-                  <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
-                    <Checkbox
-                      id="noMeat"
-                      checked={formData.noMeat}
-                      onCheckedChange={() => handleCheckboxChange('noMeat')}
-                    />
-                    <Label
-                      htmlFor="noMeat"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      Votre enfant ne mange pas de viande
-                    </Label>
-                  </div>
+                  {[
+                    { id: 'isFirstInscription', label: "C'est votre 1ère inscription" },
+                    { id: 'hasMedication', label: 'Votre enfant prend un traitement médicamenteux' },
+                    { id: 'hasAllergies', label: 'Votre enfant a des allergies' },
+                    { id: 'hasFoodAllergies', label: 'Votre enfant a des allergies alimentaires / pratiques alimentaires spécifiques' },
+                    { id: 'noPork', label: 'Votre enfant ne mange pas de porc' },
+                    { id: 'noMeat', label: 'Votre enfant ne mange pas de viande' },
+                  ].map((item) => (
+                    <div key={item.id} className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
+                      <Checkbox
+                        id={item.id}
+                        checked={formData[item.id as keyof typeof formData] as boolean}
+                        onCheckedChange={() => handleCheckboxChange(item.id)}
+                      />
+                      <Label htmlFor={item.id} className="text-sm font-medium cursor-pointer">
+                        {item.label}
+                      </Label>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -346,7 +264,6 @@ export default function Inscription() {
                   Informations sur l'enfant
                 </h2>
                 
-                {/* Informations enfant */}
                 <div className="space-y-6">
                   <div className="bg-primary/5 p-4 rounded-lg">
                     <h3 className="text-lg font-semibold text-foreground mb-4">Votre enfant</h3>
@@ -424,7 +341,6 @@ export default function Inscription() {
                     </div>
                   </div>
 
-                  {/* Responsable légal 1 */}
                   <div className="bg-secondary/5 p-4 rounded-lg">
                     <h3 className="text-lg font-semibold text-foreground mb-4">Responsable légal 1</h3>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -521,12 +437,6 @@ export default function Inscription() {
                       </div>
                     </div>
                   </div>
-
-                  <div className="bg-accent/10 p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Note :</strong> Les sections "Personnes à prévenir en cas d'urgence" et "Personnes autorisées à récupérer l'enfant" seront disponibles dans une prochaine étape.
-                    </p>
-                  </div>
                 </div>
               </div>
             )}
@@ -537,8 +447,8 @@ export default function Inscription() {
                   Choix des séjours
                 </h2>
                 <p className="text-muted-foreground mb-6">
-                  Groupe de votre enfant : <strong className="text-primary">
-                    {childAgeGroup === 'pitchouns' ? 'PITCHOUNS' : childAgeGroup === 'minots' ? 'MINOTS' : childAgeGroup === 'mias' ? 'MIAS' : 'Non défini'}
+                  Groupe : <strong className="text-primary capitalize">
+                    {childAgeGroup || 'Non défini'}
                   </strong>
                 </p>
 
@@ -548,67 +458,18 @@ export default function Inscription() {
                     <RadioGroup value={formData.sejourPreference1} onValueChange={(value) => handleInputChange('sejourPreference1', value)}>
                       <div className="space-y-3">
                         {sejours?.map((sejour) => (
-                          <div key={sejour.id} className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                          <div key={sejour.id} className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
                             <RadioGroupItem value={sejour.id} id={`pref1-${sejour.id}`} />
                             <Label htmlFor={`pref1-${sejour.id}`} className="cursor-pointer flex-1">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <p className="font-semibold text-foreground">{sejour.titre}</p>
-                                  <p className="text-sm text-muted-foreground mt-1">
-                                    Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
-                                  </p>
-                                  <span className={`inline-block mt-2 px-2 py-1 rounded text-xs ${
-                                    sejour.type === 'sejour' ? 'bg-primary/20 text-primary' : 'bg-secondary/20 text-secondary'
-                                  }`}>
-                                    {sejour.type === 'sejour' ? 'Séjour' : 'Animation Centre'}
-                                  </span>
-                                </div>
-                                <span className="text-sm text-muted-foreground">
-                                  {sejour.places_disponibles} places
-                                </span>
-                              </div>
+                              <p className="font-semibold">{sejour.titre}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                              </p>
                             </Label>
                           </div>
                         ))}
                       </div>
                     </RadioGroup>
-                  </div>
-
-                  <div>
-                    <Label className="text-base mb-3 block">Deuxième préférence (optionnel)</Label>
-                    <RadioGroup value={formData.sejourPreference2} onValueChange={(value) => handleInputChange('sejourPreference2', value)}>
-                      <div className="space-y-3">
-                        {sejours?.filter(s => s.id !== formData.sejourPreference1).map((sejour) => (
-                          <div key={sejour.id} className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-                            <RadioGroupItem value={sejour.id} id={`pref2-${sejour.id}`} />
-                            <Label htmlFor={`pref2-${sejour.id}`} className="cursor-pointer flex-1">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <p className="font-semibold text-foreground">{sejour.titre}</p>
-                                  <p className="text-sm text-muted-foreground mt-1">
-                                    Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
-                                  </p>
-                                  <span className={`inline-block mt-2 px-2 py-1 rounded text-xs ${
-                                    sejour.type === 'sejour' ? 'bg-primary/20 text-primary' : 'bg-secondary/20 text-secondary'
-                                  }`}>
-                                    {sejour.type === 'sejour' ? 'Séjour' : 'Animation Centre'}
-                                  </span>
-                                </div>
-                                <span className="text-sm text-muted-foreground">
-                                  {sejour.places_disponibles} places
-                                </span>
-                              </div>
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                    </RadioGroup>
-                  </div>
-
-                  <div className="bg-accent/10 p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Note :</strong> En raison de la forte demande, vos préférences seront prises en compte mais ne garantissent pas une place. Le bureau validera votre inscription en fonction des disponibilités.
-                    </p>
                   </div>
                 </div>
               </div>
@@ -619,62 +480,24 @@ export default function Inscription() {
                 <h2 className="text-2xl font-bold text-foreground mb-4">
                   Documents requis
                 </h2>
-                <p className="text-muted-foreground mb-6">
-                  L'association ne prendra pas en compte les dossiers incomplets.
-                </p>
-
                 <div className="space-y-4">
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <Label className="text-sm font-semibold text-foreground mb-2 block">
-                      Fiche sanitaire de liaison (à télécharger et remplir)
-                    </Label>
-                    <p className="text-xs text-muted-foreground mb-3">Formats acceptés : .pdf, .jpg, .png</p>
-                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" />
-                  </div>
-
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <Label className="text-sm font-semibold text-foreground mb-2 block">
-                      Autorisation parentale (à télécharger et remplir)
-                    </Label>
-                    <p className="text-xs text-muted-foreground mb-3">Formats acceptés : .pdf, .jpg, .png</p>
-                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" />
-                  </div>
-
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <Label className="text-sm font-semibold text-foreground mb-2 block">
-                      Attestation d'assurance Responsabilité civile (avec le nom de l'enfant)
-                    </Label>
-                    <p className="text-xs text-muted-foreground mb-3">Formats acceptés : .pdf, .jpg, .png</p>
-                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" />
-                  </div>
-
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <Label className="text-sm font-semibold text-foreground mb-2 block">
-                      Certificat médical
-                    </Label>
-                    <p className="text-xs text-muted-foreground mb-3">Complété et signé par le médecin traitant indiquant que l'enfant ne présente aucune contre-indication à la pratique des activités nautiques, sportives et de plein air</p>
-                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" />
-                  </div>
-
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <Label className="text-sm font-semibold text-foreground mb-2 block">
-                      Attestation CAF (moins de 3 mois) OU Avis d'imposition 2024
-                    </Label>
-                    <p className="text-xs text-muted-foreground mb-3">En l'absence de ce document, le tarif maximum sera automatiquement appliqué</p>
-                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" />
-                  </div>
-
-                  <div className="bg-accent/10 p-4 rounded-lg mt-6">
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Note :</strong> Le téléversement des documents sera fonctionnel prochainement. Pour l'instant, cliquez sur "Terminer l'inscription" pour valider votre demande.
-                    </p>
-                  </div>
+                  {[
+                    'Fiche sanitaire de liaison',
+                    'Autorisation parentale',
+                    'Attestation d\'assurance Responsabilité civile',
+                    'Certificat médical',
+                    'Attestation CAF ou Avis d\'imposition 2024',
+                  ].map((doc) => (
+                    <div key={doc} className="p-4 bg-muted/50 rounded-lg">
+                      <Label className="text-sm font-semibold mb-2 block">{doc}</Label>
+                      <Input type="file" accept=".pdf,.jpg,.jpeg,.png" />
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
           </div>
 
-          {/* Navigation */}
           <div className="flex justify-between mt-8 pt-6 border-t">
             <Button
               variant="outline"
@@ -690,9 +513,9 @@ export default function Inscription() {
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
-              <Button onClick={handleSubmit} className="bg-primary">
+              <Button onClick={handleSubmit}>
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Terminer l'inscription
+                Terminer
               </Button>
             )}
           </div>
