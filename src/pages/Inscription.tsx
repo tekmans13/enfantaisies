@@ -177,13 +177,13 @@ export default function Inscription() {
         if (!formData.childClass) return { isValid: false, message: "La classe est requise" };
         if (!formData.childGender) return { isValid: false, message: "Le sexe est requis" };
         if (!formData.childSchool.trim()) return { isValid: false, message: "L'école est requise" };
-        if (!formData.parentFirstName.trim()) return { isValid: false, message: "Le prénom du responsable légal 1 est requis" };
-        if (!formData.parentLastName.trim()) return { isValid: false, message: "Le nom du responsable légal 1 est requis" };
-        if (!formData.parentEmail.trim()) return { isValid: false, message: "L'email du responsable légal 1 est requis" };
-        if (!validateEmail(formData.parentEmail)) return { isValid: false, message: "L'email du responsable légal 1 n'est pas valide" };
-        if (!formData.parentAuthority) return { isValid: false, message: "L'autorité parentale du responsable légal 1 est requise" };
-        if (!formData.parentMobile.trim()) return { isValid: false, message: "Le téléphone portable du responsable légal 1 est requis" };
-        if (!validatePhone(formData.parentMobile)) return { isValid: false, message: "Le numéro de téléphone du responsable légal 1 n'est pas valide" };
+        if (!formData.parentFirstName.trim()) return { isValid: false, message: "Le prénom du responsable légal est requis" };
+        if (!formData.parentLastName.trim()) return { isValid: false, message: "Le nom du responsable légal est requis" };
+        if (!formData.parentEmail.trim()) return { isValid: false, message: "L'email du responsable légal est requis" };
+        if (!validateEmail(formData.parentEmail)) return { isValid: false, message: "L'email du responsable légal n'est pas valide" };
+        if (!formData.parentAuthority) return { isValid: false, message: "L'autorité parentale du responsable légal est requise" };
+        if (!formData.parentMobile.trim()) return { isValid: false, message: "Le téléphone portable du responsable légal est requis" };
+        if (!validatePhone(formData.parentMobile)) return { isValid: false, message: "Le numéro de téléphone du responsable légal n'est pas valide" };
         if (!formData.parentAddress.trim()) return { isValid: false, message: "L'adresse du domicile est requise" };
         if (!formData.socialSecurityRegime) return { isValid: false, message: "Le régime de sécurité sociale est requis" };
         break;
@@ -533,7 +533,7 @@ export default function Inscription() {
 
                   <div className="bg-secondary/5 p-4 rounded-lg">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-foreground">Responsable légal 1</h3>
+                      <h3 className="text-lg font-semibold text-foreground">Responsable légal</h3>
                     </div>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
@@ -629,7 +629,7 @@ export default function Inscription() {
                       className="w-full border-dashed"
                     >
                       <Plus className="w-4 h-4 mr-2" />
-                      Ajouter un responsable légal 2
+                      Ajouter un autre responsable légal
                     </Button>
                   )}
 
