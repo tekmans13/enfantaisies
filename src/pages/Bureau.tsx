@@ -274,8 +274,8 @@ export default function Bureau() {
                             
                             <div className="pt-2 border-t">
                               <div className="flex justify-between text-sm mb-3">
-                                <span className="text-muted-foreground">Places</span>
-                                <span className="font-semibold">{sejour.places_disponibles}</span>
+                                <span className="text-muted-foreground">Places demandées</span>
+                                <span className="font-semibold">{stats ? stats.total : 0}/{sejour.places_disponibles}</span>
                               </div>
                               <div className="grid grid-cols-2 gap-2">
                                 <Button
