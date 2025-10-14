@@ -51,6 +51,12 @@ export default function Inscription() {
   const [numberOfWeeks, setNumberOfWeeks] = useState<"1" | "2">("1");
   const [selectedSejours, setSelectedSejours] = useState<string[]>([]);
   const [prioritySejour, setPrioritySejour] = useState<string>("");
+  
+  // Pour le mode 2 semaines
+  const [week1Selected, setWeek1Selected] = useState<string[]>([]);
+  const [week1Priority, setWeek1Priority] = useState<string>("");
+  const [week2Selected, setWeek2Selected] = useState<string[]>([]);
+  const [week2Priority, setWeek2Priority] = useState<string>("");
 
   const { data: sejours } = useQuery({
     queryKey: ['sejours', childAgeGroup],
@@ -503,6 +509,10 @@ export default function Inscription() {
                         setNumberOfWeeks(value);
                         setSelectedSejours([]);
                         setPrioritySejour("");
+                        setWeek1Selected([]);
+                        setWeek1Priority("");
+                        setWeek2Selected([]);
+                        setWeek2Priority("");
                         handleInputChange('sejourPreference1', "");
                         handleInputChange('sejourPreference2', "");
                       }} 
@@ -620,57 +630,187 @@ export default function Inscription() {
                     </div>
                   )}
 
-                  {/* Mode 2 semaines : deux sections distinctes */}
+                  {/* Mode 2 semaines : deux sections avec sélection multiple chacune */}
                   {numberOfWeeks === "2" && (
                     <>
                       {/* Première semaine */}
                       <div className="bg-accent/10 p-4 rounded-lg border-2 border-accent/30">
                         <Label className="text-base mb-3 block font-semibold text-accent-foreground">
-                          Première semaine (prioritaire) *
+                          Première semaine - Sélectionnez jusqu'à 2 semaines
                         </Label>
-                        <RadioGroup 
-                          value={formData.sejourPreference1} 
-                          onValueChange={(value) => handleInputChange('sejourPreference1', value)}
-                        >
-                          <div className="space-y-3">
-                            {sejours?.map((sejour) => (
-                              <div key={sejour.id} className="flex items-start space-x-3 p-4 bg-background/80 rounded-lg hover:bg-background transition-colors">
-                                <RadioGroupItem value={sejour.id} id={`week1-${sejour.id}`} />
-                                <Label htmlFor={`week1-${sejour.id}`} className="cursor-pointer flex-1">
-                                  <p className="font-semibold">{sejour.titre}</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
-                                  </p>
-                                </Label>
+                        <div className="space-y-3">
+                          {sejours?.map((sejour) => {
+                            const isSelected = week1Selected.includes(sejour.id);
+                            const isPriority = week1Priority === sejour.id;
+                            
+                            return (
+                              <div 
+                                key={sejour.id} 
+                                className={`flex items-start space-x-3 p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                                  isSelected 
+                                    ? 'bg-accent/20 border-accent' 
+                                    : 'bg-background/80 border-transparent hover:bg-background hover:border-muted-foreground/20'
+                                }`}
+                              >
+                                <Checkbox
+                                  id={`week1-${sejour.id}`}
+                                  checked={isSelected}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      if (week1Selected.length < 2) {
+                                        const newSelection = [...week1Selected, sejour.id];
+                                        setWeek1Selected(newSelection);
+                                        if (week1Selected.length === 0) {
+                                          setWeek1Priority(sejour.id);
+                                          handleInputChange('sejourPreference1', sejour.id);
+                                        }
+                                      } else {
+                                        const nonPriority = week1Selected.find(id => id !== week1Priority);
+                                        const newSelection = week1Selected.filter(id => id !== nonPriority);
+                                        newSelection.push(sejour.id);
+                                        setWeek1Selected(newSelection);
+                                        if (week1Priority === newSelection[0]) {
+                                          handleInputChange('sejourPreference1', newSelection[0]);
+                                        } else {
+                                          handleInputChange('sejourPreference1', newSelection[1]);
+                                        }
+                                      }
+                                    } else {
+                                      setWeek1Selected(week1Selected.filter(id => id !== sejour.id));
+                                      if (week1Priority === sejour.id) {
+                                        const remaining = week1Selected.filter(id => id !== sejour.id);
+                                        setWeek1Priority(remaining[0] || "");
+                                        handleInputChange('sejourPreference1', remaining[0] || "");
+                                      }
+                                    }
+                                  }}
+                                  className="mt-1"
+                                />
+                                <div className="flex-1">
+                                  <Label htmlFor={`week1-${sejour.id}`} className="cursor-pointer">
+                                    <p className="font-semibold">{sejour.titre}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                                    </p>
+                                  </Label>
+                                </div>
+                                {isSelected && (
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroup
+                                      value={isPriority ? sejour.id : ""}
+                                      onValueChange={() => {
+                                        setWeek1Priority(sejour.id);
+                                        handleInputChange('sejourPreference1', sejour.id);
+                                      }}
+                                    >
+                                      <div className="flex items-center space-x-2">
+                                        <RadioGroupItem value={sejour.id} id={`week1-priority-${sejour.id}`} />
+                                        <Label htmlFor={`week1-priority-${sejour.id}`} className="text-xs font-medium cursor-pointer whitespace-nowrap">
+                                          Prioritaire
+                                        </Label>
+                                      </div>
+                                    </RadioGroup>
+                                  </div>
+                                )}
                               </div>
-                            ))}
-                          </div>
-                        </RadioGroup>
+                            );
+                          })}
+                        </div>
+                        {week1Selected.length > 0 && !week1Priority && (
+                          <p className="text-sm text-destructive mt-3">
+                            ⚠️ Veuillez indiquer quelle semaine est prioritaire
+                          </p>
+                        )}
                       </div>
 
                       {/* Deuxième semaine */}
                       <div className="bg-primary/10 p-4 rounded-lg border-2 border-primary/30">
                         <Label className="text-base mb-3 block font-semibold">
-                          Deuxième semaine *
+                          Deuxième semaine - Sélectionnez jusqu'à 2 semaines
                         </Label>
-                        <RadioGroup 
-                          value={formData.sejourPreference2} 
-                          onValueChange={(value) => handleInputChange('sejourPreference2', value)}
-                        >
-                          <div className="space-y-3">
-                            {sejours?.filter(s => s.id !== formData.sejourPreference1).map((sejour) => (
-                              <div key={sejour.id} className="flex items-start space-x-3 p-4 bg-background/80 rounded-lg hover:bg-background transition-colors">
-                                <RadioGroupItem value={sejour.id} id={`week2-${sejour.id}`} />
-                                <Label htmlFor={`week2-${sejour.id}`} className="cursor-pointer flex-1">
-                                  <p className="font-semibold">{sejour.titre}</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
-                                  </p>
-                                </Label>
+                        <div className="space-y-3">
+                          {sejours?.map((sejour) => {
+                            const isSelected = week2Selected.includes(sejour.id);
+                            const isPriority = week2Priority === sejour.id;
+                            
+                            return (
+                              <div 
+                                key={sejour.id} 
+                                className={`flex items-start space-x-3 p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                                  isSelected 
+                                    ? 'bg-primary/20 border-primary' 
+                                    : 'bg-background/80 border-transparent hover:bg-background hover:border-muted-foreground/20'
+                                }`}
+                              >
+                                <Checkbox
+                                  id={`week2-${sejour.id}`}
+                                  checked={isSelected}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      if (week2Selected.length < 2) {
+                                        const newSelection = [...week2Selected, sejour.id];
+                                        setWeek2Selected(newSelection);
+                                        if (week2Selected.length === 0) {
+                                          setWeek2Priority(sejour.id);
+                                          handleInputChange('sejourPreference2', sejour.id);
+                                        }
+                                      } else {
+                                        const nonPriority = week2Selected.find(id => id !== week2Priority);
+                                        const newSelection = week2Selected.filter(id => id !== nonPriority);
+                                        newSelection.push(sejour.id);
+                                        setWeek2Selected(newSelection);
+                                        if (week2Priority === newSelection[0]) {
+                                          handleInputChange('sejourPreference2', newSelection[0]);
+                                        } else {
+                                          handleInputChange('sejourPreference2', newSelection[1]);
+                                        }
+                                      }
+                                    } else {
+                                      setWeek2Selected(week2Selected.filter(id => id !== sejour.id));
+                                      if (week2Priority === sejour.id) {
+                                        const remaining = week2Selected.filter(id => id !== sejour.id);
+                                        setWeek2Priority(remaining[0] || "");
+                                        handleInputChange('sejourPreference2', remaining[0] || "");
+                                      }
+                                    }
+                                  }}
+                                  className="mt-1"
+                                />
+                                <div className="flex-1">
+                                  <Label htmlFor={`week2-${sejour.id}`} className="cursor-pointer">
+                                    <p className="font-semibold">{sejour.titre}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                                    </p>
+                                  </Label>
+                                </div>
+                                {isSelected && (
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroup
+                                      value={isPriority ? sejour.id : ""}
+                                      onValueChange={() => {
+                                        setWeek2Priority(sejour.id);
+                                        handleInputChange('sejourPreference2', sejour.id);
+                                      }}
+                                    >
+                                      <div className="flex items-center space-x-2">
+                                        <RadioGroupItem value={sejour.id} id={`week2-priority-${sejour.id}`} />
+                                        <Label htmlFor={`week2-priority-${sejour.id}`} className="text-xs font-medium cursor-pointer whitespace-nowrap">
+                                          Prioritaire
+                                        </Label>
+                                      </div>
+                                    </RadioGroup>
+                                  </div>
+                                )}
                               </div>
-                            ))}
-                          </div>
-                        </RadioGroup>
+                            );
+                          })}
+                        </div>
+                        {week2Selected.length > 0 && !week2Priority && (
+                          <p className="text-sm text-destructive mt-3">
+                            ⚠️ Veuillez indiquer quelle semaine est prioritaire
+                          </p>
+                        )}
                       </div>
                     </>
                   )}
