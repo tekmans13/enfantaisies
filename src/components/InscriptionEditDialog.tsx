@@ -10,9 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Users } from "lucide-react";
+import { Calendar, Users, Info } from "lucide-react";
 
 interface InscriptionEditDialogProps {
   inscription: any;
@@ -28,13 +30,34 @@ export function InscriptionEditDialog({
   onSuccess,
 }: InscriptionEditDialogProps) {
   const [sejours, setSejours] = useState<any[]>([]);
-  const [selectedSejour, setSelectedSejour] = useState("");
+  const [numberOfWeeks, setNumberOfWeeks] = useState<"1" | "2">("1");
+  const [selectedSejours, setSelectedSejours] = useState<string[]>([]);
+  const [prioritySejour, setPrioritySejour] = useState<string>("");
+  const [week1Selected, setWeek1Selected] = useState<string[]>([]);
+  const [week1Priority, setWeek1Priority] = useState<string>("");
+  const [week2Selected, setWeek2Selected] = useState<string[]>([]);
+  const [week2Priority, setWeek2Priority] = useState<string>("");
   const { toast } = useToast();
 
   useEffect(() => {
     if (open && inscription) {
       fetchSejours();
-      setSelectedSejour(inscription.sejour_preference_1 || "");
+      
+      // Déterminer le nombre de semaines basé sur les préférences existantes
+      if (inscription.sejour_preference_1 && inscription.sejour_preference_2) {
+        setNumberOfWeeks("2");
+        setWeek1Selected([inscription.sejour_preference_1]);
+        setWeek1Priority(inscription.sejour_preference_1);
+        setWeek2Selected([inscription.sejour_preference_2]);
+        setWeek2Priority(inscription.sejour_preference_2);
+      } else if (inscription.sejour_preference_1) {
+        setNumberOfWeeks("1");
+        const prefs = inscription.sejour_preference_2 
+          ? [inscription.sejour_preference_1, inscription.sejour_preference_2]
+          : [inscription.sejour_preference_1];
+        setSelectedSejours(prefs);
+        setPrioritySejour(inscription.sejour_preference_1);
+      }
     }
   }, [open, inscription]);
 
@@ -51,19 +74,38 @@ export function InscriptionEditDialog({
   };
 
   const handleAssignSejour = async () => {
-    if (!selectedSejour) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez sélectionner un séjour",
-        variant: "destructive",
-      });
-      return;
+    let pref1 = "";
+    let pref2 = "";
+
+    if (numberOfWeeks === "1") {
+      if (!prioritySejour) {
+        toast({
+          title: "Erreur",
+          description: "Veuillez sélectionner un séjour prioritaire",
+          variant: "destructive",
+        });
+        return;
+      }
+      pref1 = prioritySejour;
+      pref2 = selectedSejours.find(id => id !== prioritySejour) || "";
+    } else {
+      if (!week1Priority || !week2Priority) {
+        toast({
+          title: "Erreur",
+          description: "Veuillez sélectionner les séjours pour chaque semaine",
+          variant: "destructive",
+        });
+        return;
+      }
+      pref1 = week1Priority;
+      pref2 = week2Priority;
     }
 
     const { error } = await supabase
       .from('inscriptions')
       .update({ 
-        sejour_preference_1: selectedSejour,
+        sejour_preference_1: pref1,
+        sejour_preference_2: pref2 || null,
         status: 'validee',
         validated_at: new Date().toISOString()
       })
@@ -134,32 +176,292 @@ export function InscriptionEditDialog({
             </div>
           </div>
 
-          {/* Sélection du séjour */}
-          <div className="space-y-4">
-            <Label className="text-base font-semibold">Assigner un séjour</Label>
-            <RadioGroup value={selectedSejour} onValueChange={setSelectedSejour}>
-              <div className="space-y-3">
-                {sejours.map((sejour) => (
-                  <div key={sejour.id} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                    <RadioGroupItem value={sejour.id} id={sejour.id} />
-                    <Label htmlFor={sejour.id} className="flex-1 cursor-pointer">
-                      <div className="font-semibold">{sejour.titre}</div>
-                      <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Users className="w-3 h-3" />
-                          {sejour.places_disponibles} places
-                        </span>
-                      </div>
-                    </Label>
-                  </div>
-                ))}
+          <Alert className="border-primary/50 bg-primary/5">
+            <Info className="h-4 w-4 text-primary" />
+            <AlertDescription className="text-sm">
+              Sélectionnez le nombre de semaines souhaitées, puis choisissez les séjours correspondants avec leur priorité.
+            </AlertDescription>
+          </Alert>
+
+          {/* Choix du nombre de semaines */}
+          <div className="bg-muted/30 p-4 rounded-lg">
+            <Label className="text-base mb-3 block font-semibold">Nombre de semaines</Label>
+            <RadioGroup 
+              value={numberOfWeeks} 
+              onValueChange={(value: "1" | "2") => {
+                setNumberOfWeeks(value);
+                setSelectedSejours([]);
+                setPrioritySejour("");
+                setWeek1Selected([]);
+                setWeek1Priority("");
+                setWeek2Selected([]);
+                setWeek2Priority("");
+              }} 
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="1" id="weeks-1" />
+                <Label htmlFor="weeks-1" className="cursor-pointer font-medium">1 semaine</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="2" id="weeks-2" />
+                <Label htmlFor="weeks-2" className="cursor-pointer font-medium">2 semaines</Label>
               </div>
             </RadioGroup>
           </div>
+
+          {/* Mode 1 semaine */}
+          {numberOfWeeks === "1" && (
+            <div>
+              <Label className="text-base mb-3 block font-semibold">
+                Sélectionnez jusqu'à 2 séjours (1 prioritaire + 1 alternative)
+              </Label>
+              <div className="space-y-3">
+                {sejours.map((sejour) => {
+                  const isSelected = selectedSejours.includes(sejour.id);
+                  const isPriority = prioritySejour === sejour.id;
+                  
+                  return (
+                    <div 
+                      key={sejour.id} 
+                      className={`flex items-start space-x-3 p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                        isSelected 
+                          ? 'bg-primary/10 border-primary' 
+                          : 'bg-muted/50 border-transparent hover:bg-muted hover:border-muted-foreground/20'
+                      }`}
+                    >
+                      <Checkbox
+                        id={`sejour-${sejour.id}`}
+                        checked={isSelected}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            if (selectedSejours.length < 2) {
+                              const newSelection = [...selectedSejours, sejour.id];
+                              setSelectedSejours(newSelection);
+                              if (selectedSejours.length === 0) {
+                                setPrioritySejour(sejour.id);
+                              }
+                            } else {
+                              const nonPriority = selectedSejours.find(id => id !== prioritySejour);
+                              const newSelection = selectedSejours.filter(id => id !== nonPriority);
+                              newSelection.push(sejour.id);
+                              setSelectedSejours(newSelection);
+                            }
+                          } else {
+                            setSelectedSejours(selectedSejours.filter(id => id !== sejour.id));
+                            if (prioritySejour === sejour.id) {
+                              const remaining = selectedSejours.filter(id => id !== sejour.id);
+                              setPrioritySejour(remaining[0] || "");
+                            }
+                          }
+                        }}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <Label htmlFor={`sejour-${sejour.id}`} className="cursor-pointer">
+                          <p className="font-semibold">{sejour.titre}</p>
+                          <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Users className="w-3 h-3" />
+                              {sejour.places_disponibles} places
+                            </span>
+                          </div>
+                        </Label>
+                      </div>
+                      {isSelected && (
+                        <div className="flex items-center space-x-2">
+                          <RadioGroup
+                            value={isPriority ? sejour.id : ""}
+                            onValueChange={() => {
+                              setPrioritySejour(sejour.id);
+                            }}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value={sejour.id} id={`priority-${sejour.id}`} />
+                              <Label htmlFor={`priority-${sejour.id}`} className="text-xs font-medium cursor-pointer whitespace-nowrap">
+                                Prioritaire
+                              </Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Mode 2 semaines */}
+          {numberOfWeeks === "2" && (
+            <>
+              <div className="bg-accent/10 p-4 rounded-lg border-2 border-accent/30">
+                <Label className="text-base mb-3 block font-semibold text-accent-foreground">
+                  Première semaine - Sélectionnez jusqu'à 2 séjours
+                </Label>
+                <div className="space-y-3">
+                  {sejours.map((sejour) => {
+                    const isSelected = week1Selected.includes(sejour.id);
+                    const isPriority = week1Priority === sejour.id;
+                    
+                    return (
+                      <div 
+                        key={sejour.id} 
+                        className={`flex items-start space-x-3 p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                          isSelected 
+                            ? 'bg-accent/20 border-accent' 
+                            : 'bg-background/80 border-transparent hover:bg-background hover:border-muted-foreground/20'
+                        }`}
+                      >
+                        <Checkbox
+                          id={`week1-${sejour.id}`}
+                          checked={isSelected}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              if (week1Selected.length < 2) {
+                                const newSelection = [...week1Selected, sejour.id];
+                                setWeek1Selected(newSelection);
+                                if (week1Selected.length === 0) {
+                                  setWeek1Priority(sejour.id);
+                                }
+                              } else {
+                                const nonPriority = week1Selected.find(id => id !== week1Priority);
+                                const newSelection = week1Selected.filter(id => id !== nonPriority);
+                                newSelection.push(sejour.id);
+                                setWeek1Selected(newSelection);
+                              }
+                            } else {
+                              setWeek1Selected(week1Selected.filter(id => id !== sejour.id));
+                              if (week1Priority === sejour.id) {
+                                const remaining = week1Selected.filter(id => id !== sejour.id);
+                                setWeek1Priority(remaining[0] || "");
+                              }
+                            }
+                          }}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <Label htmlFor={`week1-${sejour.id}`} className="cursor-pointer">
+                            <p className="font-semibold">{sejour.titre}</p>
+                            <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Users className="w-3 h-3" />
+                                {sejour.places_disponibles} places
+                              </span>
+                            </div>
+                          </Label>
+                        </div>
+                        {isSelected && (
+                          <div className="flex items-center space-x-2">
+                            <RadioGroup
+                              value={isPriority ? sejour.id : ""}
+                              onValueChange={() => setWeek1Priority(sejour.id)}
+                            >
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value={sejour.id} id={`week1-priority-${sejour.id}`} />
+                                <Label htmlFor={`week1-priority-${sejour.id}`} className="text-xs font-medium cursor-pointer whitespace-nowrap">
+                                  Prioritaire
+                                </Label>
+                              </div>
+                            </RadioGroup>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="bg-primary/10 p-4 rounded-lg border-2 border-primary/30">
+                <Label className="text-base mb-3 block font-semibold">
+                  Deuxième semaine - Sélectionnez jusqu'à 2 séjours
+                </Label>
+                <div className="space-y-3">
+                  {sejours.map((sejour) => {
+                    const isSelected = week2Selected.includes(sejour.id);
+                    const isPriority = week2Priority === sejour.id;
+                    
+                    return (
+                      <div 
+                        key={sejour.id} 
+                        className={`flex items-start space-x-3 p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                          isSelected 
+                            ? 'bg-primary/20 border-primary' 
+                            : 'bg-background/80 border-transparent hover:bg-background hover:border-muted-foreground/20'
+                        }`}
+                      >
+                        <Checkbox
+                          id={`week2-${sejour.id}`}
+                          checked={isSelected}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              if (week2Selected.length < 2) {
+                                const newSelection = [...week2Selected, sejour.id];
+                                setWeek2Selected(newSelection);
+                                if (week2Selected.length === 0) {
+                                  setWeek2Priority(sejour.id);
+                                }
+                              } else {
+                                const nonPriority = week2Selected.find(id => id !== week2Priority);
+                                const newSelection = week2Selected.filter(id => id !== nonPriority);
+                                newSelection.push(sejour.id);
+                                setWeek2Selected(newSelection);
+                              }
+                            } else {
+                              setWeek2Selected(week2Selected.filter(id => id !== sejour.id));
+                              if (week2Priority === sejour.id) {
+                                const remaining = week2Selected.filter(id => id !== sejour.id);
+                                setWeek2Priority(remaining[0] || "");
+                              }
+                            }
+                          }}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <Label htmlFor={`week2-${sejour.id}`} className="cursor-pointer">
+                            <p className="font-semibold">{sejour.titre}</p>
+                            <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Users className="w-3 h-3" />
+                                {sejour.places_disponibles} places
+                              </span>
+                            </div>
+                          </Label>
+                        </div>
+                        {isSelected && (
+                          <div className="flex items-center space-x-2">
+                            <RadioGroup
+                              value={isPriority ? sejour.id : ""}
+                              onValueChange={() => setWeek2Priority(sejour.id)}
+                            >
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value={sejour.id} id={`week2-priority-${sejour.id}`} />
+                                <Label htmlFor={`week2-priority-${sejour.id}`} className="text-xs font-medium cursor-pointer whitespace-nowrap">
+                                  Prioritaire
+                                </Label>
+                              </div>
+                            </RadioGroup>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <DialogFooter>
