@@ -93,6 +93,13 @@ export default function Bureau() {
   };
 
   const handleValidate = async (id: string, status: 'validee' | 'refusee') => {
+    // Récupérer l'inscription pour connaître le séjour choisi
+    const { data: inscription } = await supabase
+      .from('inscriptions')
+      .select('sejour_preference_1')
+      .eq('id', id)
+      .single();
+
     const { error } = await supabase
       .from('inscriptions')
       .update({ 
@@ -100,6 +107,24 @@ export default function Bureau() {
         validated_at: new Date().toISOString()
       })
       .eq('id', id);
+
+    if (!error && inscription && status === 'validee' && inscription.sejour_preference_1) {
+      // Décrémenter les places disponibles du séjour
+      const { data: sejour } = await supabase
+        .from('sejours')
+        .select('places_disponibles')
+        .eq('id', inscription.sejour_preference_1)
+        .single();
+
+      if (sejour && sejour.places_disponibles > 0) {
+        await supabase
+          .from('sejours')
+          .update({ places_disponibles: sejour.places_disponibles - 1 })
+          .eq('id', inscription.sejour_preference_1);
+      }
+      
+      fetchSejours();
+    }
 
     if (!error) {
       fetchInscriptions();
