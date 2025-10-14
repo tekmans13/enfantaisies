@@ -32,6 +32,7 @@ export function InscriptionEditDialog({
   const [sejours, setSejours] = useState<any[]>([]);
   const [assignedSejour, setAssignedSejour] = useState<string>("");
   const [assignedSejour2, setAssignedSejour2] = useState<string>("");
+  const [sejourAttribution, setSejourAttribution] = useState<Map<string, number>>(new Map());
   const { toast } = useToast();
 
   useEffect(() => {
@@ -72,6 +73,32 @@ export function InscriptionEditDialog({
     
     if (data) {
       setSejours(data);
+      
+      // Compter les attributions pour chaque séjour
+      const { data: inscriptions } = await supabase
+        .from('inscriptions')
+        .select('sejour_attribue_1, sejour_attribue_2');
+      
+      if (inscriptions) {
+        const attributionMap = new Map<string, number>();
+        
+        inscriptions.forEach(insc => {
+          if (insc.sejour_attribue_1) {
+            attributionMap.set(
+              insc.sejour_attribue_1, 
+              (attributionMap.get(insc.sejour_attribue_1) || 0) + 1
+            );
+          }
+          if (insc.sejour_attribue_2) {
+            attributionMap.set(
+              insc.sejour_attribue_2, 
+              (attributionMap.get(insc.sejour_attribue_2) || 0) + 1
+            );
+          }
+        });
+        
+        setSejourAttribution(attributionMap);
+      }
     }
   };
 
@@ -286,7 +313,7 @@ export function InscriptionEditDialog({
                               </span>
                               <span className="flex items-center gap-1">
                                 <Users className="w-3 h-3" />
-                                {sejour.places_disponibles} places
+                                {sejourAttribution.get(sejour.id) || 0}/{sejour.places_disponibles} places
                               </span>
                             </div>
                           </Label>
@@ -318,7 +345,7 @@ export function InscriptionEditDialog({
                               </span>
                               <span className="flex items-center gap-1">
                                 <Users className="w-3 h-3" />
-                                {sejour.places_disponibles} places
+                                {sejourAttribution.get(sejour.id) || 0}/{sejour.places_disponibles} places
                               </span>
                             </div>
                           </Label>
