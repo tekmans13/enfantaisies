@@ -217,6 +217,13 @@ export default function Inscription() {
           if (!week2Priority) return { isValid: false, message: "Veuillez indiquer le séjour prioritaire pour la deuxième semaine" };
         }
         break;
+      case 5: // Étape Documents
+        if (!uploadedFiles.ficheSanitaire1) return { isValid: false, message: "La fiche sanitaire de liaison est requise" };
+        if (!uploadedFiles.autorisationParentale) return { isValid: false, message: "L'autorisation parentale est requise" };
+        if (!uploadedFiles.assuranceRC) return { isValid: false, message: "L'attestation d'assurance RC est requise" };
+        if (!uploadedFiles.certificatMedical) return { isValid: false, message: "Le certificat médical est requis" };
+        if (!uploadedFiles.attestationCAF) return { isValid: false, message: "L'attestation CAF ou avis d'imposition est requise" };
+        break;
     }
     return { isValid: true };
   };
@@ -1154,6 +1161,13 @@ export default function Inscription() {
                 <h2 className="text-2xl font-bold text-foreground mb-4">
                   Documents requis
                 </h2>
+                <Alert className="mb-6">
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    <p className="font-semibold mb-1">L'association ne prendra pas en compte les dossiers incomplets.</p>
+                    <p className="text-sm">Documents à envoyer (.pdf, .jpg ou .png)</p>
+                  </AlertDescription>
+                </Alert>
                 <div className="space-y-6">
                   {/* Fiche sanitaire de liaison - 2 uploads */}
                   <div className="p-4 bg-muted/50 rounded-lg space-y-4">
