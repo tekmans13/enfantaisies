@@ -787,7 +787,7 @@ export default function Inscription() {
                   {numberOfWeeks === "1" && (
                     <div>
                       <Label className="text-base mb-3 block font-semibold">
-                        Sélectionnez jusqu'à 2 semaines (1 prioritaire + 1 alternative)
+                        Sélectionnez une semaine prioritaire et une alternative
                       </Label>
                       <div className="space-y-3">
                         {sejours?.map((sejour) => {
@@ -898,7 +898,7 @@ export default function Inscription() {
                       {/* Première semaine */}
                       <div className="bg-accent/10 p-4 rounded-lg border-2 border-accent/30">
                         <Label className="text-base mb-3 block font-semibold text-accent-foreground">
-                          Première semaine - Sélectionnez jusqu'à 2 semaines
+                          Première semaine - Sélectionnez une semaine prioritaire et une alternative.
                         </Label>
                         <div className="space-y-3">
                            {sejours?.map((sejour) => {
@@ -1005,7 +1005,7 @@ export default function Inscription() {
                       {/* Deuxième semaine */}
                       <div className="bg-primary/10 p-4 rounded-lg border-2 border-primary/30">
                         <Label className="text-base mb-3 block font-semibold">
-                          Deuxième semaine - Sélectionnez jusqu'à 2 semaines
+                          Deuxième semaine - Sélectionnez une semaine prioritaire et une alternative.
                         </Label>
                         <div className="space-y-3">
                            {sejours?.map((sejour) => {
