@@ -147,12 +147,31 @@ export default function Inscription() {
 
       if (error) throw error;
 
+      // Envoyer l'email de confirmation
+      const recapUrl = `${window.location.origin}/recap-inscription/${data.id}`;
+      
+      try {
+        await supabase.functions.invoke('send-inscription-email', {
+          body: {
+            inscriptionId: data.id.slice(0, 8),
+            parentEmail: formData.parentEmail,
+            parentName: `${formData.parentFirstName} ${formData.parentLastName}`,
+            childName: `${formData.childFirstName} ${formData.childLastName}`,
+            recapUrl: recapUrl,
+          },
+        });
+      } catch (emailError) {
+        console.error("Erreur lors de l'envoi de l'email:", emailError);
+        // On continue même si l'email échoue
+      }
+
       toast({
         title: "Inscription enregistrée !",
-        description: "Votre inscription a été envoyée au bureau pour validation.",
+        description: "Vous allez recevoir un email de confirmation.",
       });
 
-      setTimeout(() => navigate("/"), 2000);
+      // Rediriger vers la page de récapitulatif
+      navigate(`/recap-inscription/${data.id}`);
     } catch (error) {
       toast({
         title: "Erreur",
