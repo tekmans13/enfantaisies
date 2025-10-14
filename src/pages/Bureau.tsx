@@ -307,10 +307,26 @@ export default function Bureau() {
               Tableau de bord des inscriptions
             </p>
           </div>
-          <Button onClick={() => navigate("/tarifs")} variant="outline" className="gap-2">
-            <DollarSign className="h-4 w-4" />
-            Gérer les tarifs
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => {
+                const currentMode = localStorage.getItem('debugMode') === 'true';
+                localStorage.setItem('debugMode', (!currentMode).toString());
+                toast({
+                  title: currentMode ? "Mode Debug désactivé" : "Mode Debug activé",
+                  description: currentMode ? "La validation des champs est maintenant active" : "La validation des champs est désactivée",
+                });
+              }} 
+              variant={localStorage.getItem('debugMode') === 'true' ? "default" : "outline"}
+              className="gap-2"
+            >
+              {localStorage.getItem('debugMode') === 'true' ? "Debug: ON" : "Debug: OFF"}
+            </Button>
+            <Button onClick={() => navigate("/tarifs")} variant="outline" className="gap-2">
+              <DollarSign className="h-4 w-4" />
+              Gérer les tarifs
+            </Button>
+          </div>
         </div>
 
         {/* Statistiques générales */}

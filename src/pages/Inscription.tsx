@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 const TOTAL_STEPS = 5;
-const DEBUG_MODE = true; // Mettre à true pour désactiver la validation pendant le développement
+const getDebugMode = () => localStorage.getItem('debugMode') === 'true';
 
 export default function Inscription() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -185,7 +185,7 @@ export default function Inscription() {
   };
 
   const validateStep = (step: number): { isValid: boolean; message?: string } => {
-    if (DEBUG_MODE) return { isValid: true }; // Bypass validation en mode debug
+    if (getDebugMode()) return { isValid: true }; // Bypass validation en mode debug
 
     switch (step) {
       case 3: // Étape Enfant
