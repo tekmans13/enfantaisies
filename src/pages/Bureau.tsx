@@ -265,13 +265,21 @@ export default function Bureau() {
       if (error) throw error;
 
       if (data.success) {
-        toast({
-          title: "Lien de paiement créé",
-          description: "Le lien a été copié dans le presse-papier",
-        });
-        
         // Copier le lien dans le presse-papier
         await navigator.clipboard.writeText(data.paymentUrl);
+        
+        // Ouvrir le lien dans un nouvel onglet
+        window.open(data.paymentUrl, '_blank');
+        
+        toast({
+          title: "Lien de paiement créé",
+          description: `Lien copié et ouvert. Montant: ${montantTotal.toFixed(2)}€`,
+        });
+        
+        // Afficher aussi dans une alerte pour pouvoir copier manuellement si besoin
+        setTimeout(() => {
+          alert(`Lien de paiement Stripe:\n\n${data.paymentUrl}\n\nMontant: ${montantTotal.toFixed(2)}€\nNombre de semaines: ${sejoursData.length}`);
+        }, 500);
       } else {
         throw new Error(data.error || 'Erreur inconnue');
       }
