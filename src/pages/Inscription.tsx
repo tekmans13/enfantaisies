@@ -46,6 +46,8 @@ export default function Inscription() {
     socialSecurityRegime: "",
     sejourPreference1: "",
     sejourPreference2: "",
+    sejourPreference1Alternatif: "",
+    sejourPreference2Alternatif: "",
   });
 
   const [numberOfWeeks, setNumberOfWeeks] = useState<"1" | "2">("1");
@@ -132,6 +134,8 @@ export default function Inscription() {
         social_security_regime: formData.socialSecurityRegime,
         sejour_preference_1: formData.sejourPreference1 || null,
         sejour_preference_2: formData.sejourPreference2 || null,
+        sejour_preference_1_alternatif: formData.sejourPreference1Alternatif || null,
+        sejour_preference_2_alternatif: formData.sejourPreference2Alternatif || null,
         nombre_semaines_demandees: parseInt(numberOfWeeks),
       };
 
@@ -656,35 +660,42 @@ export default function Inscription() {
                                 <Checkbox
                                   id={`week1-${sejour.id}`}
                                   checked={isSelected}
-                                  onCheckedChange={(checked) => {
-                                    if (checked) {
-                                      if (week1Selected.length < 2) {
-                                        const newSelection = [...week1Selected, sejour.id];
-                                        setWeek1Selected(newSelection);
-                                        if (week1Selected.length === 0) {
-                                          setWeek1Priority(sejour.id);
-                                          handleInputChange('sejourPreference1', sejour.id);
-                                        }
-                                      } else {
-                                        const nonPriority = week1Selected.find(id => id !== week1Priority);
-                                        const newSelection = week1Selected.filter(id => id !== nonPriority);
-                                        newSelection.push(sejour.id);
-                                        setWeek1Selected(newSelection);
-                                        if (week1Priority === newSelection[0]) {
-                                          handleInputChange('sejourPreference1', newSelection[0]);
-                                        } else {
-                                          handleInputChange('sejourPreference1', newSelection[1]);
-                                        }
-                                      }
-                                    } else {
-                                      setWeek1Selected(week1Selected.filter(id => id !== sejour.id));
-                                      if (week1Priority === sejour.id) {
-                                        const remaining = week1Selected.filter(id => id !== sejour.id);
-                                        setWeek1Priority(remaining[0] || "");
-                                        handleInputChange('sejourPreference1', remaining[0] || "");
-                                      }
-                                    }
-                                  }}
+                                   onCheckedChange={(checked) => {
+                                     if (checked) {
+                                       if (week1Selected.length < 2) {
+                                         const newSelection = [...week1Selected, sejour.id];
+                                         setWeek1Selected(newSelection);
+                                         if (week1Selected.length === 0) {
+                                           setWeek1Priority(sejour.id);
+                                           handleInputChange('sejourPreference1', sejour.id);
+                                         } else {
+                                           handleInputChange('sejourPreference1Alternatif', sejour.id);
+                                         }
+                                       } else {
+                                         const nonPriority = week1Selected.find(id => id !== week1Priority);
+                                         const newSelection = week1Selected.filter(id => id !== nonPriority);
+                                         newSelection.push(sejour.id);
+                                         setWeek1Selected(newSelection);
+                                         if (week1Priority === newSelection[0]) {
+                                           handleInputChange('sejourPreference1', newSelection[0]);
+                                           handleInputChange('sejourPreference1Alternatif', newSelection[1]);
+                                         } else {
+                                           handleInputChange('sejourPreference1', newSelection[1]);
+                                           handleInputChange('sejourPreference1Alternatif', newSelection[0]);
+                                         }
+                                       }
+                                     } else {
+                                       setWeek1Selected(week1Selected.filter(id => id !== sejour.id));
+                                       if (week1Priority === sejour.id) {
+                                         const remaining = week1Selected.filter(id => id !== sejour.id);
+                                         setWeek1Priority(remaining[0] || "");
+                                         handleInputChange('sejourPreference1', remaining[0] || "");
+                                         handleInputChange('sejourPreference1Alternatif', "");
+                                       } else {
+                                         handleInputChange('sejourPreference1Alternatif', "");
+                                       }
+                                     }
+                                   }}
                                   className="mt-1"
                                 />
                                 <div className="flex-1">
@@ -698,11 +709,13 @@ export default function Inscription() {
                                 {isSelected && (
                                   <div className="flex items-center space-x-2">
                                     <RadioGroup
-                                      value={isPriority ? sejour.id : ""}
-                                      onValueChange={() => {
-                                        setWeek1Priority(sejour.id);
-                                        handleInputChange('sejourPreference1', sejour.id);
-                                      }}
+                                       value={isPriority ? sejour.id : ""}
+                                       onValueChange={() => {
+                                         setWeek1Priority(sejour.id);
+                                         const otherSejour = week1Selected.find(id => id !== sejour.id);
+                                         handleInputChange('sejourPreference1', sejour.id);
+                                         handleInputChange('sejourPreference1Alternatif', otherSejour || "");
+                                       }}
                                     >
                                       <div className="flex items-center space-x-2">
                                         <RadioGroupItem value={sejour.id} id={`week1-priority-${sejour.id}`} />
@@ -746,35 +759,42 @@ export default function Inscription() {
                                 <Checkbox
                                   id={`week2-${sejour.id}`}
                                   checked={isSelected}
-                                  onCheckedChange={(checked) => {
-                                    if (checked) {
-                                      if (week2Selected.length < 2) {
-                                        const newSelection = [...week2Selected, sejour.id];
-                                        setWeek2Selected(newSelection);
-                                        if (week2Selected.length === 0) {
-                                          setWeek2Priority(sejour.id);
-                                          handleInputChange('sejourPreference2', sejour.id);
-                                        }
-                                      } else {
-                                        const nonPriority = week2Selected.find(id => id !== week2Priority);
-                                        const newSelection = week2Selected.filter(id => id !== nonPriority);
-                                        newSelection.push(sejour.id);
-                                        setWeek2Selected(newSelection);
-                                        if (week2Priority === newSelection[0]) {
-                                          handleInputChange('sejourPreference2', newSelection[0]);
-                                        } else {
-                                          handleInputChange('sejourPreference2', newSelection[1]);
-                                        }
-                                      }
-                                    } else {
-                                      setWeek2Selected(week2Selected.filter(id => id !== sejour.id));
-                                      if (week2Priority === sejour.id) {
-                                        const remaining = week2Selected.filter(id => id !== sejour.id);
-                                        setWeek2Priority(remaining[0] || "");
-                                        handleInputChange('sejourPreference2', remaining[0] || "");
-                                      }
-                                    }
-                                  }}
+                                   onCheckedChange={(checked) => {
+                                     if (checked) {
+                                       if (week2Selected.length < 2) {
+                                         const newSelection = [...week2Selected, sejour.id];
+                                         setWeek2Selected(newSelection);
+                                         if (week2Selected.length === 0) {
+                                           setWeek2Priority(sejour.id);
+                                           handleInputChange('sejourPreference2', sejour.id);
+                                         } else {
+                                           handleInputChange('sejourPreference2Alternatif', sejour.id);
+                                         }
+                                       } else {
+                                         const nonPriority = week2Selected.find(id => id !== week2Priority);
+                                         const newSelection = week2Selected.filter(id => id !== nonPriority);
+                                         newSelection.push(sejour.id);
+                                         setWeek2Selected(newSelection);
+                                         if (week2Priority === newSelection[0]) {
+                                           handleInputChange('sejourPreference2', newSelection[0]);
+                                           handleInputChange('sejourPreference2Alternatif', newSelection[1]);
+                                         } else {
+                                           handleInputChange('sejourPreference2', newSelection[1]);
+                                           handleInputChange('sejourPreference2Alternatif', newSelection[0]);
+                                         }
+                                       }
+                                     } else {
+                                       setWeek2Selected(week2Selected.filter(id => id !== sejour.id));
+                                       if (week2Priority === sejour.id) {
+                                         const remaining = week2Selected.filter(id => id !== sejour.id);
+                                         setWeek2Priority(remaining[0] || "");
+                                         handleInputChange('sejourPreference2', remaining[0] || "");
+                                         handleInputChange('sejourPreference2Alternatif', "");
+                                       } else {
+                                         handleInputChange('sejourPreference2Alternatif', "");
+                                       }
+                                     }
+                                   }}
                                   className="mt-1"
                                 />
                                 <div className="flex-1">
@@ -788,11 +808,13 @@ export default function Inscription() {
                                 {isSelected && (
                                   <div className="flex items-center space-x-2">
                                     <RadioGroup
-                                      value={isPriority ? sejour.id : ""}
-                                      onValueChange={() => {
-                                        setWeek2Priority(sejour.id);
-                                        handleInputChange('sejourPreference2', sejour.id);
-                                      }}
+                                       value={isPriority ? sejour.id : ""}
+                                       onValueChange={() => {
+                                         setWeek2Priority(sejour.id);
+                                         const otherSejour = week2Selected.find(id => id !== sejour.id);
+                                         handleInputChange('sejourPreference2', sejour.id);
+                                         handleInputChange('sejourPreference2Alternatif', otherSejour || "");
+                                       }}
                                     >
                                       <div className="flex items-center space-x-2">
                                         <RadioGroupItem value={sejour.id} id={`week2-priority-${sejour.id}`} />

@@ -303,28 +303,99 @@ export function InscriptionEditDialog({
                   )}
                 </div>
                 
-                <div>
-                  <Label className="text-base mb-3 block font-semibold">
-                    {wantsTwoWeeks ? "2ème semaine (choix prioritaire)" : "2ème choix (alternatif)"}
-                  </Label>
-                  {inscription?.sejour_preference_2 && sejours.find(s => s.id === inscription.sejour_preference_2) ? (
-                    <div className="p-3 border-2 border-blue-600 bg-blue-600/10 rounded-lg">
-                      <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_2)?.titre}</div>
-                      <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(sejours.find(s => s.id === inscription.sejour_preference_2)!.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejours.find(s => s.id === inscription.sejour_preference_2)!.date_fin).toLocaleDateString('fr-FR')}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Users className="w-3 h-3" />
-                          {sejours.find(s => s.id === inscription.sejour_preference_2)?.places_disponibles} places
-                        </span>
+                {/* Choix alternatif pour la 1ère semaine */}
+                {wantsTwoWeeks && (
+                  <div>
+                    <Label className="text-base mb-3 block font-semibold">1ère semaine (choix alternatif)</Label>
+                    {inscription?.sejour_preference_1_alternatif && sejours.find(s => s.id === inscription.sejour_preference_1_alternatif) ? (
+                      <div className="p-3 border-2 border-blue-400 bg-blue-400/10 rounded-lg">
+                        <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)?.titre}</div>
+                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)!.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)!.date_fin).toLocaleDateString('fr-FR')}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)?.places_disponibles} places
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="p-3 border-2 rounded-lg text-muted-foreground">Non renseigné</div>
-                  )}
-                </div>
+                    ) : (
+                      <div className="p-3 border-2 rounded-lg text-muted-foreground">Non renseigné</div>
+                    )}
+                  </div>
+                )}
+                
+                {wantsTwoWeeks && (
+                  <div>
+                    <Label className="text-base mb-3 block font-semibold">2ème semaine (choix prioritaire)</Label>
+                    {inscription?.sejour_preference_2 && sejours.find(s => s.id === inscription.sejour_preference_2) ? (
+                      <div className="p-3 border-2 border-blue-600 bg-blue-600/10 rounded-lg">
+                        <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_2)?.titre}</div>
+                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(sejours.find(s => s.id === inscription.sejour_preference_2)!.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejours.find(s => s.id === inscription.sejour_preference_2)!.date_fin).toLocaleDateString('fr-FR')}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {sejours.find(s => s.id === inscription.sejour_preference_2)?.places_disponibles} places
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3 border-2 rounded-lg text-muted-foreground">Non renseigné</div>
+                    )}
+                  </div>
+                )}
+                
+                {!wantsTwoWeeks && (
+                  <div>
+                    <Label className="text-base mb-3 block font-semibold">2ème choix (alternatif)</Label>
+                    {inscription?.sejour_preference_2 && sejours.find(s => s.id === inscription.sejour_preference_2) ? (
+                      <div className="p-3 border-2 border-blue-600 bg-blue-600/10 rounded-lg">
+                        <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_2)?.titre}</div>
+                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(sejours.find(s => s.id === inscription.sejour_preference_2)!.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejours.find(s => s.id === inscription.sejour_preference_2)!.date_fin).toLocaleDateString('fr-FR')}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {sejours.find(s => s.id === inscription.sejour_preference_2)?.places_disponibles} places
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3 border-2 rounded-lg text-muted-foreground">Non renseigné</div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Choix alternatif pour la 2ème semaine */}
+                {wantsTwoWeeks && (
+                  <div>
+                    <Label className="text-base mb-3 block font-semibold">2ème semaine (choix alternatif)</Label>
+                    {inscription?.sejour_preference_2_alternatif && sejours.find(s => s.id === inscription.sejour_preference_2_alternatif) ? (
+                      <div className="p-3 border-2 border-blue-400 bg-blue-400/10 rounded-lg">
+                        <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)?.titre}</div>
+                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)!.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)!.date_fin).toLocaleDateString('fr-FR')}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)?.places_disponibles} places
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3 border-2 rounded-lg text-muted-foreground">Non renseigné</div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

@@ -75,7 +75,9 @@ export type Database = {
           sejour_attribue_1: string | null
           sejour_attribue_2: string | null
           sejour_preference_1: string | null
+          sejour_preference_1_alternatif: string | null
           sejour_preference_2: string | null
+          sejour_preference_2_alternatif: string | null
           social_security_regime: string
           status: string | null
           updated_at: string | null
@@ -110,7 +112,9 @@ export type Database = {
           sejour_attribue_1?: string | null
           sejour_attribue_2?: string | null
           sejour_preference_1?: string | null
+          sejour_preference_1_alternatif?: string | null
           sejour_preference_2?: string | null
+          sejour_preference_2_alternatif?: string | null
           social_security_regime: string
           status?: string | null
           updated_at?: string | null
@@ -145,7 +149,9 @@ export type Database = {
           sejour_attribue_1?: string | null
           sejour_attribue_2?: string | null
           sejour_preference_1?: string | null
+          sejour_preference_1_alternatif?: string | null
           sejour_preference_2?: string | null
+          sejour_preference_2_alternatif?: string | null
           social_security_regime?: string
           status?: string | null
           updated_at?: string | null
