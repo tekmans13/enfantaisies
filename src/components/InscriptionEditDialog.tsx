@@ -73,34 +73,62 @@ export function InscriptionEditDialog({
     
     if (data) {
       setSejours(data);
-      
-      // Compter les attributions pour chaque séjour
-      const { data: inscriptions } = await supabase
-        .from('inscriptions')
-        .select('sejour_attribue_1, sejour_attribue_2');
-      
-      if (inscriptions) {
-        const attributionMap = new Map<string, number>();
-        
-        inscriptions.forEach(insc => {
-          if (insc.sejour_attribue_1) {
-            attributionMap.set(
-              insc.sejour_attribue_1, 
-              (attributionMap.get(insc.sejour_attribue_1) || 0) + 1
-            );
-          }
-          if (insc.sejour_attribue_2) {
-            attributionMap.set(
-              insc.sejour_attribue_2, 
-              (attributionMap.get(insc.sejour_attribue_2) || 0) + 1
-            );
-          }
-        });
-        
-        setSejourAttribution(attributionMap);
-      }
+      updateSejourAttribution(data);
     }
   };
+
+  const updateSejourAttribution = (sejoursData: any[]) => {
+    // Compter les attributions pour chaque séjour
+    supabase
+      .from('inscriptions')
+      .select('sejour_attribue_1, sejour_attribue_2, id')
+      .then(({ data: inscriptions }) => {
+        if (inscriptions) {
+          const attributionMap = new Map<string, number>();
+          
+          inscriptions.forEach(insc => {
+            // Ne pas compter l'inscription en cours d'édition
+            if (insc.id === inscription.id) return;
+            
+            if (insc.sejour_attribue_1) {
+              attributionMap.set(
+                insc.sejour_attribue_1, 
+                (attributionMap.get(insc.sejour_attribue_1) || 0) + 1
+              );
+            }
+            if (insc.sejour_attribue_2) {
+              attributionMap.set(
+                insc.sejour_attribue_2, 
+                (attributionMap.get(insc.sejour_attribue_2) || 0) + 1
+              );
+            }
+          });
+          
+          // Ajouter les sélections actuelles
+          if (assignedSejour) {
+            attributionMap.set(
+              assignedSejour, 
+              (attributionMap.get(assignedSejour) || 0) + 1
+            );
+          }
+          if (assignedSejour2) {
+            attributionMap.set(
+              assignedSejour2, 
+              (attributionMap.get(assignedSejour2) || 0) + 1
+            );
+          }
+          
+          setSejourAttribution(attributionMap);
+        }
+      });
+  };
+
+  // Mettre à jour les compteurs quand les sélections changent
+  useEffect(() => {
+    if (sejours.length > 0) {
+      updateSejourAttribution(sejours);
+    }
+  }, [assignedSejour, assignedSejour2]);
 
   const handleSave = async () => {
     if (!assignedSejour) {
