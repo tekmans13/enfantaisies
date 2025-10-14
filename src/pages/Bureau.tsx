@@ -11,9 +11,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2 } from "lucide-react";
+import { Users, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InscriptionEditDialog } from "@/components/InscriptionEditDialog";
 import { SejourManageDialog } from "@/components/SejourManageDialog";
+import { SejourDetailsDialog } from "@/components/SejourDetailsDialog";
 
 export default function Bureau() {
   const [inscriptions, setInscriptions] = useState<any[]>([]);
@@ -23,6 +25,7 @@ export default function Bureau() {
   const [editingInscription, setEditingInscription] = useState<any>(null);
   const [editingSejour, setEditingSejour] = useState<any>(null);
   const [isCreatingSejour, setIsCreatingSejour] = useState(false);
+  const [viewingSejour, setViewingSejour] = useState<any>(null);
 
   useEffect(() => {
     fetchInscriptions();
@@ -181,7 +184,7 @@ export default function Bureau() {
           </Card>
         </div>
 
-        {/* Gestion des séjours */}
+        {/* Gestion des séjours par groupe */}
         <Card className="p-6 mb-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-foreground">Gestion des séjours</h2>
@@ -190,75 +193,100 @@ export default function Bureau() {
               Nouveau séjour
             </Button>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sejours.map((sejour) => {
-              const stats = sejourStats.find(s => s.id === sejour.id);
-              
-              return (
-                <Card key={sejour.id} className="p-4 border-2">
-                  <div className="space-y-2">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{sejour.titre}</h3>
-                        {sejour.lieu && (
-                          <p className="text-xs text-muted-foreground">{sejour.lieu}</p>
-                        )}
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
-                        </div>
-                      </div>
-                      <Badge variant="outline" className="capitalize">
-                        {sejour.groupe_age}
-                      </Badge>
-                    </div>
-                    
-                    {stats && (
-                      <div className="grid grid-cols-3 gap-2 pt-2 border-t">
-                        <div className="text-center">
-                          <p className="text-2xl font-bold text-primary">{stats.choix1}</p>
-                          <p className="text-xs text-muted-foreground">1er choix</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-2xl font-bold text-secondary">{stats.choix2}</p>
-                          <p className="text-xs text-muted-foreground">2ème choix</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-2xl font-bold text-foreground">{stats.total}</p>
-                          <p className="text-xs text-muted-foreground">Total</p>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="pt-2 border-t">
-                      <div className="flex justify-between text-sm mb-3">
-                        <span className="text-muted-foreground">Places disponibles</span>
-                        <span className="font-semibold">{sejour.places_disponibles}</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex-1"
-                          onClick={() => setEditingSejour(sejour)}
-                        >
-                          <Edit className="w-3 h-3 mr-1" />
-                          Modifier
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDeleteSejour(sejour.id)}
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
+
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="all">Tous</TabsTrigger>
+              <TabsTrigger value="pitchouns">Pitchouns</TabsTrigger>
+              <TabsTrigger value="minots">Minots</TabsTrigger>
+              <TabsTrigger value="mias">Mias</TabsTrigger>
+            </TabsList>
+
+            {['all', 'pitchouns', 'minots', 'mias'].map((groupe) => (
+              <TabsContent key={groupe} value={groupe} className="mt-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {sejours
+                    .filter(sejour => groupe === 'all' || sejour.groupe_age === groupe)
+                    .map((sejour) => {
+                      const stats = sejourStats.find(s => s.id === sejour.id);
+                      
+                      return (
+                        <Card key={sejour.id} className="p-4 border-2">
+                          <div className="space-y-2">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h3 className="font-semibold">{sejour.titre}</h3>
+                                {sejour.lieu && (
+                                  <p className="text-xs text-muted-foreground">{sejour.lieu}</p>
+                                )}
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                                </div>
+                              </div>
+                              <Badge variant="outline" className="capitalize">
+                                {sejour.groupe_age}
+                              </Badge>
+                            </div>
+                            
+                            {stats && (
+                              <div className="grid grid-cols-3 gap-2 pt-2 border-t">
+                                <div className="text-center">
+                                  <p className="text-2xl font-bold text-primary">{stats.choix1}</p>
+                                  <p className="text-xs text-muted-foreground">1er choix</p>
+                                </div>
+                                <div className="text-center">
+                                  <p className="text-2xl font-bold text-secondary">{stats.choix2}</p>
+                                  <p className="text-xs text-muted-foreground">2ème choix</p>
+                                </div>
+                                <div className="text-center">
+                                  <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+                                  <p className="text-xs text-muted-foreground">Total</p>
+                                </div>
+                              </div>
+                            )}
+                            
+                            <div className="pt-2 border-t">
+                              <div className="flex justify-between text-sm mb-3">
+                                <span className="text-muted-foreground">Places</span>
+                                <span className="font-semibold">{sejour.places_disponibles}</span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setViewingSejour(sejour)}
+                                >
+                                  <Eye className="w-3 h-3 mr-1" />
+                                  Détails
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setEditingSejour(sejour)}
+                                >
+                                  <Edit className="w-3 h-3 mr-1" />
+                                  Modifier
+                                </Button>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                className="w-full mt-2"
+                                onClick={() => handleDeleteSejour(sejour.id)}
+                              >
+                                <Trash2 className="w-3 h-3 mr-1" />
+                                Supprimer
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })}
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
         </Card>
 
         {/* Table des inscriptions */}
@@ -382,6 +410,12 @@ export default function Bureau() {
           fetchSejours();
           fetchInscriptions();
         }}
+      />
+
+      <SejourDetailsDialog
+        sejour={viewingSejour}
+        open={!!viewingSejour}
+        onOpenChange={(open) => !open && setViewingSejour(null)}
       />
     </div>
   );
