@@ -378,8 +378,9 @@ export default function Bureau() {
                 <TableRow>
                   <TableHead>Enfant</TableHead>
                   <TableHead>Âge/Groupe</TableHead>
-                  <TableHead>Parent</TableHead>
-                  <TableHead>Contact</TableHead>
+                  <TableHead>Téléphone</TableHead>
+                  <TableHead>Choix principal</TableHead>
+                  <TableHead>Choix secondaire</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Actions</TableHead>
@@ -404,13 +405,25 @@ export default function Bureau() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {inscription.parent_first_name} {inscription.parent_last_name}
+                      {inscription.parent_mobile}
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">
-                        <p>{inscription.parent_email}</p>
-                        <p className="text-muted-foreground">{inscription.parent_mobile}</p>
-                      </div>
+                      {inscription.sejour_preference_1 ? (
+                        <span className="text-sm">
+                          {sejours.find(s => s.id === inscription.sejour_preference_1)?.titre || 'N/A'}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {inscription.sejour_preference_2 ? (
+                        <span className="text-sm">
+                          {sejours.find(s => s.id === inscription.sejour_preference_2)?.titre || 'N/A'}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">-</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       {inscription.status === 'en_attente' && (
