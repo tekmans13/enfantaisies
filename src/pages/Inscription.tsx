@@ -160,6 +160,12 @@ export default function Inscription() {
     return emailRegex.test(email);
   };
 
+  const validatePhone = (phone: string): boolean => {
+    // Accepte les formats: 0612345678, 06 12 34 56 78, 06.12.34.56.78, 06-12-34-56-78, +33612345678
+    const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
+    return phoneRegex.test(phone.trim());
+  };
+
   const validateStep = (step: number): { isValid: boolean; message?: string } => {
     if (DEBUG_MODE) return { isValid: true }; // Bypass validation en mode debug
 
@@ -177,6 +183,7 @@ export default function Inscription() {
         if (!validateEmail(formData.parentEmail)) return { isValid: false, message: "L'email du responsable légal 1 n'est pas valide" };
         if (!formData.parentAuthority) return { isValid: false, message: "L'autorité parentale du responsable légal 1 est requise" };
         if (!formData.parentMobile.trim()) return { isValid: false, message: "Le téléphone portable du responsable légal 1 est requis" };
+        if (!validatePhone(formData.parentMobile)) return { isValid: false, message: "Le numéro de téléphone du responsable légal 1 n'est pas valide" };
         if (!formData.parentAddress.trim()) return { isValid: false, message: "L'adresse du domicile est requise" };
         if (!formData.socialSecurityRegime) return { isValid: false, message: "Le régime de sécurité sociale est requis" };
         break;
