@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { CheckCircle, Calendar, User, Mail, Phone, FileText, Home } from "lucide-react";
+import { CheckCircle, Calendar, User, Mail, Phone, FileText, Home, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
@@ -58,6 +58,12 @@ export default function RecapInscription() {
   const getSejourTitle = (sejourId: string) => {
     const sejour = sejours.find(s => s.id === sejourId);
     return sejour ? sejour.titre : 'Non spécifié';
+  };
+
+  const getSejourDates = (sejourId: string) => {
+    const sejour = sejours.find(s => s.id === sejourId);
+    if (!sejour) return 'Non spécifié';
+    return `${formatDate(sejour.date_debut)} - ${formatDate(sejour.date_fin)}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -170,6 +176,26 @@ export default function RecapInscription() {
               </div>
             </div>
 
+            {/* Tarif */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Info className="w-5 h-5 text-primary" />
+                <h2 className="text-xl font-semibold">Tarif</h2>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-6 space-y-3">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Quotient familial</p>
+                    <p className="font-medium">{inscription.quotient_familial || 'Non renseigné (tarif max. appliqué)'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Numéro d'allocataire CAF</p>
+                    <p className="font-medium">{inscription.caf_number || 'Non renseigné'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Séjours choisis */}
             <div>
               <div className="flex items-center gap-2 mb-4">
@@ -185,24 +211,28 @@ export default function RecapInscription() {
                   <div>
                     <p className="text-sm text-muted-foreground">Choix principal 1</p>
                     <p className="font-medium">{getSejourTitle(inscription.sejour_preference_1)}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_1)}</p>
                   </div>
                 )}
                 {inscription.sejour_preference_2 && (
                   <div>
                     <p className="text-sm text-muted-foreground">Choix principal 2</p>
                     <p className="font-medium">{getSejourTitle(inscription.sejour_preference_2)}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_2)}</p>
                   </div>
                 )}
                 {inscription.sejour_preference_1_alternatif && (
                   <div>
                     <p className="text-sm text-muted-foreground">Choix alternatif 1</p>
                     <p className="font-medium text-muted-foreground">{getSejourTitle(inscription.sejour_preference_1_alternatif)}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_1_alternatif)}</p>
                   </div>
                 )}
                 {inscription.sejour_preference_2_alternatif && (
                   <div>
                     <p className="text-sm text-muted-foreground">Choix alternatif 2</p>
                     <p className="font-medium text-muted-foreground">{getSejourTitle(inscription.sejour_preference_2_alternatif)}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_2_alternatif)}</p>
                   </div>
                 )}
               </div>
