@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
-import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle, Info } from "lucide-react";
+import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle, Info, Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +19,7 @@ const TOTAL_STEPS = 5;
 export default function Inscription() {
   const [currentStep, setCurrentStep] = useState(1);
   const [childAgeGroup, setChildAgeGroup] = useState<string | null>(null);
+  const [showParent2, setShowParent2] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -35,6 +36,8 @@ export default function Inscription() {
     childClass: "",
     childGender: "",
     childSchool: "",
+    quotientFamilial: "",
+    cafNumber: "",
     parentFirstName: "",
     parentLastName: "",
     parentEmail: "",
@@ -42,7 +45,12 @@ export default function Inscription() {
     parentMobile: "",
     parentOfficePhone: "",
     parentAddress: "",
-    cafNumber: "",
+    parent2FirstName: "",
+    parent2LastName: "",
+    parent2Email: "",
+    parent2Authority: "",
+    parent2Mobile: "",
+    parent2OfficePhone: "",
     socialSecurityRegime: "",
     sejourPreference1: "",
     sejourPreference2: "",
@@ -393,8 +401,45 @@ export default function Inscription() {
                     </div>
                   </div>
 
+                  <div className="bg-accent/5 p-4 rounded-lg border-2 border-accent/20">
+                    <h3 className="text-lg font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <Info className="w-5 h-5 text-accent" />
+                      Tarif
+                    </h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="quotientFamilial">Votre quotient familial</Label>
+                        <Input
+                          id="quotientFamilial"
+                          type="number"
+                          value={formData.quotientFamilial}
+                          onChange={(e) => handleInputChange('quotientFamilial', e.target.value)}
+                          className="mt-1"
+                          placeholder="Ex: 850"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="cafNumber">Numéro d'allocataire CAF</Label>
+                        <Input
+                          id="cafNumber"
+                          value={formData.cafNumber}
+                          onChange={(e) => handleInputChange('cafNumber', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                    <Alert className="mt-4 border-amber-500/50 bg-amber-500/10">
+                      <Info className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-sm text-amber-900 dark:text-amber-100">
+                        Si aucun quotient familial n'est renseigné : le tarif max. sera appliqué
+                      </AlertDescription>
+                    </Alert>
+                  </div>
+
                   <div className="bg-secondary/5 p-4 rounded-lg">
-                    <h3 className="text-lg font-semibold text-foreground mb-4">Responsable légal 1</h3>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-foreground">Responsable légal 1</h3>
+                    </div>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="parentFirstName">Prénom *</Label>
@@ -467,15 +512,6 @@ export default function Inscription() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="cafNumber">Numéro d'allocataire CAF</Label>
-                        <Input
-                          id="cafNumber"
-                          value={formData.cafNumber}
-                          onChange={(e) => handleInputChange('cafNumber', e.target.value)}
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
                         <Label htmlFor="socialSecurityRegime">Régime Sécurité Sociale *</Label>
                         <Select value={formData.socialSecurityRegime} onValueChange={(value) => handleInputChange('socialSecurityRegime', value)}>
                           <SelectTrigger className="mt-1">
@@ -489,6 +525,105 @@ export default function Inscription() {
                       </div>
                     </div>
                   </div>
+
+                  {!showParent2 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowParent2(true)}
+                      className="w-full border-dashed"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Ajouter un responsable légal 2
+                    </Button>
+                  )}
+
+                  {showParent2 && (
+                    <div className="bg-secondary/5 p-4 rounded-lg border-2 border-secondary/30">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-foreground">Responsable légal 2</h3>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setShowParent2(false);
+                            handleInputChange('parent2FirstName', '');
+                            handleInputChange('parent2LastName', '');
+                            handleInputChange('parent2Email', '');
+                            handleInputChange('parent2Authority', '');
+                            handleInputChange('parent2Mobile', '');
+                            handleInputChange('parent2OfficePhone', '');
+                          }}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="parent2FirstName">Prénom</Label>
+                          <Input
+                            id="parent2FirstName"
+                            value={formData.parent2FirstName}
+                            onChange={(e) => handleInputChange('parent2FirstName', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="parent2LastName">Nom</Label>
+                          <Input
+                            id="parent2LastName"
+                            value={formData.parent2LastName}
+                            onChange={(e) => handleInputChange('parent2LastName', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="parent2Email">E-mail</Label>
+                          <Input
+                            id="parent2Email"
+                            type="email"
+                            value={formData.parent2Email}
+                            onChange={(e) => handleInputChange('parent2Email', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label>Autorité parentale</Label>
+                          <RadioGroup value={formData.parent2Authority} onValueChange={(value) => handleInputChange('parent2Authority', value)} className="flex gap-4 mt-2">
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="oui" id="authority2Oui" />
+                              <Label htmlFor="authority2Oui" className="cursor-pointer">Oui</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="non" id="authority2Non" />
+                              <Label htmlFor="authority2Non" className="cursor-pointer">Non</Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                        <div>
+                          <Label htmlFor="parent2Mobile">Téléphone Portable</Label>
+                          <Input
+                            id="parent2Mobile"
+                            type="tel"
+                            value={formData.parent2Mobile}
+                            onChange={(e) => handleInputChange('parent2Mobile', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="parent2OfficePhone">Téléphone Bureau</Label>
+                          <Input
+                            id="parent2OfficePhone"
+                            type="tel"
+                            value={formData.parent2OfficePhone}
+                            onChange={(e) => handleInputChange('parent2OfficePhone', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
