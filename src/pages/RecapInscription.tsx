@@ -202,37 +202,68 @@ export default function RecapInscription() {
                 <Calendar className="w-5 h-5 text-primary" />
                 <h2 className="text-xl font-semibold">Séjours demandés</h2>
               </div>
-              <div className="bg-muted/50 rounded-lg p-6 space-y-3">
+              <div className="bg-muted/50 rounded-lg p-6 space-y-4">
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">Nombre de semaines</p>
                   <Badge>{inscription.nombre_semaines_demandees} semaine{inscription.nombre_semaines_demandees > 1 ? 's' : ''}</Badge>
                 </div>
-                {inscription.sejour_preference_1 && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Choix préféré</p>
-                    <p className="font-medium">{getSejourTitle(inscription.sejour_preference_1)}</p>
-                    <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_1)}</p>
+                
+                {inscription.nombre_semaines_demandees === 1 ? (
+                  <div className="space-y-3">
+                    {inscription.sejour_preference_1 && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Choix préféré</p>
+                        <p className="font-medium">{getSejourTitle(inscription.sejour_preference_1)}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_1)}</p>
+                      </div>
+                    )}
+                    {inscription.sejour_preference_2 && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Choix secondaire</p>
+                        <p className="font-medium">{getSejourTitle(inscription.sejour_preference_2)}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_2)}</p>
+                      </div>
+                    )}
                   </div>
-                )}
-                {inscription.sejour_preference_2 && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Choix secondaire</p>
-                    <p className="font-medium">{getSejourTitle(inscription.sejour_preference_2)}</p>
-                    <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_2)}</p>
-                  </div>
-                )}
-                {inscription.sejour_preference_1_alternatif && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Choix alternatif 1</p>
-                    <p className="font-medium text-muted-foreground">{getSejourTitle(inscription.sejour_preference_1_alternatif)}</p>
-                    <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_1_alternatif)}</p>
-                  </div>
-                )}
-                {inscription.sejour_preference_2_alternatif && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Choix alternatif 2</p>
-                    <p className="font-medium text-muted-foreground">{getSejourTitle(inscription.sejour_preference_2_alternatif)}</p>
-                    <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_2_alternatif)}</p>
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Première semaine */}
+                    <div className="space-y-3">
+                      <h3 className="font-semibold text-primary">Première semaine</h3>
+                      {inscription.sejour_preference_1 && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Choix préféré</p>
+                          <p className="font-medium">{getSejourTitle(inscription.sejour_preference_1)}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_1)}</p>
+                        </div>
+                      )}
+                      {inscription.sejour_preference_1_alternatif && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Choix secondaire</p>
+                          <p className="font-medium text-muted-foreground">{getSejourTitle(inscription.sejour_preference_1_alternatif)}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_1_alternatif)}</p>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Deuxième semaine */}
+                    <div className="space-y-3">
+                      <h3 className="font-semibold text-primary">Deuxième semaine</h3>
+                      {inscription.sejour_preference_2 && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Choix préféré</p>
+                          <p className="font-medium">{getSejourTitle(inscription.sejour_preference_2)}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_2)}</p>
+                        </div>
+                      )}
+                      {inscription.sejour_preference_2_alternatif && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Choix secondaire</p>
+                          <p className="font-medium text-muted-foreground">{getSejourTitle(inscription.sejour_preference_2_alternatif)}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_2_alternatif)}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -242,33 +273,70 @@ export default function RecapInscription() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Mail className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-semibold">Contact du responsable légal</h2>
+                <h2 className="text-xl font-semibold">Contact des responsables légaux</h2>
               </div>
-              <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Nom complet</p>
-                    <p className="font-medium">{inscription.parent_first_name} {inscription.parent_last_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="font-medium">{inscription.parent_email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Téléphone mobile</p>
-                    <p className="font-medium">{inscription.parent_mobile}</p>
-                  </div>
-                  {inscription.parent_office_phone && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">Téléphone bureau</p>
-                      <p className="font-medium">{inscription.parent_office_phone}</p>
+              <div className="space-y-4">
+                <div className="bg-muted/50 rounded-lg p-6">
+                  <h3 className="font-semibold mb-3">Responsable légal 1</h3>
+                  <div className="space-y-3">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Nom complet</p>
+                        <p className="font-medium">{inscription.parent_first_name} {inscription.parent_last_name}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Email</p>
+                        <p className="font-medium">{inscription.parent_email}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Téléphone mobile</p>
+                        <p className="font-medium">{inscription.parent_mobile}</p>
+                      </div>
+                      {inscription.parent_office_phone && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Téléphone bureau</p>
+                          <p className="font-medium">{inscription.parent_office_phone}</p>
+                        </div>
+                      )}
+                      <div className="md:col-span-2">
+                        <p className="text-sm text-muted-foreground">Adresse</p>
+                        <p className="font-medium">{inscription.parent_address}</p>
+                      </div>
                     </div>
-                  )}
-                  <div className="md:col-span-2">
-                    <p className="text-sm text-muted-foreground">Adresse</p>
-                    <p className="font-medium">{inscription.parent_address}</p>
                   </div>
                 </div>
+
+                {inscription.parent2_first_name && (
+                  <div className="bg-muted/50 rounded-lg p-6">
+                    <h3 className="font-semibold mb-3">Responsable légal 2</h3>
+                    <div className="space-y-3">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Nom complet</p>
+                          <p className="font-medium">{inscription.parent2_first_name} {inscription.parent2_last_name}</p>
+                        </div>
+                        {inscription.parent2_email && (
+                          <div>
+                            <p className="text-sm text-muted-foreground">Email</p>
+                            <p className="font-medium">{inscription.parent2_email}</p>
+                          </div>
+                        )}
+                        {inscription.parent2_mobile && (
+                          <div>
+                            <p className="text-sm text-muted-foreground">Téléphone mobile</p>
+                            <p className="font-medium">{inscription.parent2_mobile}</p>
+                          </div>
+                        )}
+                        {inscription.parent2_office_phone && (
+                          <div>
+                            <p className="text-sm text-muted-foreground">Téléphone bureau</p>
+                            <p className="font-medium">{inscription.parent2_office_phone}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

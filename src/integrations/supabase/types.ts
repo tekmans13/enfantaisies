@@ -72,6 +72,13 @@ export type Database = {
           parent_last_name: string
           parent_mobile: string
           parent_office_phone: string | null
+          parent2_authority: string | null
+          parent2_email: string | null
+          parent2_first_name: string | null
+          parent2_last_name: string | null
+          parent2_mobile: string | null
+          parent2_office_phone: string | null
+          quotient_familial: number | null
           sejour_attribue_1: string | null
           sejour_attribue_2: string | null
           sejour_preference_1: string | null
@@ -109,6 +116,13 @@ export type Database = {
           parent_last_name: string
           parent_mobile: string
           parent_office_phone?: string | null
+          parent2_authority?: string | null
+          parent2_email?: string | null
+          parent2_first_name?: string | null
+          parent2_last_name?: string | null
+          parent2_mobile?: string | null
+          parent2_office_phone?: string | null
+          quotient_familial?: number | null
           sejour_attribue_1?: string | null
           sejour_attribue_2?: string | null
           sejour_preference_1?: string | null
@@ -146,6 +160,13 @@ export type Database = {
           parent_last_name?: string
           parent_mobile?: string
           parent_office_phone?: string | null
+          parent2_authority?: string | null
+          parent2_email?: string | null
+          parent2_first_name?: string | null
+          parent2_last_name?: string | null
+          parent2_mobile?: string | null
+          parent2_office_phone?: string | null
+          quotient_familial?: number | null
           sejour_attribue_1?: string | null
           sejour_attribue_2?: string | null
           sejour_preference_1?: string | null
