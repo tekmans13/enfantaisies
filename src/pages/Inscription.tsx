@@ -86,34 +86,36 @@ export default function Inscription() {
 
   const handleSubmit = async () => {
     try {
+      const inscriptionData: any = {
+        is_first_inscription: formData.isFirstInscription,
+        has_medication: formData.hasMedication,
+        has_allergies: formData.hasAllergies,
+        has_food_allergies: formData.hasFoodAllergies,
+        no_pork: formData.noPork,
+        no_meat: formData.noMeat,
+        child_first_name: formData.childFirstName,
+        child_last_name: formData.childLastName,
+        child_birth_date: formData.childBirthDate,
+        child_class: formData.childClass,
+        child_gender: formData.childGender,
+        child_school: formData.childSchool,
+        child_age_group: childAgeGroup,
+        parent_first_name: formData.parentFirstName,
+        parent_last_name: formData.parentLastName,
+        parent_email: formData.parentEmail,
+        parent_authority: formData.parentAuthority,
+        parent_mobile: formData.parentMobile,
+        parent_office_phone: formData.parentOfficePhone,
+        parent_address: formData.parentAddress,
+        caf_number: formData.cafNumber,
+        social_security_regime: formData.socialSecurityRegime,
+        sejour_preference_1: formData.sejourPreference1 || null,
+        sejour_preference_2: formData.sejourPreference2 || null,
+      };
+
       const { data, error } = await supabase
         .from('inscriptions')
-        .insert({
-          is_first_inscription: formData.isFirstInscription,
-          has_medication: formData.hasMedication,
-          has_allergies: formData.hasAllergies,
-          has_food_allergies: formData.hasFoodAllergies,
-          no_pork: formData.noPork,
-          no_meat: formData.noMeat,
-          child_first_name: formData.childFirstName,
-          child_last_name: formData.childLastName,
-          child_birth_date: formData.childBirthDate,
-          child_class: formData.childClass,
-          child_gender: formData.childGender,
-          child_school: formData.childSchool,
-          child_age_group: childAgeGroup,
-          parent_first_name: formData.parentFirstName,
-          parent_last_name: formData.parentLastName,
-          parent_email: formData.parentEmail,
-          parent_authority: formData.parentAuthority,
-          parent_mobile: formData.parentMobile,
-          parent_office_phone: formData.parentOfficePhone,
-          parent_address: formData.parentAddress,
-          caf_number: formData.cafNumber,
-          social_security_regime: formData.socialSecurityRegime,
-          sejour_preference_1: formData.sejourPreference1 || null,
-          sejour_preference_2: formData.sejourPreference2 || null,
-        })
+        .insert(inscriptionData)
         .select()
         .single();
 
