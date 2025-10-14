@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 const TOTAL_STEPS = 5;
-const DEBUG_MODE = false; // Mettre à true pour désactiver la validation pendant le développement
+const DEBUG_MODE = true; // Mettre à true pour désactiver la validation pendant le développement
 
 export default function Inscription() {
   const [currentStep, setCurrentStep] = useState(1);
