@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -7,13 +7,22 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
-import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar } from "lucide-react";
+import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle } from "lucide-react";
+import { useSejours } from "@/hooks/use-sejours";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const TOTAL_STEPS = 5;
 
 
+
 export default function Inscription() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [childAgeGroup, setChildAgeGroup] = useState<string | null>(null);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     // Étape 2 - Préalables
     isFirstInscription: false,
@@ -39,7 +48,27 @@ export default function Inscription() {
     parentAddress: "",
     cafNumber: "",
     socialSecurityRegime: "",
+    // Étape 4 - Séjours
+    sejourPreference1: "",
+    sejourPreference2: "",
   });
+
+  const { data: sejours } = useSejours(childAgeGroup || undefined);
+
+  // Calculer le groupe d'âge automatiquement
+  useEffect(() => {
+    if (formData.childClass) {
+      let group = null;
+      if (['ms', 'gs', 'cp'].includes(formData.childClass)) {
+        group = 'pitchouns';
+      } else if (['ce1', 'ce2', 'cm1'].includes(formData.childClass)) {
+        group = 'minots';
+      } else if (['cm2', '6eme', '5eme', '4eme'].includes(formData.childClass)) {
+        group = 'mias';
+      }
+      setChildAgeGroup(group);
+    }
+  }, [formData.childClass]);
 
   const handleCheckboxChange = (field: string) => {
     setFormData(prev => ({
@@ -53,6 +82,57 @@ export default function Inscription() {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('inscriptions')
+        .insert({
+          is_first_inscription: formData.isFirstInscription,
+          has_medication: formData.hasMedication,
+          has_allergies: formData.hasAllergies,
+          has_food_allergies: formData.hasFoodAllergies,
+          no_pork: formData.noPork,
+          no_meat: formData.noMeat,
+          child_first_name: formData.childFirstName,
+          child_last_name: formData.childLastName,
+          child_birth_date: formData.childBirthDate,
+          child_class: formData.childClass,
+          child_gender: formData.childGender,
+          child_school: formData.childSchool,
+          child_age_group: childAgeGroup,
+          parent_first_name: formData.parentFirstName,
+          parent_last_name: formData.parentLastName,
+          parent_email: formData.parentEmail,
+          parent_authority: formData.parentAuthority,
+          parent_mobile: formData.parentMobile,
+          parent_office_phone: formData.parentOfficePhone,
+          parent_address: formData.parentAddress,
+          caf_number: formData.cafNumber,
+          social_security_regime: formData.socialSecurityRegime,
+          sejour_preference_1: formData.sejourPreference1 || null,
+          sejour_preference_2: formData.sejourPreference2 || null,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Inscription enregistrée !",
+        description: "Votre inscription a été envoyée au bureau pour validation.",
+      });
+
+      // Rediriger vers la page d'accueil
+      setTimeout(() => navigate("/"), 2000);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'enregistrement.",
+        variant: "destructive",
+      });
+    }
   };
 
   const steps = [
@@ -451,19 +531,143 @@ export default function Inscription() {
 
             {currentStep === 4 && (
               <div>
-                <h2 className="text-2xl font-bold text-foreground mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-4">
                   Choix des séjours
                 </h2>
-                {/* Formulaire étape 4 sera ajouté */}
+                <p className="text-muted-foreground mb-6">
+                  Groupe de votre enfant : <strong className="text-primary">
+                    {childAgeGroup === 'pitchouns' ? 'PITCHOUNS' : childAgeGroup === 'minots' ? 'MINOTS' : childAgeGroup === 'mias' ? 'MIAS' : 'Non défini'}
+                  </strong>
+                </p>
+
+                <div className="space-y-6">
+                  <div>
+                    <Label className="text-base mb-3 block">Première préférence *</Label>
+                    <RadioGroup value={formData.sejourPreference1} onValueChange={(value) => handleInputChange('sejourPreference1', value)}>
+                      <div className="space-y-3">
+                        {sejours?.map((sejour) => (
+                          <div key={sejour.id} className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                            <RadioGroupItem value={sejour.id} id={`pref1-${sejour.id}`} />
+                            <Label htmlFor={`pref1-${sejour.id}`} className="cursor-pointer flex-1">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <p className="font-semibold text-foreground">{sejour.titre}</p>
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                                  </p>
+                                  <span className={`inline-block mt-2 px-2 py-1 rounded text-xs ${
+                                    sejour.type === 'sejour' ? 'bg-primary/20 text-primary' : 'bg-secondary/20 text-secondary'
+                                  }`}>
+                                    {sejour.type === 'sejour' ? 'Séjour' : 'Animation Centre'}
+                                  </span>
+                                </div>
+                                <span className="text-sm text-muted-foreground">
+                                  {sejour.places_disponibles} places
+                                </span>
+                              </div>
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  <div>
+                    <Label className="text-base mb-3 block">Deuxième préférence (optionnel)</Label>
+                    <RadioGroup value={formData.sejourPreference2} onValueChange={(value) => handleInputChange('sejourPreference2', value)}>
+                      <div className="space-y-3">
+                        {sejours?.filter(s => s.id !== formData.sejourPreference1).map((sejour) => (
+                          <div key={sejour.id} className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                            <RadioGroupItem value={sejour.id} id={`pref2-${sejour.id}`} />
+                            <Label htmlFor={`pref2-${sejour.id}`} className="cursor-pointer flex-1">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <p className="font-semibold text-foreground">{sejour.titre}</p>
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                                  </p>
+                                  <span className={`inline-block mt-2 px-2 py-1 rounded text-xs ${
+                                    sejour.type === 'sejour' ? 'bg-primary/20 text-primary' : 'bg-secondary/20 text-secondary'
+                                  }`}>
+                                    {sejour.type === 'sejour' ? 'Séjour' : 'Animation Centre'}
+                                  </span>
+                                </div>
+                                <span className="text-sm text-muted-foreground">
+                                  {sejour.places_disponibles} places
+                                </span>
+                              </div>
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  <div className="bg-accent/10 p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Note :</strong> En raison de la forte demande, vos préférences seront prises en compte mais ne garantissent pas une place. Le bureau validera votre inscription en fonction des disponibilités.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 
             {currentStep === 5 && (
               <div>
-                <h2 className="text-2xl font-bold text-foreground mb-6">
-                  Téléversement des documents
+                <h2 className="text-2xl font-bold text-foreground mb-4">
+                  Documents requis
                 </h2>
-                {/* Formulaire étape 5 sera ajouté */}
+                <p className="text-muted-foreground mb-6">
+                  L'association ne prendra pas en compte les dossiers incomplets.
+                </p>
+
+                <div className="space-y-4">
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <Label className="text-sm font-semibold text-foreground mb-2 block">
+                      Fiche sanitaire de liaison (à télécharger et remplir)
+                    </Label>
+                    <p className="text-xs text-muted-foreground mb-3">Formats acceptés : .pdf, .jpg, .png</p>
+                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" />
+                  </div>
+
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <Label className="text-sm font-semibold text-foreground mb-2 block">
+                      Autorisation parentale (à télécharger et remplir)
+                    </Label>
+                    <p className="text-xs text-muted-foreground mb-3">Formats acceptés : .pdf, .jpg, .png</p>
+                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" />
+                  </div>
+
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <Label className="text-sm font-semibold text-foreground mb-2 block">
+                      Attestation d'assurance Responsabilité civile (avec le nom de l'enfant)
+                    </Label>
+                    <p className="text-xs text-muted-foreground mb-3">Formats acceptés : .pdf, .jpg, .png</p>
+                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" />
+                  </div>
+
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <Label className="text-sm font-semibold text-foreground mb-2 block">
+                      Certificat médical
+                    </Label>
+                    <p className="text-xs text-muted-foreground mb-3">Complété et signé par le médecin traitant indiquant que l'enfant ne présente aucune contre-indication à la pratique des activités nautiques, sportives et de plein air</p>
+                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" />
+                  </div>
+
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <Label className="text-sm font-semibold text-foreground mb-2 block">
+                      Attestation CAF (moins de 3 mois) OU Avis d'imposition 2024
+                    </Label>
+                    <p className="text-xs text-muted-foreground mb-3">En l'absence de ce document, le tarif maximum sera automatiquement appliqué</p>
+                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" />
+                  </div>
+
+                  <div className="bg-accent/10 p-4 rounded-lg mt-6">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Note :</strong> Le téléversement des documents sera fonctionnel prochainement. Pour l'instant, cliquez sur "Terminer l'inscription" pour valider votre demande.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -478,13 +682,17 @@ export default function Inscription() {
               <ChevronLeft className="w-4 h-4 mr-2" />
               Précédent
             </Button>
-            <Button
-              onClick={() => setCurrentStep(Math.min(TOTAL_STEPS, currentStep + 1))}
-              disabled={currentStep === TOTAL_STEPS}
-            >
-              Suivant
-              <ChevronRight className="w-4 h-4 ml-2" />
-            </Button>
+            {currentStep < TOTAL_STEPS ? (
+              <Button onClick={() => setCurrentStep(Math.min(TOTAL_STEPS, currentStep + 1))}>
+                Suivant
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            ) : (
+              <Button onClick={handleSubmit} className="bg-primary">
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Terminer l'inscription
+              </Button>
+            )}
           </div>
         </Card>
       </div>
