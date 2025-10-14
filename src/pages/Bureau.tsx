@@ -11,7 +11,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye } from "lucide-react";
+import { Users, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InscriptionEditDialog } from "@/components/InscriptionEditDialog";
 import { SejourManageDialog } from "@/components/SejourManageDialog";
@@ -274,7 +280,11 @@ export default function Bureau() {
                       const stats = sejourStats.find(s => s.id === sejour.id);
                       
                       return (
-                        <Card key={sejour.id} className="p-4 border-2">
+                        <Card 
+                          key={sejour.id} 
+                          className="p-4 border-2 cursor-pointer hover:border-primary/50 transition-colors relative"
+                          onClick={() => setViewingSejour(sejour)}
+                        >
                           <div className="space-y-2">
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
@@ -287,9 +297,37 @@ export default function Bureau() {
                                   {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
                                 </div>
                               </div>
-                              <Badge variant="outline" className="capitalize">
-                                {sejour.groupe_age}
-                              </Badge>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="capitalize">
+                                  {sejour.groupe_age}
+                                </Badge>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={(e) => {
+                                      e.stopPropagation();
+                                      setEditingSejour(sejour);
+                                    }}>
+                                      <Edit className="w-4 h-4 mr-2" />
+                                      Modifier
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteSejour(sejour.id);
+                                      }}
+                                      className="text-destructive"
+                                    >
+                                      <Trash2 className="w-4 h-4 mr-2" />
+                                      Supprimer
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
                             </div>
                             
                             {stats && (
@@ -314,37 +352,10 @@ export default function Bureau() {
                                 <span className="text-muted-foreground">Places demandées 1er choix</span>
                                 <span className="font-semibold text-primary">{stats ? stats.choix1 : 0}/{sejour.places_disponibles}</span>
                               </div>
-                              <div className="flex justify-between text-sm mb-3">
+                              <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Places demandées total</span>
                                 <span className="font-semibold">{stats ? stats.total : 0}/{sejour.places_disponibles}</span>
                               </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => setViewingSejour(sejour)}
-                                >
-                                  <Eye className="w-3 h-3 mr-1" />
-                                  Détails
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => setEditingSejour(sejour)}
-                                >
-                                  <Edit className="w-3 h-3 mr-1" />
-                                  Modifier
-                                </Button>
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                className="w-full mt-2"
-                                onClick={() => handleDeleteSejour(sejour.id)}
-                              >
-                                <Trash2 className="w-3 h-3 mr-1" />
-                                Supprimer
-                              </Button>
                             </div>
                           </div>
                         </Card>
