@@ -11,7 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign } from "lucide-react";
+import { Users, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign, Send } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
@@ -26,6 +27,7 @@ import { SejourDetailsDialog } from "@/components/SejourDetailsDialog";
 
 export default function Bureau() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [inscriptions, setInscriptions] = useState<any[]>([]);
   const [stats, setStats] = useState({ total: 0, garcons: 0, filles: 0, enAttente: 0 });
   const [sejourStats, setSejourStats] = useState<any[]>([]);
@@ -35,6 +37,7 @@ export default function Bureau() {
   const [isCreatingSejour, setIsCreatingSejour] = useState(false);
   const [viewingSejour, setViewingSejour] = useState<any>(null);
   const [selectedGroupe, setSelectedGroupe] = useState<string>("all");
+  const [sendingPayment, setSendingPayment] = useState<string | null>(null);
 
   useEffect(() => {
     fetchInscriptions();
@@ -187,6 +190,100 @@ export default function Bureau() {
     if (!error) {
       fetchSejours();
       fetchInscriptions();
+    }
+  };
+
+  const handleSendPayment = async (inscription: any) => {
+    setSendingPayment(inscription.id);
+    
+    try {
+      // Récupérer les tarifs
+      const { data: tarifs } = await supabase
+        .from('tarifs')
+        .select('*')
+        .eq('annee', 2025)
+        .order('tarif_numero', { ascending: true });
+
+      if (!tarifs || tarifs.length === 0) {
+        toast({
+          title: "Erreur",
+          description: "Aucun tarif configuré pour 2025",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Trouver le tarif correspondant au quotient familial
+      const qf = inscription.quotient_familial || 0;
+      const tarif = tarifs.find(t => 
+        qf >= t.qf_min && (t.qf_max === null || qf <= t.qf_max)
+      ) || tarifs[tarifs.length - 1];
+
+      // Récupérer les séjours pour calculer le montant
+      const sejourIds = [inscription.sejour_preference_1, inscription.sejour_preference_2].filter(Boolean);
+      const { data: sejoursData } = await supabase
+        .from('sejours')
+        .select('*')
+        .in('id', sejourIds);
+
+      if (!sejoursData || sejoursData.length === 0) {
+        toast({
+          title: "Erreur",
+          description: "Aucun séjour trouvé",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Calculer le montant total
+      let montantTotal = 0;
+      sejoursData.forEach(sejour => {
+        const dateDebut = new Date(sejour.date_debut);
+        const dateFin = new Date(sejour.date_fin);
+        const nbJours = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        
+        const isCentreAere = sejour.type === 'centre_aere' || sejour.type === 'animation';
+        const tarifJournalier = isCentreAere
+          ? tarif.tarif_journee_centre_aere 
+          : tarif.tarif_journee_sejour;
+        
+        montantTotal += Number(tarifJournalier) * nbJours;
+      });
+
+      // Appeler la fonction edge
+      const { data, error } = await supabase.functions.invoke('create-stripe-payment-link', {
+        body: {
+          inscriptionId: inscription.id,
+          parentEmail: inscription.parent_email,
+          parentName: `${inscription.parent_first_name} ${inscription.parent_last_name}`,
+          childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
+          montantTotal: montantTotal,
+          nombreSemaines: sejoursData.length,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast({
+          title: "Lien de paiement créé",
+          description: "Le lien a été copié dans le presse-papier",
+        });
+        
+        // Copier le lien dans le presse-papier
+        await navigator.clipboard.writeText(data.paymentUrl);
+      } else {
+        throw new Error(data.error || 'Erreur inconnue');
+      }
+    } catch (error: any) {
+      console.error('Error sending payment:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de créer le lien de paiement",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingPayment(null);
     }
   };
 
@@ -480,6 +577,17 @@ export default function Bureau() {
                               <XCircle className="w-4 h-4" />
                             </Button>
                           </>
+                        )}
+                        {inscription.status === 'validee' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleSendPayment(inscription)}
+                            disabled={sendingPayment === inscription.id}
+                          >
+                            <Send className="w-4 h-4 mr-1" />
+                            {sendingPayment === inscription.id ? 'Envoi...' : 'Paiement'}
+                          </Button>
                         )}
                       </div>
                     </TableCell>
