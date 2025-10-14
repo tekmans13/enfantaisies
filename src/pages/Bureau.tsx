@@ -11,15 +11,31 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Calendar, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Users, Calendar, CheckCircle, XCircle, Clock, Edit } from "lucide-react";
+import { InscriptionEditDialog } from "@/components/InscriptionEditDialog";
 
 export default function Bureau() {
   const [inscriptions, setInscriptions] = useState<any[]>([]);
   const [stats, setStats] = useState({ total: 0, garcons: 0, filles: 0, enAttente: 0 });
+  const [sejourStats, setSejourStats] = useState<any[]>([]);
+  const [sejours, setSejours] = useState<any[]>([]);
+  const [editingInscription, setEditingInscription] = useState<any>(null);
 
   useEffect(() => {
     fetchInscriptions();
+    fetchSejours();
   }, []);
+
+  const fetchSejours = async () => {
+    const { data } = await supabase
+      .from('sejours')
+      .select('*')
+      .order('date_debut', { ascending: true });
+    
+    if (data) {
+      setSejours(data);
+    }
+  };
 
   const fetchInscriptions = async () => {
     const { data, error } = await supabase
@@ -30,13 +46,42 @@ export default function Bureau() {
     if (data) {
       setInscriptions(data);
       
-      // Calculer les statistiques
+      // Calculer les statistiques générales
       const total = data.length;
       const garcons = data.filter(i => i.child_gender === 'garcon').length;
       const filles = data.filter(i => i.child_gender === 'fille').length;
       const enAttente = data.filter(i => i.status === 'en_attente').length;
       
       setStats({ total, garcons, filles, enAttente });
+
+      // Calculer les statistiques par séjour
+      const sejourMap = new Map();
+      
+      data.forEach(inscription => {
+        // Premier choix
+        if (inscription.sejour_preference_1) {
+          const key = inscription.sejour_preference_1;
+          if (!sejourMap.has(key)) {
+            sejourMap.set(key, { id: key, choix1: 0, choix2: 0, total: 0 });
+          }
+          const stat = sejourMap.get(key);
+          stat.choix1++;
+          stat.total++;
+        }
+        
+        // Second choix
+        if (inscription.sejour_preference_2) {
+          const key = inscription.sejour_preference_2;
+          if (!sejourMap.has(key)) {
+            sejourMap.set(key, { id: key, choix1: 0, choix2: 0, total: 0 });
+          }
+          const stat = sejourMap.get(key);
+          stat.choix2++;
+          stat.total++;
+        }
+      });
+
+      setSejourStats(Array.from(sejourMap.values()));
     }
   };
 
@@ -68,7 +113,7 @@ export default function Bureau() {
           </div>
         </div>
 
-        {/* Statistiques */}
+        {/* Statistiques générales */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card className="p-6">
             <div className="flex items-center gap-4">
@@ -118,6 +163,56 @@ export default function Bureau() {
             </div>
           </Card>
         </div>
+
+        {/* Statistiques par séjour */}
+        <Card className="p-6 mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-6">Statistiques par séjour</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sejourStats.map((stat) => {
+              const sejour = sejours.find(s => s.id === stat.id);
+              if (!sejour) return null;
+              
+              return (
+                <Card key={stat.id} className="p-4 border-2">
+                  <div className="space-y-2">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-semibold">{sejour.titre}</h3>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(sejour.date_debut).toLocaleDateString('fr-FR')}
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="capitalize">
+                        {sejour.groupe_age}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 pt-2 border-t">
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-primary">{stat.choix1}</p>
+                        <p className="text-xs text-muted-foreground">1er choix</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-secondary">{stat.choix2}</p>
+                        <p className="text-xs text-muted-foreground">2ème choix</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-foreground">{stat.total}</p>
+                        <p className="text-xs text-muted-foreground">Total</p>
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Places disponibles</span>
+                        <span className="font-semibold">{sejour.places_disponibles}</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </Card>
 
         {/* Table des inscriptions */}
         <Card className="p-6">
@@ -184,24 +279,33 @@ export default function Bureau() {
                       {new Date(inscription.created_at).toLocaleDateString('fr-FR')}
                     </TableCell>
                     <TableCell>
-                      {inscription.status === 'en_attente' && (
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            onClick={() => handleValidate(inscription.id, 'validee')}
-                            className="bg-green-500 hover:bg-green-600"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleValidate(inscription.id, 'refusee')}
-                          >
-                            <XCircle className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      )}
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setEditingInscription(inscription)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        {inscription.status === 'en_attente' && (
+                          <>
+                            <Button
+                              size="sm"
+                              onClick={() => handleValidate(inscription.id, 'validee')}
+                              className="bg-green-500 hover:bg-green-600"
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleValidate(inscription.id, 'refusee')}
+                            >
+                              <XCircle className="w-4 h-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -210,6 +314,13 @@ export default function Bureau() {
           </div>
         </Card>
       </div>
+
+      <InscriptionEditDialog
+        inscription={editingInscription}
+        open={!!editingInscription}
+        onOpenChange={(open) => !open && setEditingInscription(null)}
+        onSuccess={fetchInscriptions}
+      />
     </div>
   );
 }
