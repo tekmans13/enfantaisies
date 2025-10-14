@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle, Info, Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -86,6 +87,43 @@ export default function Inscription() {
     },
     enabled: !!childAgeGroup,
   });
+
+  const { data: tarifs } = useQuery({
+    queryKey: ['tarifs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tarifs')
+        .select('*')
+        .eq('annee', 2025)
+        .order('qf_min', { ascending: true });
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const calculatePrice = (sejour: any) => {
+    if (!sejour || !tarifs) return null;
+    
+    const qf = parseInt(formData.quotientFamilial) || 999999;
+    const tarif = tarifs.find(t => 
+      qf >= t.qf_min && (t.qf_max === null || qf <= t.qf_max)
+    );
+    
+    if (!tarif) return null;
+    
+    // Calculer le nombre de jours
+    const dateDebut = new Date(sejour.date_debut);
+    const dateFin = new Date(sejour.date_fin);
+    const nbJours = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    
+    // Appliquer le tarif journalier selon le type
+    const tarifJournalier = sejour.type === 'centre_aere' 
+      ? tarif.tarif_journee_centre_aere 
+      : tarif.tarif_journee_sejour;
+    
+    return tarifJournalier * nbJours;
+  };
 
   useEffect(() => {
     if (formData.childClass) {
@@ -705,6 +743,7 @@ export default function Inscription() {
                         {sejours?.map((sejour) => {
                           const isSelected = selectedSejours.includes(sejour.id);
                           const isPriority = prioritySejour === sejour.id;
+                          const price = calculatePrice(sejour);
                           
                           return (
                             <div 
@@ -756,14 +795,21 @@ export default function Inscription() {
                                 }}
                                 className="mt-1"
                               />
-                              <div className="flex-1">
-                                <Label htmlFor={`sejour-${sejour.id}`} className="cursor-pointer">
-                                  <p className="font-semibold">{sejour.titre}</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
-                                  </p>
-                                </Label>
-                              </div>
+                               <div className="flex-1">
+                                 <Label htmlFor={`sejour-${sejour.id}`} className="cursor-pointer">
+                                   <div className="flex items-center justify-between">
+                                     <p className="font-semibold">{sejour.titre}</p>
+                                     {price !== null && (
+                                       <Badge variant="secondary" className="ml-2">
+                                         {price.toFixed(2)} €
+                                       </Badge>
+                                     )}
+                                   </div>
+                                   <p className="text-sm text-muted-foreground">
+                                     Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                                   </p>
+                                 </Label>
+                               </div>
                               {isSelected && (
                                 <div className="flex items-center space-x-2">
                                   <RadioGroup
@@ -805,9 +851,10 @@ export default function Inscription() {
                           Première semaine - Sélectionnez jusqu'à 2 semaines
                         </Label>
                         <div className="space-y-3">
-                          {sejours?.map((sejour) => {
-                            const isSelected = week1Selected.includes(sejour.id);
-                            const isPriority = week1Priority === sejour.id;
+                           {sejours?.map((sejour) => {
+                             const isSelected = week1Selected.includes(sejour.id);
+                             const isPriority = week1Priority === sejour.id;
+                             const price = calculatePrice(sejour);
                             
                             return (
                               <div 
@@ -859,14 +906,21 @@ export default function Inscription() {
                                    }}
                                   className="mt-1"
                                 />
-                                <div className="flex-1">
-                                  <Label htmlFor={`week1-${sejour.id}`} className="cursor-pointer">
-                                    <p className="font-semibold">{sejour.titre}</p>
-                                    <p className="text-sm text-muted-foreground">
-                                      Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
-                                    </p>
-                                  </Label>
-                                </div>
+                                 <div className="flex-1">
+                                   <Label htmlFor={`week1-${sejour.id}`} className="cursor-pointer">
+                                     <div className="flex items-center justify-between">
+                                       <p className="font-semibold">{sejour.titre}</p>
+                                       {price !== null && (
+                                         <Badge variant="secondary" className="ml-2">
+                                           {price.toFixed(2)} €
+                                         </Badge>
+                                       )}
+                                     </div>
+                                     <p className="text-sm text-muted-foreground">
+                                       Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                                     </p>
+                                   </Label>
+                                 </div>
                                 {isSelected && (
                                   <div className="flex items-center space-x-2">
                                     <RadioGroup
@@ -904,9 +958,10 @@ export default function Inscription() {
                           Deuxième semaine - Sélectionnez jusqu'à 2 semaines
                         </Label>
                         <div className="space-y-3">
-                          {sejours?.map((sejour) => {
-                            const isSelected = week2Selected.includes(sejour.id);
-                            const isPriority = week2Priority === sejour.id;
+                           {sejours?.map((sejour) => {
+                             const isSelected = week2Selected.includes(sejour.id);
+                             const isPriority = week2Priority === sejour.id;
+                             const price = calculatePrice(sejour);
                             
                             return (
                               <div 
@@ -958,14 +1013,21 @@ export default function Inscription() {
                                    }}
                                   className="mt-1"
                                 />
-                                <div className="flex-1">
-                                  <Label htmlFor={`week2-${sejour.id}`} className="cursor-pointer">
-                                    <p className="font-semibold">{sejour.titre}</p>
-                                    <p className="text-sm text-muted-foreground">
-                                      Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
-                                    </p>
-                                  </Label>
-                                </div>
+                                 <div className="flex-1">
+                                   <Label htmlFor={`week2-${sejour.id}`} className="cursor-pointer">
+                                     <div className="flex items-center justify-between">
+                                       <p className="font-semibold">{sejour.titre}</p>
+                                       {price !== null && (
+                                         <Badge variant="secondary" className="ml-2">
+                                           {price.toFixed(2)} €
+                                         </Badge>
+                                       )}
+                                     </div>
+                                     <p className="text-sm text-muted-foreground">
+                                       Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                                     </p>
+                                   </Label>
+                                 </div>
                                 {isSelected && (
                                   <div className="flex items-center space-x-2">
                                     <RadioGroup

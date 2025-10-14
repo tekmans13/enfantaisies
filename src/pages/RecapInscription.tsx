@@ -12,6 +12,7 @@ export default function RecapInscription() {
   const navigate = useNavigate();
   const [inscription, setInscription] = useState<any>(null);
   const [sejours, setSejours] = useState<any[]>([]);
+  const [tarifs, setTarifs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,6 +46,16 @@ export default function RecapInscription() {
           if (sejoursError) throw sejoursError;
           setSejours(sejoursData || []);
         }
+
+        // Récupérer les tarifs
+        const { data: tarifsData, error: tarifsError } = await supabase
+          .from('tarifs')
+          .select('*')
+          .eq('annee', 2025)
+          .order('qf_min', { ascending: true });
+
+        if (tarifsError) throw tarifsError;
+        setTarifs(tarifsData || []);
       } catch (error) {
         console.error('Erreur lors du chargement:', error);
       } finally {
@@ -64,6 +75,30 @@ export default function RecapInscription() {
     const sejour = sejours.find(s => s.id === sejourId);
     if (!sejour) return 'Non spécifié';
     return `${formatDate(sejour.date_debut)} - ${formatDate(sejour.date_fin)}`;
+  };
+
+  const calculatePrice = (sejourId: string) => {
+    const sejour = sejours.find(s => s.id === sejourId);
+    if (!sejour || !tarifs) return null;
+    
+    const qf = inscription?.quotient_familial || 999999;
+    const tarif = tarifs.find(t => 
+      qf >= t.qf_min && (t.qf_max === null || qf <= t.qf_max)
+    );
+    
+    if (!tarif) return null;
+    
+    // Calculer le nombre de jours
+    const dateDebut = new Date(sejour.date_debut);
+    const dateFin = new Date(sejour.date_fin);
+    const nbJours = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    
+    // Appliquer le tarif journalier selon le type
+    const tarifJournalier = sejour.type === 'centre_aere' 
+      ? tarif.tarif_journee_centre_aere 
+      : tarif.tarif_journee_sejour;
+    
+    return tarifJournalier * nbJours;
   };
 
   const formatDate = (dateString: string) => {
@@ -215,6 +250,11 @@ export default function RecapInscription() {
                         <p className="text-sm text-muted-foreground">Choix préféré</p>
                         <p className="font-medium">{getSejourTitle(inscription.sejour_preference_1)}</p>
                         <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_1)}</p>
+                        {calculatePrice(inscription.sejour_preference_1) !== null && (
+                          <Badge variant="secondary" className="mt-2">
+                            Prix: {calculatePrice(inscription.sejour_preference_1)?.toFixed(2)} €
+                          </Badge>
+                        )}
                       </div>
                     )}
                     {inscription.sejour_preference_2 && (
@@ -222,6 +262,11 @@ export default function RecapInscription() {
                         <p className="text-sm text-muted-foreground">Choix secondaire</p>
                         <p className="font-medium">{getSejourTitle(inscription.sejour_preference_2)}</p>
                         <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_2)}</p>
+                        {calculatePrice(inscription.sejour_preference_2) !== null && (
+                          <Badge variant="secondary" className="mt-2">
+                            Prix: {calculatePrice(inscription.sejour_preference_2)?.toFixed(2)} €
+                          </Badge>
+                        )}
                       </div>
                     )}
                   </div>
@@ -235,6 +280,11 @@ export default function RecapInscription() {
                           <p className="text-sm text-muted-foreground">Choix préféré</p>
                           <p className="font-medium">{getSejourTitle(inscription.sejour_preference_1)}</p>
                           <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_1)}</p>
+                          {calculatePrice(inscription.sejour_preference_1) !== null && (
+                            <Badge variant="secondary" className="mt-2">
+                              Prix: {calculatePrice(inscription.sejour_preference_1)?.toFixed(2)} €
+                            </Badge>
+                          )}
                         </div>
                       )}
                       {inscription.sejour_preference_1_alternatif && (
@@ -242,6 +292,11 @@ export default function RecapInscription() {
                           <p className="text-sm text-muted-foreground">Choix secondaire</p>
                           <p className="font-medium text-muted-foreground">{getSejourTitle(inscription.sejour_preference_1_alternatif)}</p>
                           <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_1_alternatif)}</p>
+                          {calculatePrice(inscription.sejour_preference_1_alternatif) !== null && (
+                            <Badge variant="secondary" className="mt-2">
+                              Prix: {calculatePrice(inscription.sejour_preference_1_alternatif)?.toFixed(2)} €
+                            </Badge>
+                          )}
                         </div>
                       )}
                     </div>
@@ -254,6 +309,11 @@ export default function RecapInscription() {
                           <p className="text-sm text-muted-foreground">Choix préféré</p>
                           <p className="font-medium">{getSejourTitle(inscription.sejour_preference_2)}</p>
                           <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_2)}</p>
+                          {calculatePrice(inscription.sejour_preference_2) !== null && (
+                            <Badge variant="secondary" className="mt-2">
+                              Prix: {calculatePrice(inscription.sejour_preference_2)?.toFixed(2)} €
+                            </Badge>
+                          )}
                         </div>
                       )}
                       {inscription.sejour_preference_2_alternatif && (
@@ -261,6 +321,11 @@ export default function RecapInscription() {
                           <p className="text-sm text-muted-foreground">Choix secondaire</p>
                           <p className="font-medium text-muted-foreground">{getSejourTitle(inscription.sejour_preference_2_alternatif)}</p>
                           <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_2_alternatif)}</p>
+                          {calculatePrice(inscription.sejour_preference_2_alternatif) !== null && (
+                            <Badge variant="secondary" className="mt-2">
+                              Prix: {calculatePrice(inscription.sejour_preference_2_alternatif)?.toFixed(2)} €
+                            </Badge>
+                          )}
                         </div>
                       )}
                     </div>
