@@ -3,11 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
-import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle } from "lucide-react";
+import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -463,11 +464,20 @@ export default function Inscription() {
                 <h2 className="text-2xl font-bold text-foreground mb-4">
                   Choix des séjours
                 </h2>
-                <p className="text-muted-foreground mb-6">
+                <p className="text-muted-foreground mb-4">
                   Groupe : <strong className="text-primary capitalize">
                     {childAgeGroup || 'Non défini'}
                   </strong>
                 </p>
+
+                <Alert className="mb-6 border-primary/50 bg-primary/5">
+                  <Info className="h-4 w-4 text-primary" />
+                  <AlertDescription className="text-sm">
+                    <strong>ENFANTAISIES</strong> fera tout son possible pour accéder à vos choix. 
+                    Nous donnons en priorité <strong>une semaine par enfant</strong>, une seconde semaine sera attribuée 
+                    pour ceux qui le souhaitent si le nombre de places est suffisant.
+                  </AlertDescription>
+                </Alert>
 
                 <div className="space-y-6">
                   <div>
