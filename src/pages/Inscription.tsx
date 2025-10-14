@@ -48,6 +48,8 @@ export default function Inscription() {
     sejourPreference2: "",
   });
 
+  const [numberOfWeeks, setNumberOfWeeks] = useState<"1" | "2">("1");
+
   const { data: sejours } = useQuery({
     queryKey: ['sejours', childAgeGroup],
     queryFn: async () => {
@@ -472,22 +474,85 @@ export default function Inscription() {
 
                 <Alert className="mb-6 border-primary/50 bg-primary/5">
                   <Info className="h-4 w-4 text-primary" />
-                  <AlertDescription className="text-sm">
-                    <strong>ENFANTAISIES</strong> fera tout son possible pour accéder à vos choix. 
-                    Nous donnons en priorité <strong>une semaine par enfant</strong>, une seconde semaine sera attribuée 
-                    pour ceux qui le souhaitent si le nombre de places est suffisant.
+                  <AlertDescription className="text-sm space-y-2">
+                    <p>
+                      <strong>ENFANTAISIES</strong> fera tout son possible pour accéder à vos choix. 
+                      Nous donnons en priorité <strong>une semaine par enfant</strong>, une seconde semaine sera attribuée 
+                      pour ceux qui le souhaitent si le nombre de places est suffisant.
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 mt-2">
+                      <li>
+                        <strong>1 semaine :</strong> Indiquez votre semaine de choix (voeu 1) et éventuellement une alternative (voeu 2).
+                      </li>
+                      <li>
+                        <strong>2 semaines :</strong> Indiquez les 2 semaines souhaitées par ordre de préférence.
+                      </li>
+                    </ul>
                   </AlertDescription>
                 </Alert>
 
                 <div className="space-y-6">
+                  {/* Choix du nombre de semaines */}
+                  <div className="bg-muted/30 p-4 rounded-lg">
+                    <Label className="text-base mb-3 block font-semibold">Nombre de semaines souhaitées *</Label>
+                    <RadioGroup value={numberOfWeeks} onValueChange={(value: "1" | "2") => setNumberOfWeeks(value)} className="flex gap-4">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="1" id="weeks-1" />
+                        <Label htmlFor="weeks-1" className="cursor-pointer font-medium">1 semaine</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="2" id="weeks-2" />
+                        <Label htmlFor="weeks-2" className="cursor-pointer font-medium">2 semaines</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  {/* Voeu 1 */}
                   <div>
-                    <Label className="text-base mb-3 block">Première préférence *</Label>
+                    <Label className="text-base mb-3 block">
+                      {numberOfWeeks === "1" ? "Voeu 1 - Semaine prioritaire *" : "Semaine 1 - Priorité 1 *"}
+                    </Label>
                     <RadioGroup value={formData.sejourPreference1} onValueChange={(value) => handleInputChange('sejourPreference1', value)}>
                       <div className="space-y-3">
                         {sejours?.map((sejour) => (
-                          <div key={sejour.id} className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
+                          <div key={sejour.id} className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                             <RadioGroupItem value={sejour.id} id={`pref1-${sejour.id}`} />
                             <Label htmlFor={`pref1-${sejour.id}`} className="cursor-pointer flex-1">
+                              <p className="font-semibold">{sejour.titre}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                              </p>
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  {/* Voeu 2 */}
+                  <div>
+                    <Label className="text-base mb-3 block">
+                      {numberOfWeeks === "1" 
+                        ? "Voeu 2 - Alternative (optionnel)" 
+                        : "Semaine 2 - Priorité 2 *"}
+                    </Label>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {numberOfWeeks === "1" 
+                        ? "Si votre 1er choix n'est pas disponible" 
+                        : "Votre seconde semaine souhaitée"}
+                    </p>
+                    <RadioGroup value={formData.sejourPreference2} onValueChange={(value) => handleInputChange('sejourPreference2', value)}>
+                      <div className="space-y-3">
+                        <div className="flex items-start space-x-3 p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                          <RadioGroupItem value="" id="pref2-none" />
+                          <Label htmlFor="pref2-none" className="cursor-pointer flex-1">
+                            <p className="font-semibold">Aucun choix alternatif</p>
+                          </Label>
+                        </div>
+                        {sejours?.filter(s => s.id !== formData.sejourPreference1).map((sejour) => (
+                          <div key={sejour.id} className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                            <RadioGroupItem value={sejour.id} id={`pref2-${sejour.id}`} />
+                            <Label htmlFor={`pref2-${sejour.id}`} className="cursor-pointer flex-1">
                               <p className="font-semibold">{sejour.titre}</p>
                               <p className="text-sm text-muted-foreground">
                                 Du {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} au {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
