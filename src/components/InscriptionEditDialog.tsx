@@ -40,6 +40,26 @@ export function InscriptionEditDialog({
       // Initialiser avec le séjour actuellement attribué (ou le choix du parent si pas encore attribué)
       setAssignedSejour(inscription.sejour_attribue_1 || inscription.sejour_preference_1 || "");
       setAssignedSejour2(inscription.sejour_attribue_2 || inscription.sejour_preference_2 || "");
+      
+      // Écouter les changements en temps réel sur la table sejours
+      const channel = supabase
+        .channel('sejours-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'sejours'
+          },
+          () => {
+            fetchSejours();
+          }
+        )
+        .subscribe();
+      
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [open, inscription]);
 
