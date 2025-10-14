@@ -14,16 +14,197 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      documents: {
+        Row: {
+          file_url: string
+          id: string
+          inscription_id: string | null
+          type_document: string
+          uploaded_at: string | null
+        }
+        Insert: {
+          file_url: string
+          id?: string
+          inscription_id?: string | null
+          type_document: string
+          uploaded_at?: string | null
+        }
+        Update: {
+          file_url?: string
+          id?: string
+          inscription_id?: string | null
+          type_document?: string
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_inscription_id_fkey"
+            columns: ["inscription_id"]
+            isOneToOne: false
+            referencedRelation: "inscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inscriptions: {
+        Row: {
+          caf_number: string | null
+          child_age_group: Database["public"]["Enums"]["age_group"] | null
+          child_birth_date: string
+          child_class: string
+          child_first_name: string
+          child_gender: string
+          child_last_name: string
+          child_school: string
+          created_at: string | null
+          has_allergies: boolean | null
+          has_food_allergies: boolean | null
+          has_medication: boolean | null
+          id: string
+          is_first_inscription: boolean | null
+          no_meat: boolean | null
+          no_pork: boolean | null
+          parent_address: string
+          parent_authority: string
+          parent_email: string
+          parent_first_name: string
+          parent_last_name: string
+          parent_mobile: string
+          parent_office_phone: string | null
+          sejour_preference_1: string | null
+          sejour_preference_2: string | null
+          social_security_regime: string
+          status: string | null
+          updated_at: string | null
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          caf_number?: string | null
+          child_age_group?: Database["public"]["Enums"]["age_group"] | null
+          child_birth_date: string
+          child_class: string
+          child_first_name: string
+          child_gender: string
+          child_last_name: string
+          child_school: string
+          created_at?: string | null
+          has_allergies?: boolean | null
+          has_food_allergies?: boolean | null
+          has_medication?: boolean | null
+          id?: string
+          is_first_inscription?: boolean | null
+          no_meat?: boolean | null
+          no_pork?: boolean | null
+          parent_address: string
+          parent_authority: string
+          parent_email: string
+          parent_first_name: string
+          parent_last_name: string
+          parent_mobile: string
+          parent_office_phone?: string | null
+          sejour_preference_1?: string | null
+          sejour_preference_2?: string | null
+          social_security_regime: string
+          status?: string | null
+          updated_at?: string | null
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          caf_number?: string | null
+          child_age_group?: Database["public"]["Enums"]["age_group"] | null
+          child_birth_date?: string
+          child_class?: string
+          child_first_name?: string
+          child_gender?: string
+          child_last_name?: string
+          child_school?: string
+          created_at?: string | null
+          has_allergies?: boolean | null
+          has_food_allergies?: boolean | null
+          has_medication?: boolean | null
+          id?: string
+          is_first_inscription?: boolean | null
+          no_meat?: boolean | null
+          no_pork?: boolean | null
+          parent_address?: string
+          parent_authority?: string
+          parent_email?: string
+          parent_first_name?: string
+          parent_last_name?: string
+          parent_mobile?: string
+          parent_office_phone?: string | null
+          sejour_preference_1?: string | null
+          sejour_preference_2?: string | null
+          social_security_regime?: string
+          status?: string | null
+          updated_at?: string | null
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inscriptions_sejour_preference_1_fkey"
+            columns: ["sejour_preference_1"]
+            isOneToOne: false
+            referencedRelation: "sejours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inscriptions_sejour_preference_2_fkey"
+            columns: ["sejour_preference_2"]
+            isOneToOne: false
+            referencedRelation: "sejours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sejours: {
+        Row: {
+          created_at: string | null
+          date_debut: string
+          date_fin: string
+          groupe_age: Database["public"]["Enums"]["age_group"]
+          id: string
+          places_disponibles: number
+          titre: string
+          type: string
+        }
+        Insert: {
+          created_at?: string | null
+          date_debut: string
+          date_fin: string
+          groupe_age: Database["public"]["Enums"]["age_group"]
+          id?: string
+          places_disponibles: number
+          titre: string
+          type: string
+        }
+        Update: {
+          created_at?: string | null
+          date_debut?: string
+          date_fin?: string
+          groupe_age?: Database["public"]["Enums"]["age_group"]
+          id?: string
+          places_disponibles?: number
+          titre?: string
+          type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_age_group: {
+        Args: { birth_date: string; class_level: string }
+        Returns: Database["public"]["Enums"]["age_group"]
+      }
     }
     Enums: {
-      [_ in never]: never
+      age_group: "pitchouns" | "minots" | "mias"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +331,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      age_group: ["pitchouns", "minots", "mias"],
+    },
   },
 } as const
