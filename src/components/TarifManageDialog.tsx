@@ -34,8 +34,6 @@ export const TarifManageDialog = ({
     qf_max: "",
     tarif_journee_centre_aere: "",
     tarif_journee_sejour: "",
-    tarif_semaine_centre_aere: "",
-    tarif_semaine_sejour: "",
   });
 
   useEffect(() => {
@@ -47,8 +45,6 @@ export const TarifManageDialog = ({
         qf_max: tarif.qf_max?.toString() || "",
         tarif_journee_centre_aere: tarif.tarif_journee_centre_aere?.toString() || "",
         tarif_journee_sejour: tarif.tarif_journee_sejour?.toString() || "",
-        tarif_semaine_centre_aere: tarif.tarif_semaine_centre_aere?.toString() || "",
-        tarif_semaine_sejour: tarif.tarif_semaine_sejour?.toString() || "",
       });
     } else {
       setFormData({
@@ -58,8 +54,6 @@ export const TarifManageDialog = ({
         qf_max: "",
         tarif_journee_centre_aere: "",
         tarif_journee_sejour: "",
-        tarif_semaine_centre_aere: "",
-        tarif_semaine_sejour: "",
       });
     }
   }, [tarif]);
@@ -67,15 +61,18 @@ export const TarifManageDialog = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const tarifJourCentreAere = parseFloat(formData.tarif_journee_centre_aere);
+    const tarifJourSejour = parseFloat(formData.tarif_journee_sejour);
+
     const tarifData = {
       annee: formData.annee,
       tarif_numero: parseInt(formData.tarif_numero),
       qf_min: parseInt(formData.qf_min),
       qf_max: formData.qf_max ? parseInt(formData.qf_max) : null,
-      tarif_journee_centre_aere: parseFloat(formData.tarif_journee_centre_aere),
-      tarif_journee_sejour: parseFloat(formData.tarif_journee_sejour),
-      tarif_semaine_centre_aere: parseFloat(formData.tarif_semaine_centre_aere),
-      tarif_semaine_sejour: parseFloat(formData.tarif_semaine_sejour),
+      tarif_journee_centre_aere: tarifJourCentreAere,
+      tarif_journee_sejour: tarifJourSejour,
+      tarif_semaine_centre_aere: tarifJourCentreAere * 5,
+      tarif_semaine_sejour: tarifJourSejour * 6,
     };
 
     try {
@@ -179,23 +176,10 @@ export const TarifManageDialog = ({
                   }
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  Tarif semaine (5 jours) : {formData.tarif_journee_centre_aere ? (parseFloat(formData.tarif_journee_centre_aere) * 5).toFixed(2) : '0.00'} €
+                </p>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="tarif_semaine_centre_aere">Tarif/semaine Centre Aéré (€)</Label>
-                <Input
-                  id="tarif_semaine_centre_aere"
-                  type="number"
-                  step="0.01"
-                  value={formData.tarif_semaine_centre_aere}
-                  onChange={(e) =>
-                    setFormData({ ...formData, tarif_semaine_centre_aere: e.target.value })
-                  }
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="tarif_journee_sejour">Tarif/jour Séjour (€)</Label>
                 <Input
@@ -208,19 +192,9 @@ export const TarifManageDialog = ({
                   }
                   required
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="tarif_semaine_sejour">Tarif/semaine Séjour (€)</Label>
-                <Input
-                  id="tarif_semaine_sejour"
-                  type="number"
-                  step="0.01"
-                  value={formData.tarif_semaine_sejour}
-                  onChange={(e) =>
-                    setFormData({ ...formData, tarif_semaine_sejour: e.target.value })
-                  }
-                  required
-                />
+                <p className="text-xs text-muted-foreground">
+                  Tarif semaine (6 jours) : {formData.tarif_journee_sejour ? (parseFloat(formData.tarif_journee_sejour) * 6).toFixed(2) : '0.00'} €
+                </p>
               </div>
             </div>
           </div>
