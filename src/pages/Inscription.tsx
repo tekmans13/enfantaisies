@@ -1,13 +1,31 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar } from "lucide-react";
 
 const TOTAL_STEPS = 5;
 
+
 export default function Inscription() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState({
+    isFirstInscription: false,
+    hasMedication: false,
+    hasAllergies: false,
+    hasFoodAllergies: false,
+    noPork: false,
+    noMeat: false,
+  });
+
+  const handleCheckboxChange = (field: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: !prev[field as keyof typeof prev]
+    }));
+  };
 
   const steps = [
     { number: 1, title: "Documents", icon: FileCheck },
@@ -118,13 +136,97 @@ export default function Inscription() {
 
             {currentStep === 2 && (
               <div>
-                <h2 className="text-2xl font-bold text-foreground mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-4">
                   Informations préalables
                 </h2>
-                <p className="text-muted-foreground mb-4">
-                  Avant de commencer, merci de cocher les cases correspondantes :
+                <p className="text-muted-foreground mb-6">
+                  Avant de commencer, merci de cocher les cases correspondantes à votre inscription :
                 </p>
-                {/* Formulaire étape 2 sera ajouté */}
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
+                    <Checkbox
+                      id="firstInscription"
+                      checked={formData.isFirstInscription}
+                      onCheckedChange={() => handleCheckboxChange('isFirstInscription')}
+                    />
+                    <Label
+                      htmlFor="firstInscription"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      C'est votre 1ère inscription
+                    </Label>
+                  </div>
+
+                  <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
+                    <Checkbox
+                      id="medication"
+                      checked={formData.hasMedication}
+                      onCheckedChange={() => handleCheckboxChange('hasMedication')}
+                    />
+                    <Label
+                      htmlFor="medication"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      Votre enfant prend un traitement médicamenteux
+                    </Label>
+                  </div>
+
+                  <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
+                    <Checkbox
+                      id="allergies"
+                      checked={formData.hasAllergies}
+                      onCheckedChange={() => handleCheckboxChange('hasAllergies')}
+                    />
+                    <Label
+                      htmlFor="allergies"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      Votre enfant a des allergies
+                    </Label>
+                  </div>
+
+                  <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
+                    <Checkbox
+                      id="foodAllergies"
+                      checked={formData.hasFoodAllergies}
+                      onCheckedChange={() => handleCheckboxChange('hasFoodAllergies')}
+                    />
+                    <Label
+                      htmlFor="foodAllergies"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      Votre enfant a des allergies alimentaires / pratiques alimentaires spécifiques
+                    </Label>
+                  </div>
+
+                  <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
+                    <Checkbox
+                      id="noPork"
+                      checked={formData.noPork}
+                      onCheckedChange={() => handleCheckboxChange('noPork')}
+                    />
+                    <Label
+                      htmlFor="noPork"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      Votre enfant ne mange pas de porc
+                    </Label>
+                  </div>
+
+                  <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
+                    <Checkbox
+                      id="noMeat"
+                      checked={formData.noMeat}
+                      onCheckedChange={() => handleCheckboxChange('noMeat')}
+                    />
+                    <Label
+                      htmlFor="noMeat"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      Votre enfant ne mange pas de viande
+                    </Label>
+                  </div>
+                </div>
               </div>
             )}
 
