@@ -53,7 +53,7 @@ export default function Inscription() {
     parent2Authority: "",
     parent2Mobile: "",
     parent2OfficePhone: "",
-    socialSecurityRegime: "",
+    socialSecurityRegime: "général",
     sejourPreference1: "",
     sejourPreference2: "",
     sejourPreference1Alternatif: "",
