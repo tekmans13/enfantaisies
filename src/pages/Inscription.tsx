@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 const TOTAL_STEPS = 5;
+const DEBUG_MODE = false; // Mettre à true pour désactiver la validation pendant le développement
 
 export default function Inscription() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -152,6 +153,41 @@ export default function Inscription() {
       ...prev,
       [field]: value
     }));
+  };
+
+  const validateStep = (step: number): { isValid: boolean; message?: string } => {
+    if (DEBUG_MODE) return { isValid: true }; // Bypass validation en mode debug
+
+    switch (step) {
+      case 3: // Étape Enfant
+        if (!formData.childFirstName.trim()) return { isValid: false, message: "Le prénom de l'enfant est requis" };
+        if (!formData.childLastName.trim()) return { isValid: false, message: "Le nom de l'enfant est requis" };
+        if (!formData.childBirthDate) return { isValid: false, message: "La date de naissance est requise" };
+        if (!formData.childClass) return { isValid: false, message: "La classe est requise" };
+        if (!formData.childGender) return { isValid: false, message: "Le sexe est requis" };
+        if (!formData.childSchool.trim()) return { isValid: false, message: "L'école est requise" };
+        if (!formData.parentFirstName.trim()) return { isValid: false, message: "Le prénom du responsable légal 1 est requis" };
+        if (!formData.parentLastName.trim()) return { isValid: false, message: "Le nom du responsable légal 1 est requis" };
+        if (!formData.parentEmail.trim()) return { isValid: false, message: "L'email du responsable légal 1 est requis" };
+        if (!formData.parentAuthority) return { isValid: false, message: "L'autorité parentale du responsable légal 1 est requise" };
+        if (!formData.parentMobile.trim()) return { isValid: false, message: "Le téléphone portable du responsable légal 1 est requis" };
+        if (!formData.parentAddress.trim()) return { isValid: false, message: "L'adresse du domicile est requise" };
+        if (!formData.socialSecurityRegime) return { isValid: false, message: "Le régime de sécurité sociale est requis" };
+        break;
+      case 4: // Étape Séjours
+        if (!numberOfWeeks) return { isValid: false, message: "Le nombre de semaines est requis" };
+        if (numberOfWeeks === "1") {
+          if (selectedSejours.length === 0) return { isValid: false, message: "Veuillez sélectionner au moins un séjour" };
+          if (!prioritySejour) return { isValid: false, message: "Veuillez indiquer le séjour prioritaire" };
+        } else if (numberOfWeeks === "2") {
+          if (week1Selected.length === 0) return { isValid: false, message: "Veuillez sélectionner au moins un séjour pour la première semaine" };
+          if (!week1Priority) return { isValid: false, message: "Veuillez indiquer le séjour prioritaire pour la première semaine" };
+          if (week2Selected.length === 0) return { isValid: false, message: "Veuillez sélectionner au moins un séjour pour la deuxième semaine" };
+          if (!week2Priority) return { isValid: false, message: "Veuillez indiquer le séjour prioritaire pour la deuxième semaine" };
+        }
+        break;
+    }
+    return { isValid: true };
   };
 
   const handleSubmit = async () => {
@@ -1098,7 +1134,18 @@ export default function Inscription() {
               Précédent
             </Button>
             {currentStep < TOTAL_STEPS ? (
-              <Button onClick={() => setCurrentStep(Math.min(TOTAL_STEPS, currentStep + 1))}>
+              <Button onClick={() => {
+                const validation = validateStep(currentStep);
+                if (!validation.isValid) {
+                  toast({
+                    title: "Champs requis manquants",
+                    description: validation.message,
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                setCurrentStep(Math.min(TOTAL_STEPS, currentStep + 1));
+              }}>
                 Suivant
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
