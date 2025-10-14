@@ -129,14 +129,47 @@ export function InscriptionEditDialog({
                 <Info className="w-4 h-4" />
                 Choix du parent (lecture seule)
               </h3>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">1er choix</p>
-                  <Badge className="bg-blue-600">{inscription?.sejour_preference_1 ? sejours.find(s => s.id === inscription.sejour_preference_1)?.titre || 'N/A' : 'Non renseigné'}</Badge>
+                  <Label className="text-base mb-3 block font-semibold">1er choix</Label>
+                  {inscription?.sejour_preference_1 && sejours.find(s => s.id === inscription.sejour_preference_1) ? (
+                    <div className="p-3 border-2 border-blue-600 bg-blue-600/10 rounded-lg">
+                      <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_1)?.titre}</div>
+                      <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(sejours.find(s => s.id === inscription.sejour_preference_1)!.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejours.find(s => s.id === inscription.sejour_preference_1)!.date_fin).toLocaleDateString('fr-FR')}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {sejours.find(s => s.id === inscription.sejour_preference_1)?.places_disponibles} places
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-3 border-2 rounded-lg text-muted-foreground">Non renseigné</div>
+                  )}
                 </div>
+                
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">2ème choix</p>
-                  <Badge variant="outline" className="border-blue-600">{inscription?.sejour_preference_2 ? sejours.find(s => s.id === inscription.sejour_preference_2)?.titre || 'N/A' : 'Non renseigné'}</Badge>
+                  <Label className="text-base mb-3 block font-semibold">2ème choix</Label>
+                  {inscription?.sejour_preference_2 && sejours.find(s => s.id === inscription.sejour_preference_2) ? (
+                    <div className="p-3 border-2 border-blue-600 bg-blue-600/10 rounded-lg">
+                      <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_2)?.titre}</div>
+                      <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(sejours.find(s => s.id === inscription.sejour_preference_2)!.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejours.find(s => s.id === inscription.sejour_preference_2)!.date_fin).toLocaleDateString('fr-FR')}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {sejours.find(s => s.id === inscription.sejour_preference_2)?.places_disponibles} places
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-3 border-2 rounded-lg text-muted-foreground">Non renseigné</div>
+                  )}
                 </div>
               </div>
             </div>
