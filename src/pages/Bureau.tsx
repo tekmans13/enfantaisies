@@ -11,7 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical } from "lucide-react";
+import { Users, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +25,7 @@ import { SejourManageDialog } from "@/components/SejourManageDialog";
 import { SejourDetailsDialog } from "@/components/SejourDetailsDialog";
 
 export default function Bureau() {
+  const navigate = useNavigate();
   const [inscriptions, setInscriptions] = useState<any[]>([]);
   const [stats, setStats] = useState({ total: 0, garcons: 0, filles: 0, enAttente: 0 });
   const [sejourStats, setSejourStats] = useState<any[]>([]);
@@ -200,6 +202,10 @@ export default function Bureau() {
               Tableau de bord des inscriptions
             </p>
           </div>
+          <Button onClick={() => navigate("/tarifs")} variant="outline" className="gap-2">
+            <DollarSign className="h-4 w-4" />
+            Gérer les tarifs
+          </Button>
         </div>
 
         {/* Statistiques générales */}

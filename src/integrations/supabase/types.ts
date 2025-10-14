@@ -225,6 +225,48 @@ export type Database = {
         }
         Relationships: []
       }
+      tarifs: {
+        Row: {
+          annee: number
+          created_at: string
+          id: string
+          qf_max: number | null
+          qf_min: number
+          tarif_journee_centre_aere: number
+          tarif_journee_sejour: number
+          tarif_numero: number
+          tarif_semaine_centre_aere: number
+          tarif_semaine_sejour: number
+          updated_at: string
+        }
+        Insert: {
+          annee?: number
+          created_at?: string
+          id?: string
+          qf_max?: number | null
+          qf_min: number
+          tarif_journee_centre_aere: number
+          tarif_journee_sejour: number
+          tarif_numero: number
+          tarif_semaine_centre_aere: number
+          tarif_semaine_sejour: number
+          updated_at?: string
+        }
+        Update: {
+          annee?: number
+          created_at?: string
+          id?: string
+          qf_max?: number | null
+          qf_min?: number
+          tarif_journee_centre_aere?: number
+          tarif_journee_sejour?: number
+          tarif_numero?: number
+          tarif_semaine_centre_aere?: number
+          tarif_semaine_sejour?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
