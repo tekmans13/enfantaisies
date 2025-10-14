@@ -528,33 +528,47 @@ export default function Inscription() {
                       {sejours?.map((sejour) => {
                         const isSelected = selectedSejours.includes(sejour.id);
                         const isPriority = prioritySejour === sejour.id;
-                        const canSelect = selectedSejours.length < 2 || isSelected;
                         
                         return (
                           <div 
                             key={sejour.id} 
-                            className={`flex items-start space-x-3 p-4 rounded-lg border-2 transition-all ${
+                            className={`flex items-start space-x-3 p-4 rounded-lg border-2 transition-all cursor-pointer ${
                               isSelected 
                                 ? 'bg-primary/10 border-primary' 
-                                : canSelect 
-                                  ? 'bg-muted/50 border-transparent hover:bg-muted hover:border-muted-foreground/20' 
-                                  : 'bg-muted/20 border-transparent opacity-50 cursor-not-allowed'
+                                : 'bg-muted/50 border-transparent hover:bg-muted hover:border-muted-foreground/20'
                             }`}
                           >
                             <Checkbox
                               id={`sejour-${sejour.id}`}
                               checked={isSelected}
-                              disabled={!canSelect}
                               onCheckedChange={(checked) => {
                                 if (checked) {
-                                  setSelectedSejours([...selectedSejours, sejour.id]);
-                                  if (selectedSejours.length === 0) {
-                                    setPrioritySejour(sejour.id);
-                                    handleInputChange('sejourPreference1', sejour.id);
+                                  if (selectedSejours.length < 2) {
+                                    // Moins de 2 séjours : on ajoute simplement
+                                    setSelectedSejours([...selectedSejours, sejour.id]);
+                                    if (selectedSejours.length === 0) {
+                                      setPrioritySejour(sejour.id);
+                                      handleInputChange('sejourPreference1', sejour.id);
+                                    } else {
+                                      handleInputChange('sejourPreference2', sejour.id);
+                                    }
                                   } else {
-                                    handleInputChange('sejourPreference2', sejour.id);
+                                    // Déjà 2 séjours : on remplace celui qui n'est PAS prioritaire
+                                    const nonPriority = selectedSejours.find(id => id !== prioritySejour);
+                                    const newSelection = selectedSejours.filter(id => id !== nonPriority);
+                                    newSelection.push(sejour.id);
+                                    setSelectedSejours(newSelection);
+                                    
+                                    if (prioritySejour === newSelection[0]) {
+                                      handleInputChange('sejourPreference1', newSelection[0]);
+                                      handleInputChange('sejourPreference2', newSelection[1]);
+                                    } else {
+                                      handleInputChange('sejourPreference1', newSelection[1]);
+                                      handleInputChange('sejourPreference2', newSelection[0]);
+                                    }
                                   }
                                 } else {
+                                  // Déselection
                                   setSelectedSejours(selectedSejours.filter(id => id !== sejour.id));
                                   if (prioritySejour === sejour.id) {
                                     const remaining = selectedSejours.filter(id => id !== sejour.id);
