@@ -281,7 +281,9 @@ export function InscriptionEditDialog({
               </h3>
               <div className="space-y-4">
                 <div>
-                  <Label className="text-base mb-3 block font-semibold">1er choix</Label>
+                  <Label className="text-base mb-3 block font-semibold">
+                    {wantsTwoWeeks ? "1ère semaine (choix prioritaire)" : "1er choix"}
+                  </Label>
                   {inscription?.sejour_preference_1 && sejours.find(s => s.id === inscription.sejour_preference_1) ? (
                     <div className="p-3 border-2 border-blue-600 bg-blue-600/10 rounded-lg">
                       <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_1)?.titre}</div>
@@ -302,7 +304,9 @@ export function InscriptionEditDialog({
                 </div>
                 
                 <div>
-                  <Label className="text-base mb-3 block font-semibold">2ème choix</Label>
+                  <Label className="text-base mb-3 block font-semibold">
+                    {wantsTwoWeeks ? "2ème semaine (choix prioritaire)" : "2ème choix (alternatif)"}
+                  </Label>
                   {inscription?.sejour_preference_2 && sejours.find(s => s.id === inscription.sejour_preference_2) ? (
                     <div className="p-3 border-2 border-blue-600 bg-blue-600/10 rounded-lg">
                       <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_2)?.titre}</div>
@@ -332,7 +336,9 @@ export function InscriptionEditDialog({
               
               <div className="space-y-4">
                 <div>
-                  <Label className="text-base mb-3 block font-semibold">1er séjour attribué *</Label>
+                  <Label className="text-base mb-3 block font-semibold">
+                    {wantsTwoWeeks ? "1ère semaine attribuée *" : "1er séjour attribué *"}
+                  </Label>
                   <RadioGroup value={assignedSejour} onValueChange={setAssignedSejour}>
                     <div className="space-y-2">
                       {sejours.map((sejour) => (
@@ -359,7 +365,7 @@ export function InscriptionEditDialog({
 
                 {wantsTwoWeeks && (
                   <div>
-                    <Label className="text-base mb-3 block font-semibold">2ème séjour attribué (optionnel)</Label>
+                    <Label className="text-base mb-3 block font-semibold">2ème semaine attribuée (optionnel)</Label>
                     <RadioGroup value={assignedSejour2} onValueChange={setAssignedSejour2}>
                       <div className="space-y-2">
                         <div className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
