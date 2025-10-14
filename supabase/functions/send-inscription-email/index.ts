@@ -29,7 +29,7 @@ const handler = async (req: Request): Promise<Response> => {
     const smtpPort = parseInt(Deno.env.get("SMTP_PORT") || "587");
     const smtpUser = Deno.env.get("SMTP_USER");
     const smtpPassword = Deno.env.get("SMTP_PASSWORD");
-    const smtpFrom = Deno.env.get("SMTP_FROM") || smtpUser;
+    const smtpFrom = Deno.env.get("SMTP_FROM") || smtpUser || "noreply@example.com";
 
     if (!smtpHost || !smtpUser || !smtpPassword) {
       console.error("Configuration SMTP manquante");
