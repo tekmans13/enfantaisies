@@ -31,6 +31,43 @@ export default function Bureau() {
   useEffect(() => {
     fetchInscriptions();
     fetchSejours();
+    
+    // Écouter les changements en temps réel sur les inscriptions
+    const inscriptionsChannel = supabase
+      .channel('inscriptions-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'inscriptions'
+        },
+        () => {
+          fetchInscriptions();
+        }
+      )
+      .subscribe();
+    
+    // Écouter les changements en temps réel sur les séjours
+    const sejoursChannel = supabase
+      .channel('sejours-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'sejours'
+        },
+        () => {
+          fetchSejours();
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(inscriptionsChannel);
+      supabase.removeChannel(sejoursChannel);
+    };
   }, []);
 
   const fetchSejours = async () => {
