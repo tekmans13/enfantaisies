@@ -1172,14 +1172,14 @@ export default function Inscription() {
                   {/* Fiche sanitaire de liaison - 2 uploads */}
                   <div className="p-4 bg-muted/50 rounded-lg space-y-4">
                     <div>
-                      <Label className="text-sm font-semibold mb-2 block">
-                        Fiche sanitaire de liaison *
-                      </Label>
-                      <p className="text-xs text-muted-foreground mb-3">
-                        <a href="/documents/ENFANTAISIES_fiche_sanitaire.pdf" download className="text-primary hover:underline">
+                      <div className="flex items-center justify-between mb-3">
+                        <Label className="text-sm font-semibold">
+                          Fiche sanitaire de liaison *
+                        </Label>
+                        <a href="/documents/ENFANTAISIES_fiche_sanitaire.pdf" download className="text-xs text-primary hover:underline">
                           Télécharger le document à remplir
                         </a>
-                      </p>
+                      </div>
                       <div className="space-y-2">
                         <div>
                           <Label className="text-xs text-muted-foreground">Document 1</Label>
@@ -1219,14 +1219,14 @@ export default function Inscription() {
 
                   {/* Autorisation parentale */}
                   <div className="p-4 bg-muted/50 rounded-lg">
-                    <Label className="text-sm font-semibold mb-2 block">
-                      Autorisation parentale *
-                    </Label>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      <a href="/documents/ENFANTAISIES_autorisations_parentales.pdf" download className="text-primary hover:underline">
+                    <div className="flex items-center justify-between mb-3">
+                      <Label className="text-sm font-semibold">
+                        Autorisation parentale *
+                      </Label>
+                      <a href="/documents/ENFANTAISIES_autorisations_parentales.pdf" download className="text-xs text-primary hover:underline">
                         Télécharger le document à remplir
                       </a>
-                    </p>
+                    </div>
                     <Input 
                       type="file" 
                       accept=".pdf,.jpg,.jpeg,.png"
@@ -1264,16 +1264,16 @@ export default function Inscription() {
 
                   {/* Certificat médical */}
                   <div className="p-4 bg-muted/50 rounded-lg">
-                    <Label className="text-sm font-semibold mb-2 block">
-                      Certificat médical *
-                    </Label>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      Le document « Certificat médical » complété et signé par le médecin traitant indiquant que l'enfant ne présente aucune contre indication à la pratique des activités nautiques, sportives et de plein air organisées dans le cadre du centre aéré ENFANTAISIES.
-                    </p>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      <a href="/documents/ENFANTAISIES_certificat_medical.pdf" download className="text-primary hover:underline">
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-sm font-semibold">
+                        Certificat médical *
+                      </Label>
+                      <a href="/documents/ENFANTAISIES_certificat_medical.pdf" download className="text-xs text-primary hover:underline">
                         Télécharger le document à remplir
                       </a>
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Le document « Certificat médical » complété et signé par le médecin traitant indiquant que l'enfant ne présente aucune contre indication à la pratique des activités nautiques, sportives et de plein air organisées dans le cadre du centre aéré ENFANTAISIES.
                     </p>
                     <Input 
                       type="file" 
