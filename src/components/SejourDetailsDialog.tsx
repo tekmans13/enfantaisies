@@ -60,6 +60,15 @@ export function SejourDetailsDialog({
   const validatedInscriptions = inscriptions.filter(i => i.status === 'validee');
   const pendingInscriptions = inscriptions.filter(i => i.status === 'en_attente');
 
+  // Calcul des statistiques alimentaires
+  const dietaryStats = {
+    noPork: validatedInscriptions.filter(i => i.no_pork).length,
+    noMeat: validatedInscriptions.filter(i => i.no_meat).length,
+    foodAllergies: validatedInscriptions.filter(i => i.has_food_allergies).length,
+    medication: validatedInscriptions.filter(i => i.has_medication).length,
+    allergies: validatedInscriptions.filter(i => i.has_allergies).length,
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
@@ -105,6 +114,35 @@ export function SejourDetailsDialog({
               </p>
             </Card>
           </div>
+
+          {/* Résumé régimes alimentaires et santé */}
+          {validatedInscriptions.length > 0 && (
+            <Card className="p-4 bg-muted/50">
+              <h3 className="font-semibold mb-3">Résumé des besoins spécifiques</h3>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <div className="text-center p-2 bg-background rounded-lg">
+                  <p className="text-2xl font-bold text-primary">{dietaryStats.noPork}</p>
+                  <p className="text-xs text-muted-foreground">Sans porc</p>
+                </div>
+                <div className="text-center p-2 bg-background rounded-lg">
+                  <p className="text-2xl font-bold text-primary">{dietaryStats.noMeat}</p>
+                  <p className="text-xs text-muted-foreground">Sans viande</p>
+                </div>
+                <div className="text-center p-2 bg-background rounded-lg">
+                  <p className="text-2xl font-bold text-orange-500">{dietaryStats.foodAllergies}</p>
+                  <p className="text-xs text-muted-foreground">Allergies alim.</p>
+                </div>
+                <div className="text-center p-2 bg-background rounded-lg">
+                  <p className="text-2xl font-bold text-orange-500">{dietaryStats.medication}</p>
+                  <p className="text-xs text-muted-foreground">Médicaments</p>
+                </div>
+                <div className="text-center p-2 bg-background rounded-lg">
+                  <p className="text-2xl font-bold text-orange-500">{dietaryStats.allergies}</p>
+                  <p className="text-xs text-muted-foreground">Allergies</p>
+                </div>
+              </div>
+            </Card>
+          )}
 
           {/* Liste des inscrits validés */}
           <div>
