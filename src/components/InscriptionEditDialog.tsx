@@ -197,6 +197,9 @@ export function InscriptionEditDialog({
       }
     }
 
+    // Rafraîchir les données pour mettre à jour les compteurs
+    await fetchSejours();
+
     toast({
       title: "Succès",
       description: "Séjour(s) attribué(s) avec succès",
