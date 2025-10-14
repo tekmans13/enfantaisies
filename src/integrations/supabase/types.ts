@@ -71,6 +71,8 @@ export type Database = {
           parent_last_name: string
           parent_mobile: string
           parent_office_phone: string | null
+          sejour_attribue_1: string | null
+          sejour_attribue_2: string | null
           sejour_preference_1: string | null
           sejour_preference_2: string | null
           social_security_regime: string
@@ -103,6 +105,8 @@ export type Database = {
           parent_last_name: string
           parent_mobile: string
           parent_office_phone?: string | null
+          sejour_attribue_1?: string | null
+          sejour_attribue_2?: string | null
           sejour_preference_1?: string | null
           sejour_preference_2?: string | null
           social_security_regime: string
@@ -135,6 +139,8 @@ export type Database = {
           parent_last_name?: string
           parent_mobile?: string
           parent_office_phone?: string | null
+          sejour_attribue_1?: string | null
+          sejour_attribue_2?: string | null
           sejour_preference_1?: string | null
           sejour_preference_2?: string | null
           social_security_regime?: string
@@ -144,6 +150,20 @@ export type Database = {
           validated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "inscriptions_sejour_attribue_1_fkey"
+            columns: ["sejour_attribue_1"]
+            isOneToOne: false
+            referencedRelation: "sejours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inscriptions_sejour_attribue_2_fkey"
+            columns: ["sejour_attribue_2"]
+            isOneToOne: false
+            referencedRelation: "sejours"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "inscriptions_sejour_preference_1_fkey"
             columns: ["sejour_preference_1"]

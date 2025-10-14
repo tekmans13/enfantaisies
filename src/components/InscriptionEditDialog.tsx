@@ -127,17 +127,15 @@ export function InscriptionEditDialog({
               <Info className="w-4 h-4" />
               Choix du parent (lecture seule)
             </h3>
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-muted-foreground">1er choix</p>
+                <p className="text-sm text-muted-foreground mb-1">1er choix</p>
                 <Badge className="bg-blue-600">{inscription?.sejour_preference_1 ? sejours.find(s => s.id === inscription.sejour_preference_1)?.titre || 'N/A' : 'Non renseigné'}</Badge>
               </div>
-              {inscription?.sejour_preference_2 && (
-                <div>
-                  <p className="text-sm text-muted-foreground">2ème choix</p>
-                  <Badge variant="outline" className="border-blue-600">{sejours.find(s => s.id === inscription.sejour_preference_2)?.titre || 'N/A'}</Badge>
-                </div>
-              )}
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">2ème choix</p>
+                <Badge variant="outline" className="border-blue-600">{inscription?.sejour_preference_2 ? sejours.find(s => s.id === inscription.sejour_preference_2)?.titre || 'N/A' : 'Non renseigné'}</Badge>
+              </div>
             </div>
           </div>
           {/* Séjours attribués par le bureau - Modifiable */}
