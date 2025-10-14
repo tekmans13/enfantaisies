@@ -93,8 +93,9 @@ export default function RecapInscription() {
     const dateFin = new Date(sejour.date_fin);
     const nbJours = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     
-    // Appliquer le tarif journalier selon le type
-    const tarifJournalier = sejour.type === 'centre_aere' 
+    // Appliquer le tarif journalier selon le type (animation = centre_aere)
+    const isCentreAere = sejour.type === 'centre_aere' || sejour.type === 'animation';
+    const tarifJournalier = isCentreAere
       ? tarif.tarif_journee_centre_aere 
       : tarif.tarif_journee_sejour;
     
