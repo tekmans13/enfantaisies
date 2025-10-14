@@ -209,14 +209,14 @@ export default function RecapInscription() {
                 </div>
                 {inscription.sejour_preference_1 && (
                   <div>
-                    <p className="text-sm text-muted-foreground">Choix principal 1</p>
+                    <p className="text-sm text-muted-foreground">Choix préféré</p>
                     <p className="font-medium">{getSejourTitle(inscription.sejour_preference_1)}</p>
                     <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_1)}</p>
                   </div>
                 )}
                 {inscription.sejour_preference_2 && (
                   <div>
-                    <p className="text-sm text-muted-foreground">Choix principal 2</p>
+                    <p className="text-sm text-muted-foreground">Choix secondaire</p>
                     <p className="font-medium">{getSejourTitle(inscription.sejour_preference_2)}</p>
                     <p className="text-sm text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_2)}</p>
                   </div>
