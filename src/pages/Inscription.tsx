@@ -3,6 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar } from "lucide-react";
 
@@ -12,18 +15,43 @@ const TOTAL_STEPS = 5;
 export default function Inscription() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
+    // Étape 2 - Préalables
     isFirstInscription: false,
     hasMedication: false,
     hasAllergies: false,
     hasFoodAllergies: false,
     noPork: false,
     noMeat: false,
+    // Étape 3 - Enfant
+    childFirstName: "",
+    childLastName: "",
+    childBirthDate: "",
+    childClass: "",
+    childGender: "",
+    childSchool: "",
+    // Responsable légal 1
+    parentFirstName: "",
+    parentLastName: "",
+    parentEmail: "",
+    parentAuthority: "",
+    parentMobile: "",
+    parentOfficePhone: "",
+    parentAddress: "",
+    cafNumber: "",
+    socialSecurityRegime: "",
   });
 
   const handleCheckboxChange = (field: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: !prev[field as keyof typeof prev]
+    }));
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
     }));
   };
 
@@ -235,7 +263,189 @@ export default function Inscription() {
                 <h2 className="text-2xl font-bold text-foreground mb-6">
                   Informations sur l'enfant
                 </h2>
-                {/* Formulaire étape 3 sera ajouté */}
+                
+                {/* Informations enfant */}
+                <div className="space-y-6">
+                  <div className="bg-primary/5 p-4 rounded-lg">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Votre enfant</h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="childFirstName">Prénom *</Label>
+                        <Input
+                          id="childFirstName"
+                          value={formData.childFirstName}
+                          onChange={(e) => handleInputChange('childFirstName', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="childLastName">Nom *</Label>
+                        <Input
+                          id="childLastName"
+                          value={formData.childLastName}
+                          onChange={(e) => handleInputChange('childLastName', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="childBirthDate">Date de naissance *</Label>
+                        <Input
+                          id="childBirthDate"
+                          type="date"
+                          value={formData.childBirthDate}
+                          onChange={(e) => handleInputChange('childBirthDate', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="childClass">Classe (septembre 2025) *</Label>
+                        <Select value={formData.childClass} onValueChange={(value) => handleInputChange('childClass', value)}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Sélectionner une classe" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ms">Moyenne Section</SelectItem>
+                            <SelectItem value="gs">Grande Section</SelectItem>
+                            <SelectItem value="cp">CP</SelectItem>
+                            <SelectItem value="ce1">CE1</SelectItem>
+                            <SelectItem value="ce2">CE2</SelectItem>
+                            <SelectItem value="cm1">CM1</SelectItem>
+                            <SelectItem value="cm2">CM2</SelectItem>
+                            <SelectItem value="6eme">6ème</SelectItem>
+                            <SelectItem value="5eme">5ème</SelectItem>
+                            <SelectItem value="4eme">4ème</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Sexe *</Label>
+                        <RadioGroup value={formData.childGender} onValueChange={(value) => handleInputChange('childGender', value)} className="flex gap-4 mt-2">
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="garcon" id="garcon" />
+                            <Label htmlFor="garcon" className="cursor-pointer">Garçon</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="fille" id="fille" />
+                            <Label htmlFor="fille" className="cursor-pointer">Fille</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                      <div>
+                        <Label htmlFor="childSchool">École fréquentée *</Label>
+                        <Input
+                          id="childSchool"
+                          value={formData.childSchool}
+                          onChange={(e) => handleInputChange('childSchool', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Responsable légal 1 */}
+                  <div className="bg-secondary/5 p-4 rounded-lg">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Responsable légal 1</h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="parentFirstName">Prénom *</Label>
+                        <Input
+                          id="parentFirstName"
+                          value={formData.parentFirstName}
+                          onChange={(e) => handleInputChange('parentFirstName', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="parentLastName">Nom *</Label>
+                        <Input
+                          id="parentLastName"
+                          value={formData.parentLastName}
+                          onChange={(e) => handleInputChange('parentLastName', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="parentEmail">E-mail *</Label>
+                        <Input
+                          id="parentEmail"
+                          type="email"
+                          value={formData.parentEmail}
+                          onChange={(e) => handleInputChange('parentEmail', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label>Autorité parentale *</Label>
+                        <RadioGroup value={formData.parentAuthority} onValueChange={(value) => handleInputChange('parentAuthority', value)} className="flex gap-4 mt-2">
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="oui" id="authorityOui" />
+                            <Label htmlFor="authorityOui" className="cursor-pointer">Oui</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="non" id="authorityNon" />
+                            <Label htmlFor="authorityNon" className="cursor-pointer">Non</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                      <div>
+                        <Label htmlFor="parentMobile">Téléphone Portable *</Label>
+                        <Input
+                          id="parentMobile"
+                          type="tel"
+                          value={formData.parentMobile}
+                          onChange={(e) => handleInputChange('parentMobile', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="parentOfficePhone">Téléphone Bureau</Label>
+                        <Input
+                          id="parentOfficePhone"
+                          type="tel"
+                          value={formData.parentOfficePhone}
+                          onChange={(e) => handleInputChange('parentOfficePhone', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label htmlFor="parentAddress">Adresse domicile *</Label>
+                        <Input
+                          id="parentAddress"
+                          value={formData.parentAddress}
+                          onChange={(e) => handleInputChange('parentAddress', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="cafNumber">Numéro d'allocataire CAF</Label>
+                        <Input
+                          id="cafNumber"
+                          value={formData.cafNumber}
+                          onChange={(e) => handleInputChange('cafNumber', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="socialSecurityRegime">Régime Sécurité Sociale *</Label>
+                        <Select value={formData.socialSecurityRegime} onValueChange={(value) => handleInputChange('socialSecurityRegime', value)}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Sélectionner un régime" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="general">Général (dont EDF/GDF)</SelectItem>
+                            <SelectItem value="msa">MSA & Agricole</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-accent/10 p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Note :</strong> Les sections "Personnes à prévenir en cas d'urgence" et "Personnes autorisées à récupérer l'enfant" seront disponibles dans une prochaine étape.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 
