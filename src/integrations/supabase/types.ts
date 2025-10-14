@@ -46,6 +46,41 @@ export type Database = {
           },
         ]
       }
+      inscription_documents: {
+        Row: {
+          document_type: string
+          file_name: string
+          file_path: string
+          id: string
+          inscription_id: string | null
+          uploaded_at: string
+        }
+        Insert: {
+          document_type: string
+          file_name: string
+          file_path: string
+          id?: string
+          inscription_id?: string | null
+          uploaded_at?: string
+        }
+        Update: {
+          document_type?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          inscription_id?: string | null
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inscription_documents_inscription_id_fkey"
+            columns: ["inscription_id"]
+            isOneToOne: false
+            referencedRelation: "inscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inscriptions: {
         Row: {
           caf_number: string | null

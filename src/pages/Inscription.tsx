@@ -60,6 +60,24 @@ export default function Inscription() {
     sejourPreference2Alternatif: "",
   });
 
+  const [uploadedFiles, setUploadedFiles] = useState<{
+    ficheSanitaire1: File | null;
+    ficheSanitaire2: File | null;
+    autorisationParentale: File | null;
+    assuranceRC: File | null;
+    certificatMedical: File | null;
+    attestationCAF: File | null;
+    testAisanceAquatique: File | null;
+  }>({
+    ficheSanitaire1: null,
+    ficheSanitaire2: null,
+    autorisationParentale: null,
+    assuranceRC: null,
+    certificatMedical: null,
+    attestationCAF: null,
+    testAisanceAquatique: null,
+  });
+
   const [numberOfWeeks, setNumberOfWeeks] = useState<"1" | "2">("1");
   const [selectedSejours, setSelectedSejours] = useState<string[]>([]);
   const [prioritySejour, setPrioritySejour] = useState<string>("");
@@ -1119,19 +1137,197 @@ export default function Inscription() {
                 <h2 className="text-2xl font-bold text-foreground mb-4">
                   Documents requis
                 </h2>
-                <div className="space-y-4">
-                  {[
-                    'Fiche sanitaire de liaison',
-                    'Autorisation parentale',
-                    'Attestation d\'assurance Responsabilité civile',
-                    'Certificat médical',
-                    'Attestation CAF ou Avis d\'imposition 2024',
-                  ].map((doc) => (
-                    <div key={doc} className="p-4 bg-muted/50 rounded-lg">
-                      <Label className="text-sm font-semibold mb-2 block">{doc}</Label>
-                      <Input type="file" accept=".pdf,.jpg,.jpeg,.png" />
+                <div className="space-y-6">
+                  {/* Fiche sanitaire de liaison - 2 uploads */}
+                  <div className="p-4 bg-muted/50 rounded-lg space-y-4">
+                    <div>
+                      <Label className="text-sm font-semibold mb-2 block">
+                        Fiche sanitaire de liaison *
+                      </Label>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        <a href="/documents/ENFANTAISIES_fiche_sanitaire.pdf" download className="text-primary hover:underline">
+                          Télécharger le document à remplir
+                        </a>
+                      </p>
+                      <div className="space-y-2">
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Document 1</Label>
+                          <Input 
+                            type="file" 
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setUploadedFiles(prev => ({ ...prev, ficheSanitaire1: file }));
+                              }
+                            }}
+                          />
+                          {uploadedFiles.ficheSanitaire1 && (
+                            <p className="text-xs text-green-600 mt-1">✓ {uploadedFiles.ficheSanitaire1.name}</p>
+                          )}
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Document 2 (optionnel)</Label>
+                          <Input 
+                            type="file" 
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setUploadedFiles(prev => ({ ...prev, ficheSanitaire2: file }));
+                              }
+                            }}
+                          />
+                          {uploadedFiles.ficheSanitaire2 && (
+                            <p className="text-xs text-green-600 mt-1">✓ {uploadedFiles.ficheSanitaire2.name}</p>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Autorisation parentale */}
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <Label className="text-sm font-semibold mb-2 block">
+                      Autorisation parentale *
+                    </Label>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      <a href="/documents/ENFANTAISIES_autorisations_parentales.pdf" download className="text-primary hover:underline">
+                        Télécharger le document à remplir
+                      </a>
+                    </p>
+                    <Input 
+                      type="file" 
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setUploadedFiles(prev => ({ ...prev, autorisationParentale: file }));
+                        }
+                      }}
+                    />
+                    {uploadedFiles.autorisationParentale && (
+                      <p className="text-xs text-green-600 mt-1">✓ {uploadedFiles.autorisationParentale.name}</p>
+                    )}
+                  </div>
+
+                  {/* Attestation d'assurance RC */}
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <Label className="text-sm font-semibold mb-2 block">
+                      Attestation d'assurance Responsabilité civile *
+                    </Label>
+                    <Input 
+                      type="file" 
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setUploadedFiles(prev => ({ ...prev, assuranceRC: file }));
+                        }
+                      }}
+                    />
+                    {uploadedFiles.assuranceRC && (
+                      <p className="text-xs text-green-600 mt-1">✓ {uploadedFiles.assuranceRC.name}</p>
+                    )}
+                  </div>
+
+                  {/* Certificat médical */}
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <Label className="text-sm font-semibold mb-2 block">
+                      Certificat médical *
+                    </Label>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Le document « Certificat médical » complété et signé par le médecin traitant indiquant que l'enfant ne présente aucune contre indication à la pratique des activités nautiques, sportives et de plein air organisées dans le cadre du centre aéré ENFANTAISIES.
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      <a href="/documents/ENFANTAISIES_certificat_medical.pdf" download className="text-primary hover:underline">
+                        Télécharger le document à remplir
+                      </a>
+                    </p>
+                    <Input 
+                      type="file" 
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setUploadedFiles(prev => ({ ...prev, certificatMedical: file }));
+                        }
+                      }}
+                    />
+                    {uploadedFiles.certificatMedical && (
+                      <p className="text-xs text-green-600 mt-1">✓ {uploadedFiles.certificatMedical.name}</p>
+                    )}
+                  </div>
+
+                  {/* Attestation CAF */}
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <Label className="text-sm font-semibold mb-2 block">
+                      Attestation CAF ou Avis d'imposition 2024 *
+                    </Label>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Attestation de la CAF (Quotient Familial) de moins de 3 mois. Si pas d'affiliation CAF : dernier avis d'imposition 2020 sur les revenus 2019 du foyer (ou de chacun des deux parents).
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-3 font-semibold">
+                      (En l'absence d'attestation CAF ou de votre avis d'imposition, le tarif 12 sera automatiquement appliqué.)
+                    </p>
+                    <Input 
+                      type="file" 
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setUploadedFiles(prev => ({ ...prev, attestationCAF: file }));
+                        }
+                      }}
+                    />
+                    {uploadedFiles.attestationCAF && (
+                      <p className="text-xs text-green-600 mt-1">✓ {uploadedFiles.attestationCAF.name}</p>
+                    )}
+                  </div>
+
+                  {/* Test d'aisance aquatique */}
+                  <div className="p-4 bg-muted/50 rounded-lg border-2 border-dashed border-muted-foreground/30">
+                    <Label className="text-sm font-semibold mb-2 block">
+                      Test d'aisance aquatique / antipanique (optionnel)
+                    </Label>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Si votre enfant est inscrit sur un séjour ou pratique des activités nautiques pendant sa semaine au centre, un test d'aisance aquatique / antipanique vous sera demandé (à fournir avant le démarrage du centre).
+                    </p>
+                    <Input 
+                      type="file" 
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setUploadedFiles(prev => ({ ...prev, testAisanceAquatique: file }));
+                        }
+                      }}
+                    />
+                    {uploadedFiles.testAisanceAquatique && (
+                      <p className="text-xs text-green-600 mt-1">✓ {uploadedFiles.testAisanceAquatique.name}</p>
+                    )}
+                  </div>
+
+                  {/* Documents informatifs */}
+                  <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                    <Label className="text-sm font-semibold mb-3 block text-primary">
+                      Documents à consulter
+                    </Label>
+                    <div className="space-y-2 text-sm">
+                      <div>
+                        <a href="/documents/ENFANTAISIES_reglement.pdf" download className="text-primary hover:underline flex items-center gap-2">
+                          <FileCheck className="w-4 h-4" />
+                          Règlement intérieur
+                        </a>
+                      </div>
+                      <div>
+                        <a href="/documents/ENFANTAISIES_charte_permanences_parents.pdf" download className="text-primary hover:underline flex items-center gap-2">
+                          <FileCheck className="w-4 h-4" />
+                          Charte des permanences parents
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
