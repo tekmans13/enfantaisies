@@ -34,6 +34,9 @@ export function InscriptionEditDialog({
   const [assignedSejour2, setAssignedSejour2] = useState<string>("");
   const [sejourAttribution, setSejourAttribution] = useState<Map<string, number>>(new Map());
   const { toast } = useToast();
+  
+  // Déterminer si l'utilisateur a demandé 1 ou 2 semaines
+  const hasTwoPreferences = inscription?.sejour_preference_1 && inscription?.sejour_preference_2;
 
   useEffect(() => {
     if (open && inscription) {
@@ -354,37 +357,39 @@ export function InscriptionEditDialog({
                   </RadioGroup>
                 </div>
 
-                <div>
-                  <Label className="text-base mb-3 block font-semibold">2ème séjour attribué (optionnel)</Label>
-                  <RadioGroup value={assignedSejour2} onValueChange={setAssignedSejour2}>
-                    <div className="space-y-2">
-                      <div className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
-                        <RadioGroupItem value="" id="assigned2-none" />
-                        <Label htmlFor="assigned2-none" className="flex-1 cursor-pointer">
-                          <div className="font-semibold">Aucun 2ème séjour</div>
-                        </Label>
-                      </div>
-                      {sejours.filter(s => s.id !== assignedSejour).map((sejour) => (
-                        <div key={sejour.id} className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
-                          <RadioGroupItem value={sejour.id} id={`assigned2-${sejour.id}`} />
-                          <Label htmlFor={`assigned2-${sejour.id}`} className="flex-1 cursor-pointer">
-                            <div className="font-semibold">{sejour.titre}</div>
-                            <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Users className="w-3 h-3" />
-                                {sejourAttribution.get(sejour.id) || 0}/{sejour.places_disponibles} places
-                              </span>
-                            </div>
+                {hasTwoPreferences && (
+                  <div>
+                    <Label className="text-base mb-3 block font-semibold">2ème séjour attribué (optionnel)</Label>
+                    <RadioGroup value={assignedSejour2} onValueChange={setAssignedSejour2}>
+                      <div className="space-y-2">
+                        <div className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
+                          <RadioGroupItem value="" id="assigned2-none" />
+                          <Label htmlFor="assigned2-none" className="flex-1 cursor-pointer">
+                            <div className="font-semibold">Aucun 2ème séjour</div>
                           </Label>
                         </div>
-                      ))}
-                    </div>
-                  </RadioGroup>
-                </div>
+                        {sejours.filter(s => s.id !== assignedSejour).map((sejour) => (
+                          <div key={sejour.id} className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
+                            <RadioGroupItem value={sejour.id} id={`assigned2-${sejour.id}`} />
+                            <Label htmlFor={`assigned2-${sejour.id}`} className="flex-1 cursor-pointer">
+                              <div className="font-semibold">{sejour.titre}</div>
+                              <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Users className="w-3 h-3" />
+                                  {sejourAttribution.get(sejour.id) || 0}/{sejour.places_disponibles} places
+                                </span>
+                              </div>
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </RadioGroup>
+                  </div>
+                )}
               </div>
             </div>
           </div>
