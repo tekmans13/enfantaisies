@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -121,54 +121,41 @@ function generateSecurePassword(): string {
 }
 
 async function sendPasswordResetEmail(supabaseAdmin: any, email: string, newPassword: string) {
-  // Récupérer la configuration SMTP
-  const { data: smtpConfig, error: configError } = await supabaseAdmin
+  // Récupérer la configuration Resend
+  const { data: resendConfig, error: configError } = await supabaseAdmin
     .from("smtp_config")
     .select("*")
     .limit(1)
     .maybeSingle();
 
-  if (configError || !smtpConfig) {
-    throw new Error("Configuration SMTP non trouvée");
+  if (configError || !resendConfig) {
+    throw new Error("Configuration Resend non trouvée");
   }
 
-  const client = new SmtpClient();
-
-  try {
-    await client.connect({
-      hostname: smtpConfig.host,
-      port: smtpConfig.port,
-      username: smtpConfig.username,
-      password: smtpConfig.password,
-    });
-  } catch (connectError) {
-    console.error("SMTP connection error:", connectError);
-    throw new Error("Impossible de se connecter au serveur SMTP");
-  }
+  const resend = new Resend(resendConfig.username); // API Key est dans username
 
   const emailContent = `
-Bonjour,
-
-Votre mot de passe a été réinitialisé par un administrateur.
-
-Voici votre nouveau mot de passe :
-${newPassword}
-
-Pour des raisons de sécurité, nous vous recommandons de changer ce mot de passe après votre prochaine connexion.
-
-Email de connexion : ${email}
-
-Cordialement,
-L'équipe du Centre Aéré
+<h1>Réinitialisation de mot de passe</h1>
+<p>Votre mot de passe a été réinitialisé par un administrateur.</p>
+<p><strong>Voici votre nouveau mot de passe :</strong><br>
+${newPassword}</p>
+<p>Pour des raisons de sécurité, nous vous recommandons de changer ce mot de passe après votre prochaine connexion.</p>
+<p><strong>Email de connexion :</strong> ${email}</p>
+<p>Cordialement,<br>
+L'équipe du Centre Aéré</p>
   `;
 
-  await client.send({
-    from: smtpConfig.from_email,
+  const { error } = await resend.emails.send({
+    from: resendConfig.from_email,
     to: email,
     subject: "Réinitialisation de votre mot de passe",
-    content: emailContent,
+    html: emailContent,
   });
 
-  await client.close();
+  if (error) {
+    console.error("Erreur Resend:", error);
+    throw new Error(`Échec de l'envoi de l'email: ${error.message}`);
+  }
+
   console.log("Email de réinitialisation envoyé à:", email);
 }
