@@ -379,7 +379,7 @@ export default function Bureau() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-foreground mb-2">
-              Gestion Bureau - Centre Aéré
+              Gestion - Centre Aéré
             </h1>
             <p className="text-muted-foreground">
               Tableau de bord des inscriptions
