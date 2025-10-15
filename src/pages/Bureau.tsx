@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign, Send, FileDown, FileArchive, FileText, Download } from "lucide-react";
+import { Users as UsersIcon, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign, Send, FileDown, FileArchive, FileText, Download, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import {
@@ -324,6 +324,10 @@ export default function Bureau() {
             >
               {localStorage.getItem('debugMode') === 'true' ? "Debug: ON" : "Debug: OFF"}
             </Button>
+            <Button onClick={() => navigate("/admin/users")} variant="outline" className="gap-2">
+              <Shield className="h-4 w-4" />
+              Gérer les utilisateurs
+            </Button>
             <Button onClick={() => navigate("/tarifs")} variant="outline" className="gap-2">
               <DollarSign className="h-4 w-4" />
               Gérer les tarifs
@@ -336,7 +340,7 @@ export default function Bureau() {
           <Card className="p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Users className="w-6 h-6 text-primary" />
+                <UsersIcon className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Inscrits</p>
@@ -348,7 +352,7 @@ export default function Bureau() {
           <Card className="p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center">
-                <Users className="w-6 h-6 text-secondary" />
+                <UsersIcon className="w-6 h-6 text-secondary" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Garçons</p>
@@ -360,7 +364,7 @@ export default function Bureau() {
           <Card className="p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                <Users className="w-6 h-6 text-accent" />
+                <UsersIcon className="w-6 h-6 text-accent" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Filles</p>

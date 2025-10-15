@@ -9,6 +9,7 @@ import Bureau from "./pages/Bureau";
 import RecapInscription from "./pages/RecapInscription";
 import Tarifs from "./pages/Tarifs";
 import Auth from "./pages/Auth";
+import Users from "./pages/admin/Users";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
@@ -37,6 +38,14 @@ const App = () => (
             element={
               <ProtectedRoute requireAdmin={true}>
                 <Tarifs />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/users" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <Users />
               </ProtectedRoute>
             } 
           />
