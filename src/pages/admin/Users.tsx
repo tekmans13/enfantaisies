@@ -36,6 +36,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Shield, User, Trash2, ArrowLeft } from "lucide-react";
 
@@ -197,6 +208,43 @@ export default function Users() {
     }
   };
 
+  const handleDeleteUser = async (userId: string, userEmail: string) => {
+    try {
+      setLoading(true);
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) return;
+
+      // Call edge function to delete user
+      const { error } = await supabase.functions.invoke("admin-delete-user", {
+        body: { userId },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Utilisateur supprimé",
+        description: `L'utilisateur ${userEmail} a été supprimé avec succès`,
+      });
+
+      await fetchUsers();
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de supprimer l'utilisateur",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -326,25 +374,57 @@ export default function Users() {
                       {new Date(user.created_at).toLocaleDateString("fr-FR")}
                     </TableCell>
                     <TableCell>
-                      <Select
-                        value={user.role || "none"}
-                        onValueChange={(value) => {
-                          if (value !== "none") {
-                            handleChangeRole(user.id, value as "admin" | "user");
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="w-[140px]">
-                          <SelectValue placeholder="Modifier rôle" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="user">Utilisateur</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="none" disabled>
-                            Aucun rôle
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center gap-2">
+                        <Select
+                          value={user.role || "none"}
+                          onValueChange={(value) => {
+                            if (value !== "none") {
+                              handleChangeRole(user.id, value as "admin" | "user");
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="w-[140px]">
+                            <SelectValue placeholder="Modifier rôle" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="user">Utilisateur</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="none" disabled>
+                              Aucun rôle
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Êtes-vous sûr de vouloir supprimer l'utilisateur {user.email} ?
+                                Cette action est irréversible.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Annuler</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteUser(user.id, user.email)}
+                                className="bg-destructive hover:bg-destructive/90"
+                              >
+                                Supprimer
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
