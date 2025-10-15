@@ -406,22 +406,6 @@ export default function Bureau() {
                   <Shield className="h-4 w-4" />
                   Gérer les utilisateurs
                 </Button>
-                <Button 
-                  onClick={() => setShowDeleteSejoursDialog(true)} 
-                  variant="destructive" 
-                  className="gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Supprimer tous les séjours
-                </Button>
-                <Button 
-                  onClick={() => setShowDeleteInscriptionsDialog(true)} 
-                  variant="destructive" 
-                  className="gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Vider les inscriptions
-                </Button>
               </>
             )}
             <Button onClick={() => navigate("/tarifs")} variant="outline" className="gap-2">
@@ -486,10 +470,22 @@ export default function Bureau() {
         <Card className="p-6 mb-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-foreground">Gestion des séjours</h2>
-            <Button onClick={() => setIsCreatingSejour(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Nouveau séjour
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => setIsCreatingSejour(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Nouveau séjour
+              </Button>
+              {isAdmin && (
+                <Button 
+                  onClick={() => setShowDeleteSejoursDialog(true)} 
+                  variant="destructive" 
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Supprimer tous
+                </Button>
+              )}
+            </div>
           </div>
 
           <Tabs value={selectedGroupe} onValueChange={setSelectedGroupe} className="w-full">
@@ -601,14 +597,26 @@ export default function Bureau() {
             <h2 className="text-2xl font-bold text-foreground">
               Liste des inscriptions {selectedGroupe !== "all" && `- ${selectedGroupe.charAt(0).toUpperCase() + selectedGroupe.slice(1)}`}
             </h2>
-            <Button
-              onClick={() => exportInscriptionsToExcel(inscriptions, sejours)}
-              variant="outline"
-              className="gap-2"
-            >
-              <FileDown className="w-4 h-4" />
-              Exporter Excel
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => exportInscriptionsToExcel(inscriptions, sejours)}
+                variant="outline"
+                className="gap-2"
+              >
+                <FileDown className="w-4 h-4" />
+                Exporter Excel
+              </Button>
+              {isAdmin && (
+                <Button 
+                  onClick={() => setShowDeleteInscriptionsDialog(true)} 
+                  variant="destructive" 
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Vider toutes
+                </Button>
+              )}
+            </div>
           </div>
           <div className="overflow-x-auto">
             <Table>
