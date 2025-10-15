@@ -12,7 +12,7 @@ interface EmailConfig {
   host: string; // Sera utilisé pour stocker "resend"
   port: number;
   username: string; // Sera utilisé pour stocker l'API Key
-  password: string;
+  password: string; // Utilisé pour stocker le domaine
   from_email: string;
 }
 
@@ -24,7 +24,7 @@ export const SmtpConfigDialog = () => {
     host: "resend",
     port: 587,
     username: "", // API Key Resend
-    password: "",
+    password: "", // Domaine
     from_email: "",
   });
 
@@ -144,6 +144,28 @@ export const SmtpConfigDialog = () => {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="password">Domaine vérifié</Label>
+            <Input
+              id="password"
+              value={config.password}
+              onChange={(e) => setConfig({ ...config, password: e.target.value })}
+              placeholder="votredomaine.com"
+              required
+            />
+            <p className="text-xs text-muted-foreground">
+              Le domaine doit être vérifié sur{" "}
+              <a
+                href="https://resend.com/domains"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline"
+              >
+                resend.com/domains
+              </a>
+            </p>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="from_email">Email expéditeur</Label>
             <Input
               id="from_email"
@@ -154,15 +176,7 @@ export const SmtpConfigDialog = () => {
               required
             />
             <p className="text-xs text-muted-foreground">
-              Vous devez vérifier ce domaine sur{" "}
-              <a
-                href="https://resend.com/domains"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary underline"
-              >
-                resend.com/domains
-              </a>
+              Doit utiliser le domaine vérifié ci-dessus
             </p>
           </div>
 
