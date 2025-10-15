@@ -8,7 +8,9 @@ import Inscription from "./pages/Inscription";
 import Bureau from "./pages/Bureau";
 import RecapInscription from "./pages/RecapInscription";
 import Tarifs from "./pages/Tarifs";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -21,9 +23,31 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/inscription" element={<Inscription />} />
-          <Route path="/bureau" element={<Bureau />} />
-          <Route path="/tarifs" element={<Tarifs />} />
-          <Route path="/recap-inscription/:id" element={<RecapInscription />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route 
+            path="/bureau" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <Bureau />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/tarifs" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <Tarifs />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/recap-inscription/:id" 
+            element={
+              <ProtectedRoute>
+                <RecapInscription />
+              </ProtectedRoute>
+            } 
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
