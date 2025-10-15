@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { Resend } from "https://esm.sh/resend@2.0.0";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -121,41 +121,49 @@ function generateSecurePassword(): string {
 }
 
 async function sendPasswordResetEmail(supabaseAdmin: any, email: string, newPassword: string) {
-  // Récupérer la configuration Resend
-  const { data: resendConfig, error: configError } = await supabaseAdmin
+  const { data: smtpConfig, error: configError } = await supabaseAdmin
     .from("smtp_config")
     .select("*")
     .limit(1)
     .maybeSingle();
 
-  if (configError || !resendConfig) {
-    throw new Error("Configuration Resend non trouvée");
+  if (configError || !smtpConfig) {
+    throw new Error("Configuration SMTP non trouvée");
   }
 
-  const resend = new Resend(resendConfig.username); // API Key est dans username
-
-  const emailContent = `
-<h1>Réinitialisation de mot de passe</h1>
-<p>Votre mot de passe a été réinitialisé par un administrateur.</p>
-<p><strong>Voici votre nouveau mot de passe :</strong><br>
-${newPassword}</p>
-<p>Pour des raisons de sécurité, nous vous recommandons de changer ce mot de passe après votre prochaine connexion.</p>
-<p><strong>Email de connexion :</strong> ${email}</p>
-<p>Cordialement,<br>
-L'équipe du Centre Aéré</p>
-  `;
-
-  const { error } = await resend.emails.send({
-    from: resendConfig.from_email,
-    to: email,
-    subject: "Réinitialisation de votre mot de passe",
-    html: emailContent,
+  const client = new SMTPClient({
+    connection: {
+      hostname: smtpConfig.host,
+      port: smtpConfig.port,
+      tls: smtpConfig.port === 465,
+      auth: {
+        username: smtpConfig.username,
+        password: smtpConfig.password,
+      },
+    },
   });
 
-  if (error) {
-    console.error("Erreur Resend:", error);
-    throw new Error(`Échec de l'envoi de l'email: ${error.message}`);
-  }
+  await client.send({
+    from: smtpConfig.from_email,
+    to: email,
+    subject: "Réinitialisation de votre mot de passe",
+    content: `
+Bonjour,
 
+Votre mot de passe a été réinitialisé par un administrateur.
+
+Voici votre nouveau mot de passe :
+${newPassword}
+
+Pour des raisons de sécurité, nous vous recommandons de changer ce mot de passe après votre prochaine connexion.
+
+Email de connexion : ${email}
+
+Cordialement,
+L'équipe du Centre Aéré
+    `,
+  });
+
+  await client.close();
   console.log("Email de réinitialisation envoyé à:", email);
 }

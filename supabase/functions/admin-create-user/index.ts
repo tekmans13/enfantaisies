@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { Resend } from "https://esm.sh/resend@2.0.0";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -127,42 +127,49 @@ function generateSecurePassword(): string {
 }
 
 async function sendWelcomeEmail(supabaseAdmin: any, email: string, password: string) {
-  // Récupérer la configuration Resend
-  const { data: resendConfig, error: configError } = await supabaseAdmin
+  const { data: smtpConfig, error: configError } = await supabaseAdmin
     .from("smtp_config")
     .select("*")
     .limit(1)
     .maybeSingle();
 
-  if (configError || !resendConfig) {
-    console.log("Configuration Resend non trouvée, email non envoyé");
+  if (configError || !smtpConfig) {
+    console.log("Configuration SMTP non trouvée, email non envoyé");
     return;
   }
 
-  const resend = new Resend(resendConfig.username); // API Key est dans username
-
-  const emailContent = `
-<h1>Bienvenue</h1>
-<p>Votre compte a été créé avec succès.</p>
-<p><strong>Voici vos identifiants de connexion :</strong></p>
-<p>Email : ${email}<br>
-Mot de passe : ${password}</p>
-<p>Pour des raisons de sécurité, nous vous recommandons de changer ce mot de passe après votre première connexion.</p>
-<p>Cordialement,<br>
-L'équipe du Centre Aéré</p>
-  `;
-
-  const { error } = await resend.emails.send({
-    from: resendConfig.from_email,
-    to: email,
-    subject: "Bienvenue - Votre compte a été créé",
-    html: emailContent,
+  const client = new SMTPClient({
+    connection: {
+      hostname: smtpConfig.host,
+      port: smtpConfig.port,
+      tls: smtpConfig.port === 465,
+      auth: {
+        username: smtpConfig.username,
+        password: smtpConfig.password,
+      },
+    },
   });
 
-  if (error) {
-    console.error("Erreur Resend:", error);
-    throw new Error(`Échec de l'envoi de l'email: ${error.message}`);
-  }
+  await client.send({
+    from: smtpConfig.from_email,
+    to: email,
+    subject: "Bienvenue - Votre compte a été créé",
+    content: `
+Bonjour,
 
+Votre compte a été créé avec succès.
+
+Voici vos identifiants de connexion :
+Email : ${email}
+Mot de passe : ${password}
+
+Pour des raisons de sécurité, nous vous recommandons de changer ce mot de passe après votre première connexion.
+
+Cordialement,
+L'équipe du Centre Aéré
+    `,
+  });
+
+  await client.close();
   console.log("Email de bienvenue envoyé à:", email);
 }

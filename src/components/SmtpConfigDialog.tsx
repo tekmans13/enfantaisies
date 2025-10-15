@@ -9,10 +9,10 @@ import { Settings } from "lucide-react";
 
 interface EmailConfig {
   id?: string;
-  host: string; // Sera utilisé pour stocker "resend"
+  host: string;
   port: number;
-  username: string; // Sera utilisé pour stocker l'API Key
-  password: string; // Utilisé pour stocker le domaine
+  username: string;
+  password: string;
   from_email: string;
 }
 
@@ -21,10 +21,10 @@ export const SmtpConfigDialog = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const [config, setConfig] = useState<EmailConfig>({
-    host: "resend",
+    host: "",
     port: 587,
-    username: "", // API Key Resend
-    password: "", // Domaine
+    username: "",
+    password: "",
     from_email: "",
   });
 
@@ -109,60 +109,58 @@ export const SmtpConfigDialog = () => {
       <DialogTrigger asChild>
         <Button variant="outline">
           <Settings className="mr-2 h-4 w-4" />
-          Configuration Email (Resend)
+          Configuration SMTP
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Configuration Resend</DialogTitle>
-          <p className="text-sm text-muted-foreground mt-2">
-            Configurez Resend pour l'envoi d'emails. <br />
-            Créez votre clé API sur{" "}
-            <a
-              href="https://resend.com/api-keys"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary underline"
-            >
-              resend.com/api-keys
-            </a>
-          </p>
+          <DialogTitle>Configuration SMTP</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Clé API Resend</Label>
+            <Label htmlFor="host">Serveur SMTP</Label>
             <Input
-              id="username"
-              value={config.username}
-              onChange={(e) => setConfig({ ...config, username: e.target.value, host: "resend" })}
-              placeholder="re_..."
+              id="host"
+              value={config.host}
+              onChange={(e) => setConfig({ ...config, host: e.target.value })}
+              placeholder="smtp.gmail.com"
               required
             />
-            <p className="text-xs text-muted-foreground">
-              Votre clé API commence par "re_"
-            </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Domaine vérifié</Label>
+            <Label htmlFor="port">Port</Label>
             <Input
-              id="password"
-              value={config.password}
-              onChange={(e) => setConfig({ ...config, password: e.target.value })}
-              placeholder="votredomaine.com"
+              id="port"
+              type="number"
+              value={config.port}
+              onChange={(e) => setConfig({ ...config, port: parseInt(e.target.value) })}
+              placeholder="587"
               required
             />
-            <p className="text-xs text-muted-foreground">
-              Le domaine doit être vérifié sur{" "}
-              <a
-                href="https://resend.com/domains"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary underline"
-              >
-                resend.com/domains
-              </a>
-            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="username">Nom d'utilisateur</Label>
+            <Input
+              id="username"
+              value={config.username}
+              onChange={(e) => setConfig({ ...config, username: e.target.value })}
+              placeholder="votre@email.com"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">Mot de passe</Label>
+            <Input
+              id="password"
+              type="password"
+              value={config.password}
+              onChange={(e) => setConfig({ ...config, password: e.target.value })}
+              placeholder="••••••••"
+              required
+            />
           </div>
 
           <div className="space-y-2">
@@ -172,12 +170,9 @@ export const SmtpConfigDialog = () => {
               type="email"
               value={config.from_email}
               onChange={(e) => setConfig({ ...config, from_email: e.target.value })}
-              placeholder="noreply@votredomaine.com"
+              placeholder="noreply@example.com"
               required
             />
-            <p className="text-xs text-muted-foreground">
-              Doit utiliser le domaine vérifié ci-dessus
-            </p>
           </div>
 
           <div className="flex justify-end gap-3">
