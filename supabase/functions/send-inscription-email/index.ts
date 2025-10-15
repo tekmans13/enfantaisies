@@ -44,12 +44,23 @@ const handler = async (req: Request): Promise<Response> => {
 
     const client = new SmtpClient();
 
-    await client.connectTLS({
-      hostname: smtpHost,
-      port: smtpPort,
-      username: smtpUser,
-      password: smtpPassword,
-    });
+    try {
+      await client.connect({
+        hostname: smtpHost,
+        port: smtpPort,
+        username: smtpUser,
+        password: smtpPassword,
+      });
+    } catch (connectError) {
+      console.error("SMTP connection error:", connectError);
+      return new Response(
+        JSON.stringify({ error: "Impossible de se connecter au serveur SMTP" }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
     const emailContent = `
 Bonjour ${parentName},

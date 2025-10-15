@@ -134,12 +134,17 @@ async function sendPasswordResetEmail(supabaseAdmin: any, email: string, newPass
 
   const client = new SmtpClient();
 
-  await client.connectTLS({
-    hostname: smtpConfig.host,
-    port: smtpConfig.port,
-    username: smtpConfig.username,
-    password: smtpConfig.password,
-  });
+  try {
+    await client.connect({
+      hostname: smtpConfig.host,
+      port: smtpConfig.port,
+      username: smtpConfig.username,
+      password: smtpConfig.password,
+    });
+  } catch (connectError) {
+    console.error("SMTP connection error:", connectError);
+    throw new Error("Impossible de se connecter au serveur SMTP");
+  }
 
   const emailContent = `
 Bonjour,
