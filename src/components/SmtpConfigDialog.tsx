@@ -7,11 +7,11 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Settings } from "lucide-react";
 
-interface SmtpConfig {
+interface EmailConfig {
   id?: string;
-  host: string;
+  host: string; // Sera utilisé pour stocker "resend"
   port: number;
-  username: string;
+  username: string; // Sera utilisé pour stocker l'API Key
   password: string;
   from_email: string;
 }
@@ -20,12 +20,12 @@ export const SmtpConfigDialog = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const [config, setConfig] = useState<SmtpConfig>({
-    host: "smtp.free.fr",
+  const [config, setConfig] = useState<EmailConfig>({
+    host: "resend",
     port: 587,
-    username: "",
+    username: "", // API Key Resend
     password: "",
-    from_email: "y.manon@free.fr",
+    from_email: "",
   });
 
   useEffect(() => {
@@ -109,56 +109,38 @@ export const SmtpConfigDialog = () => {
       <DialogTrigger asChild>
         <Button variant="outline">
           <Settings className="mr-2 h-4 w-4" />
-          Configuration SMTP
+          Configuration Email (Resend)
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Configuration SMTP</DialogTitle>
+          <DialogTitle>Configuration Resend</DialogTitle>
+          <p className="text-sm text-muted-foreground mt-2">
+            Configurez Resend pour l'envoi d'emails. <br />
+            Créez votre clé API sur{" "}
+            <a
+              href="https://resend.com/api-keys"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary underline"
+            >
+              resend.com/api-keys
+            </a>
+          </p>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="host">Serveur SMTP</Label>
-            <Input
-              id="host"
-              value={config.host}
-              onChange={(e) => setConfig({ ...config, host: e.target.value })}
-              placeholder="smtp.free.fr"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="port">Port</Label>
-            <Input
-              id="port"
-              type="number"
-              value={config.port}
-              onChange={(e) => setConfig({ ...config, port: parseInt(e.target.value) })}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="username">Nom d'utilisateur</Label>
+            <Label htmlFor="username">Clé API Resend</Label>
             <Input
               id="username"
               value={config.username}
-              onChange={(e) => setConfig({ ...config, username: e.target.value })}
-              placeholder="utilisateur"
+              onChange={(e) => setConfig({ ...config, username: e.target.value, host: "resend" })}
+              placeholder="re_..."
               required
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
-            <Input
-              id="password"
-              type="password"
-              value={config.password}
-              onChange={(e) => setConfig({ ...config, password: e.target.value })}
-              required
-            />
+            <p className="text-xs text-muted-foreground">
+              Votre clé API commence par "re_"
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -168,9 +150,20 @@ export const SmtpConfigDialog = () => {
               type="email"
               value={config.from_email}
               onChange={(e) => setConfig({ ...config, from_email: e.target.value })}
-              placeholder="y.manon@free.fr"
+              placeholder="noreply@votredomaine.com"
               required
             />
+            <p className="text-xs text-muted-foreground">
+              Vous devez vérifier ce domaine sur{" "}
+              <a
+                href="https://resend.com/domains"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline"
+              >
+                resend.com/domains
+              </a>
+            </p>
           </div>
 
           <div className="flex justify-end gap-3">
