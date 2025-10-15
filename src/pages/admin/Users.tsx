@@ -48,7 +48,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, Shield, User, Trash2, ArrowLeft } from "lucide-react";
+import { UserPlus, Shield, User, Trash2, ArrowLeft, Mail } from "lucide-react";
 
 interface UserWithRole {
   id: string;
@@ -245,6 +245,41 @@ export default function Users() {
     }
   };
 
+  const handleResetPassword = async (userId: string, userEmail: string) => {
+    try {
+      setLoading(true);
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) return;
+
+      // Call edge function to reset password
+      const { error } = await supabase.functions.invoke("admin-reset-password", {
+        body: { userId, email: userEmail },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Mot de passe réinitialisé",
+        description: `Un nouveau mot de passe a été envoyé à ${userEmail}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de réinitialiser le mot de passe",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -395,12 +430,22 @@ export default function Users() {
                           </SelectContent>
                         </Select>
                         
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleResetPassword(user.id, user.email)}
+                          title="Réinitialiser le mot de passe"
+                        >
+                          <Mail className="h-4 w-4" />
+                        </Button>
+                        
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button
                               variant="ghost"
                               size="icon"
                               className="text-destructive hover:text-destructive"
+                              title="Supprimer l'utilisateur"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
