@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -89,6 +90,14 @@ serve(async (req) => {
       }
     }
 
+    // Envoyer un email de bienvenue
+    try {
+      await sendWelcomeEmail(supabaseAdmin, email);
+    } catch (emailError: any) {
+      console.error("Erreur lors de l'envoi de l'email:", emailError);
+      // Ne pas faire échouer la création si l'email échoue
+    }
+
     return new Response(
       JSON.stringify({ user: newUser.user }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -101,3 +110,49 @@ serve(async (req) => {
     );
   }
 });
+
+async function sendWelcomeEmail(supabaseAdmin: any, email: string) {
+  // Récupérer la configuration SMTP
+  const { data: smtpConfig, error: configError } = await supabaseAdmin
+    .from("smtp_config")
+    .select("*")
+    .limit(1)
+    .maybeSingle();
+
+  if (configError || !smtpConfig) {
+    console.log("Configuration SMTP non trouvée, email non envoyé");
+    return;
+  }
+
+  const client = new SmtpClient();
+
+  await client.connectTLS({
+    hostname: smtpConfig.host,
+    port: smtpConfig.port,
+    username: smtpConfig.username,
+    password: smtpConfig.password,
+  });
+
+  const emailContent = `
+Bonjour,
+
+Votre compte a été créé avec succès sur l'application Centre Aéré.
+
+Email: ${email}
+
+Vous pouvez maintenant vous connecter à l'application.
+
+Cordialement,
+L'équipe du Centre Aéré
+  `;
+
+  await client.send({
+    from: smtpConfig.from_email,
+    to: email,
+    subject: "Bienvenue - Votre compte a été créé",
+    content: emailContent,
+  });
+
+  await client.close();
+  console.log("Email de bienvenue envoyé à:", email);
+}
