@@ -30,13 +30,7 @@ export default function Auth() {
         description: "Vous êtes maintenant connecté",
       });
 
-      // Check if user is admin
-      const { data: isAdmin } = await supabase.rpc('has_role', {
-        _user_id: data.user.id,
-        _role: 'admin'
-      });
-
-      navigate(isAdmin ? "/bureau" : "/");
+      navigate("/bureau");
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",

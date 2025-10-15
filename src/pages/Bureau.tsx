@@ -40,8 +40,10 @@ export default function Bureau() {
   const [viewingSejour, setViewingSejour] = useState<any>(null);
   const [selectedGroupe, setSelectedGroupe] = useState<string>("all");
   const [sendingPayment, setSendingPayment] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    checkAdminRole();
     fetchInscriptions();
     fetchSejours();
     
@@ -82,6 +84,17 @@ export default function Bureau() {
       supabase.removeChannel(sejoursChannel);
     };
   }, []);
+
+  const checkAdminRole = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data: isAdminRole } = await supabase.rpc('has_role', {
+        _user_id: session.user.id,
+        _role: 'admin'
+      });
+      setIsAdmin(isAdminRole || false);
+    }
+  };
 
   const fetchSejours = async () => {
     const { data } = await supabase
@@ -310,24 +323,28 @@ export default function Bureau() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button 
-              onClick={() => {
-                const currentMode = localStorage.getItem('debugMode') === 'true';
-                localStorage.setItem('debugMode', (!currentMode).toString());
-                toast({
-                  title: currentMode ? "Mode Debug désactivé" : "Mode Debug activé",
-                  description: currentMode ? "La validation des champs est maintenant active" : "La validation des champs est désactivée",
-                });
-              }} 
-              variant={localStorage.getItem('debugMode') === 'true' ? "default" : "outline"}
-              className="gap-2"
-            >
-              {localStorage.getItem('debugMode') === 'true' ? "Debug: ON" : "Debug: OFF"}
-            </Button>
-            <Button onClick={() => navigate("/admin/users")} variant="outline" className="gap-2">
-              <Shield className="h-4 w-4" />
-              Gérer les utilisateurs
-            </Button>
+            {isAdmin && (
+              <>
+                <Button 
+                  onClick={() => {
+                    const currentMode = localStorage.getItem('debugMode') === 'true';
+                    localStorage.setItem('debugMode', (!currentMode).toString());
+                    toast({
+                      title: currentMode ? "Mode Debug désactivé" : "Mode Debug activé",
+                      description: currentMode ? "La validation des champs est maintenant active" : "La validation des champs est désactivée",
+                    });
+                  }} 
+                  variant={localStorage.getItem('debugMode') === 'true' ? "default" : "outline"}
+                  className="gap-2"
+                >
+                  {localStorage.getItem('debugMode') === 'true' ? "Debug: ON" : "Debug: OFF"}
+                </Button>
+                <Button onClick={() => navigate("/admin/users")} variant="outline" className="gap-2">
+                  <Shield className="h-4 w-4" />
+                  Gérer les utilisateurs
+                </Button>
+              </>
+            )}
             <Button onClick={() => navigate("/tarifs")} variant="outline" className="gap-2">
               <DollarSign className="h-4 w-4" />
               Gérer les tarifs
