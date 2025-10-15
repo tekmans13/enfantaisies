@@ -54,7 +54,6 @@ export default function Users() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newUser, setNewUser] = useState({
     email: "",
-    password: "",
     role: "user" as "admin" | "user",
   });
 
@@ -130,15 +129,6 @@ export default function Users() {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (newUser.password.length < 6) {
-      toast({
-        title: "Erreur",
-        description: "Le mot de passe doit contenir au moins 6 caractères",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       setLoading(true);
 
@@ -152,7 +142,6 @@ export default function Users() {
       const { data, error } = await supabase.functions.invoke("admin-create-user", {
         body: {
           email: newUser.email,
-          password: newUser.password,
           role: newUser.role,
         },
         headers: {
@@ -164,11 +153,11 @@ export default function Users() {
 
       toast({
         title: "Utilisateur créé",
-        description: `L'utilisateur ${newUser.email} a été créé avec succès`,
+        description: `L'utilisateur ${newUser.email} a été créé avec succès. Un email avec le mot de passe a été envoyé.`,
       });
 
       setIsDialogOpen(false);
-      setNewUser({ email: "", password: "", role: "user" });
+      setNewUser({ email: "", role: "user" });
       await fetchUsers();
     } catch (error: any) {
       toast({
@@ -265,19 +254,9 @@ export default function Users() {
                     }
                     required
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Minimum 6 caractères"
-                    value={newUser.password}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, password: e.target.value })
-                    }
-                    required
-                  />
+                  <p className="text-sm text-muted-foreground">
+                    Un mot de passe sera généré et envoyé par email
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role">Rôle</Label>

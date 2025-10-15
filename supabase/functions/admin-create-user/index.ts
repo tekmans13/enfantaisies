@@ -55,14 +55,17 @@ serve(async (req) => {
     }
 
     // Get request body
-    const { email, password, role } = await req.json();
+    const { email, role } = await req.json();
 
-    if (!email || !password) {
+    if (!email) {
       return new Response(
-        JSON.stringify({ error: 'Email and password are required' }),
+        JSON.stringify({ error: 'Email is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Générer un mot de passe aléatoire sécurisé
+    const password = generateSecurePassword();
 
     // Create the user
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -90,9 +93,9 @@ serve(async (req) => {
       }
     }
 
-    // Envoyer un email de bienvenue
+    // Envoyer un email de bienvenue avec le mot de passe
     try {
-      await sendWelcomeEmail(supabaseAdmin, email);
+      await sendWelcomeEmail(supabaseAdmin, email, password);
     } catch (emailError: any) {
       console.error("Erreur lors de l'envoi de l'email:", emailError);
       // Ne pas faire échouer la création si l'email échoue
@@ -111,7 +114,19 @@ serve(async (req) => {
   }
 });
 
-async function sendWelcomeEmail(supabaseAdmin: any, email: string) {
+function generateSecurePassword(): string {
+  const length = 12;
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+  let password = "";
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  for (let i = 0; i < length; i++) {
+    password += charset[array[i] % charset.length];
+  }
+  return password;
+}
+
+async function sendWelcomeEmail(supabaseAdmin: any, email: string, password: string) {
   // Récupérer la configuration SMTP
   const { data: smtpConfig, error: configError } = await supabaseAdmin
     .from("smtp_config")
@@ -138,9 +153,12 @@ Bonjour,
 
 Votre compte a été créé avec succès sur l'application Centre Aéré.
 
+Voici vos identifiants de connexion :
 Email: ${email}
+Mot de passe: ${password}
 
 Vous pouvez maintenant vous connecter à l'application.
+Pour des raisons de sécurité, nous vous recommandons de changer votre mot de passe après votre première connexion.
 
 Cordialement,
 L'équipe du Centre Aéré
