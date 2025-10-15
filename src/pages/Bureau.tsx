@@ -20,6 +20,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InscriptionEditDialog } from "@/components/InscriptionEditDialog";
 import { SejourManageDialog } from "@/components/SejourManageDialog";
@@ -41,6 +51,8 @@ export default function Bureau() {
   const [selectedGroupe, setSelectedGroupe] = useState<string>("all");
   const [sendingPayment, setSendingPayment] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showDeleteSejoursDialog, setShowDeleteSejoursDialog] = useState(false);
+  const [showDeleteInscriptionsDialog, setShowDeleteInscriptionsDialog] = useState(false);
 
   useEffect(() => {
     checkAdminRole();
@@ -208,6 +220,57 @@ export default function Bureau() {
     }
   };
 
+  const handleDeleteAllSejours = async () => {
+    try {
+      const { error } = await supabase
+        .from('sejours')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+
+      if (error) throw error;
+
+      toast({
+        title: "Séjours supprimés",
+        description: "Tous les séjours ont été supprimés avec succès",
+      });
+
+      fetchSejours();
+      fetchInscriptions();
+      setShowDeleteSejoursDialog(false);
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de supprimer les séjours",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteAllInscriptions = async () => {
+    try {
+      const { error } = await supabase
+        .from('inscriptions')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+
+      if (error) throw error;
+
+      toast({
+        title: "Inscriptions supprimées",
+        description: "Toutes les inscriptions ont été supprimées avec succès",
+      });
+
+      fetchInscriptions();
+      setShowDeleteInscriptionsDialog(false);
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de supprimer les inscriptions",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSendPayment = async (inscription: any) => {
     setSendingPayment(inscription.id);
     
@@ -322,7 +385,7 @@ export default function Bureau() {
               Tableau de bord des inscriptions
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {isAdmin && (
               <>
                 <Button 
@@ -342,6 +405,22 @@ export default function Bureau() {
                 <Button onClick={() => navigate("/admin/users")} variant="outline" className="gap-2">
                   <Shield className="h-4 w-4" />
                   Gérer les utilisateurs
+                </Button>
+                <Button 
+                  onClick={() => setShowDeleteSejoursDialog(true)} 
+                  variant="destructive" 
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Supprimer tous les séjours
+                </Button>
+                <Button 
+                  onClick={() => setShowDeleteInscriptionsDialog(true)} 
+                  variant="destructive" 
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Vider les inscriptions
                 </Button>
               </>
             )}
@@ -731,6 +810,40 @@ export default function Bureau() {
         open={!!viewingSejour}
         onOpenChange={(open) => !open && setViewingSejour(null)}
       />
+
+      <AlertDialog open={showDeleteSejoursDialog} onOpenChange={setShowDeleteSejoursDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer tous les séjours ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Tous les séjours seront définitivement supprimés de la base de données.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAllSejours} className="bg-destructive hover:bg-destructive/90">
+              Supprimer tous les séjours
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showDeleteInscriptionsDialog} onOpenChange={setShowDeleteInscriptionsDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Vider toutes les inscriptions ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Toutes les inscriptions seront définitivement supprimées de la base de données.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAllInscriptions} className="bg-destructive hover:bg-destructive/90">
+              Vider les inscriptions
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
