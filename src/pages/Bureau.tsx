@@ -174,7 +174,7 @@ export default function Bureau() {
     }
   };
 
-  const handleValidate = async (id: string, status: 'validee' | 'refusee') => {
+  const handleAttribuer = async (id: string) => {
     // Récupérer l'inscription pour connaître le séjour choisi
     const { data: inscription } = await supabase
       .from('inscriptions')
@@ -185,12 +185,12 @@ export default function Bureau() {
     const { error } = await supabase
       .from('inscriptions')
       .update({ 
-        status,
+        status: 'attribuee',
         validated_at: new Date().toISOString()
       })
       .eq('id', id);
 
-    if (!error && inscription && status === 'validee' && inscription.sejour_preference_1) {
+    if (!error && inscription && inscription.sejour_preference_1) {
       // Décrémenter les places disponibles du séjour
       const { data: sejour } = await supabase
         .from('sejours')
@@ -210,6 +210,10 @@ export default function Bureau() {
 
     if (!error) {
       fetchInscriptions();
+      toast({
+        title: "Inscription attribuée",
+        description: "Le séjour a été attribué avec succès",
+      });
     }
   };
 
@@ -756,8 +760,14 @@ export default function Bureau() {
                            En attente
                          </Badge>
                        )}
-                       {inscription.status === 'validee' && (
+                       {inscription.status === 'attribuee' && (
                          <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500 text-xs px-2 py-0">
+                           <CheckCircle className="w-2 h-2 mr-1" />
+                           Attribuée
+                         </Badge>
+                       )}
+                       {inscription.status === 'validee' && (
+                         <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs px-2 py-0">
                            <CheckCircle className="w-2 h-2 mr-1" />
                            Validée
                          </Badge>
@@ -796,62 +806,24 @@ export default function Bureau() {
                      </TableCell>
                      <TableCell className="py-2">
                        <div className="flex gap-1">
-                         <TooltipProvider>
-                           <Tooltip>
-                             <TooltipTrigger asChild>
-                               <Button
-                                 size="sm"
-                                 variant="outline"
-                                 className="h-7 w-7 p-0"
-                                 onClick={() => setEditingInscription(inscription)}
-                               >
-                                 <Edit className="w-3 h-3" />
-                               </Button>
-                             </TooltipTrigger>
-                             <TooltipContent>
-                               <p>Modifier</p>
-                             </TooltipContent>
-                           </Tooltip>
-                         </TooltipProvider>
-                         
                          {inscription.status === 'en_attente' && (
-                           <>
-                             <TooltipProvider>
-                               <Tooltip>
-                                 <TooltipTrigger asChild>
-                                   <Button
-                                     size="sm"
-                                     variant="outline"
-                                     className="h-7 w-7 p-0 bg-green-500/10 text-green-500 border-green-500 hover:bg-green-500 hover:text-white"
-                                     onClick={() => handleValidate(inscription.id, 'validee')}
-                                   >
-                                     <CheckCircle className="w-3 h-3" />
-                                   </Button>
-                                 </TooltipTrigger>
-                                 <TooltipContent>
-                                   <p>Valider</p>
-                                 </TooltipContent>
-                               </Tooltip>
-                             </TooltipProvider>
-                             
-                             <TooltipProvider>
-                               <Tooltip>
-                                 <TooltipTrigger asChild>
-                                   <Button
-                                     size="sm"
-                                     variant="outline"
-                                     className="h-7 w-7 p-0 bg-red-500/10 text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
-                                     onClick={() => handleValidate(inscription.id, 'refusee')}
-                                   >
-                                     <XCircle className="w-3 h-3" />
-                                   </Button>
-                                 </TooltipTrigger>
-                                 <TooltipContent>
-                                   <p>Refuser</p>
-                                 </TooltipContent>
-                               </Tooltip>
-                             </TooltipProvider>
-                           </>
+                           <TooltipProvider>
+                             <Tooltip>
+                               <TooltipTrigger asChild>
+                                 <Button
+                                   size="sm"
+                                   variant="outline"
+                                   className="h-7 w-7 p-0 bg-green-500/10 text-green-500 border-green-500 hover:bg-green-500 hover:text-white"
+                                   onClick={() => handleAttribuer(inscription.id)}
+                                 >
+                                   <CheckCircle className="w-3 h-3" />
+                                 </Button>
+                               </TooltipTrigger>
+                               <TooltipContent>
+                                 <p>Attribuer</p>
+                               </TooltipContent>
+                             </Tooltip>
+                           </TooltipProvider>
                          )}
                          
                          <TooltipProvider>
@@ -919,6 +891,24 @@ export default function Bureau() {
                              </TooltipTrigger>
                              <TooltipContent>
                                <p>Télécharger documents</p>
+                             </TooltipContent>
+                           </Tooltip>
+                         </TooltipProvider>
+                         
+                         <TooltipProvider>
+                           <Tooltip>
+                             <TooltipTrigger asChild>
+                               <Button
+                                 size="sm"
+                                 variant="ghost"
+                                 className="h-7 w-7 p-0"
+                                 onClick={() => setEditingInscription(inscription)}
+                               >
+                                 <Edit className="w-3 h-3" />
+                               </Button>
+                             </TooltipTrigger>
+                             <TooltipContent>
+                               <p>Modifier</p>
                              </TooltipContent>
                            </Tooltip>
                          </TooltipProvider>
