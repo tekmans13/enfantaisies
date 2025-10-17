@@ -9,13 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle, Info, Plus, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle, Info, Plus, X, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 4;
 const getDebugMode = () => localStorage.getItem('debugMode') === 'true';
 
 export default function Inscription() {
@@ -188,7 +189,7 @@ export default function Inscription() {
     if (getDebugMode()) return { isValid: true }; // Bypass validation en mode debug
 
     switch (step) {
-      case 3: // Étape Enfant
+      case 2: // Étape Enfant
         if (!formData.childFirstName.trim()) return { isValid: false, message: "Le prénom de l'enfant est requis" };
         if (!formData.childLastName.trim()) return { isValid: false, message: "Le nom de l'enfant est requis" };
         if (!formData.childBirthDate) return { isValid: false, message: "La date de naissance est requise" };
@@ -205,7 +206,7 @@ export default function Inscription() {
         if (!formData.parentAddress.trim()) return { isValid: false, message: "L'adresse du domicile est requise" };
         if (!formData.socialSecurityRegime) return { isValid: false, message: "Le régime de sécurité sociale est requis" };
         break;
-      case 4: // Étape Séjours
+      case 3: // Étape Séjours
         if (!numberOfWeeks) return { isValid: false, message: "Le nombre de semaines est requis" };
         if (numberOfWeeks === "1") {
           if (selectedSejours.length === 0) return { isValid: false, message: "Veuillez sélectionner au moins un séjour" };
@@ -217,7 +218,7 @@ export default function Inscription() {
           if (!week2Priority) return { isValid: false, message: "Veuillez indiquer le séjour prioritaire pour la deuxième semaine" };
         }
         break;
-      case 5: // Étape Documents
+      case 4: // Étape Documents
         if (!uploadedFiles.ficheSanitaire1) return { isValid: false, message: "La fiche sanitaire de liaison est requise" };
         if (!uploadedFiles.autorisationParentale) return { isValid: false, message: "L'autorisation parentale est requise" };
         if (!uploadedFiles.assuranceRC) return { isValid: false, message: "L'attestation d'assurance RC est requise" };
@@ -368,11 +369,10 @@ export default function Inscription() {
   };
 
   const steps = [
-    { number: 1, title: "Documents", icon: FileCheck },
-    { number: 2, title: "Préalables", icon: FileCheck },
-    { number: 3, title: "Enfant", icon: Users },
-    { number: 4, title: "Séjours", icon: Calendar },
-    { number: 5, title: "Documents", icon: FileCheck },
+    { number: 1, title: "Préalables", icon: FileCheck },
+    { number: 2, title: "Enfant", icon: Users },
+    { number: 3, title: "Séjours", icon: Calendar },
+    { number: 4, title: "Documents", icon: FileCheck },
   ];
 
   const progressPercentage = (currentStep / TOTAL_STEPS) * 100;
@@ -444,34 +444,46 @@ export default function Inscription() {
           <div className="min-h-[400px]">
             {currentStep === 1 && (
               <div>
-                <h2 className="text-2xl font-bold text-foreground mb-4">
-                  Vérification des documents
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  Chers parents, vérifiez que vous êtes bien en possession des documents suivants avant de commencer l'inscription :
-                </p>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
-                    <FileCheck className="w-5 h-5 text-primary mt-0.5" />
-                    <p className="text-sm">Attestation de la CAF (moins de 3 mois) - OU - Avis d'imposition 2024</p>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
-                    <FileCheck className="w-5 h-5 text-primary mt-0.5" />
-                    <p className="text-sm">Certificat médical</p>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
-                    <FileCheck className="w-5 h-5 text-primary mt-0.5" />
-                    <p className="text-sm">Responsabilité civile (avec le nom de l'enfant)</p>
-                  </div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-foreground">
+                    Informations préalables
+                  </h2>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <AlertCircle className="w-4 h-4 mr-2" />
+                        Documents requis
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Documents requis</DialogTitle>
+                      </DialogHeader>
+                      <Alert variant="default" className="border-amber-500/50 bg-amber-500/10">
+                        <AlertCircle className="h-5 w-5 text-amber-600" />
+                        <AlertDescription className="text-sm mt-2">
+                          <p className="font-medium mb-3 text-amber-900 dark:text-amber-100">
+                            Chers parents, vérifiez que vous êtes bien en possession des documents suivants avant de commencer l'inscription :
+                          </p>
+                          <div className="space-y-2">
+                            <div className="flex items-start gap-2">
+                              <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                              <p className="text-amber-900 dark:text-amber-100">Attestation de la CAF (moins de 3 mois) - OU - Avis d'imposition 2024</p>
+                            </div>
+                            <div className="flex items-start gap-2">
+                              <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                              <p className="text-amber-900 dark:text-amber-100">Certificat médical</p>
+                            </div>
+                            <div className="flex items-start gap-2">
+                              <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                              <p className="text-amber-900 dark:text-amber-100">Responsabilité civile (avec le nom de l'enfant)</p>
+                            </div>
+                          </div>
+                        </AlertDescription>
+                      </Alert>
+                    </DialogContent>
+                  </Dialog>
                 </div>
-              </div>
-            )}
-
-            {currentStep === 2 && (
-              <div>
-                <h2 className="text-2xl font-bold text-foreground mb-4">
-                  Informations préalables
-                </h2>
                 <p className="text-muted-foreground mb-6">
                   Avant de commencer, merci de cocher les cases correspondantes à votre inscription :
                 </p>
@@ -499,7 +511,7 @@ export default function Inscription() {
               </div>
             )}
 
-            {currentStep === 3 && (
+            {currentStep === 2 && (
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-6">
                   Informations sur l'enfant
@@ -809,7 +821,7 @@ export default function Inscription() {
               </div>
             )}
 
-            {currentStep === 4 && (
+            {currentStep === 3 && (
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-4">
                   Choix des séjours
@@ -1200,7 +1212,7 @@ export default function Inscription() {
               </div>
             )}
 
-            {currentStep === 5 && (
+            {currentStep === 4 && (
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-4">
                   Documents requis
