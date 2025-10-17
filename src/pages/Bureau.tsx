@@ -766,6 +766,12 @@ export default function Bureau() {
                            Attribuée
                          </Badge>
                        )}
+                       {inscription.status === 'attribuee_alternatif' && (
+                         <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs px-2 py-0">
+                           <CheckCircle className="w-2 h-2 mr-1" />
+                           Attribuée
+                         </Badge>
+                       )}
                        {inscription.status === 'validee' && (
                          <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs px-2 py-0">
                            <CheckCircle className="w-2 h-2 mr-1" />

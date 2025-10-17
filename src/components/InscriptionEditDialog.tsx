@@ -147,12 +147,26 @@ export function InscriptionEditDialog({
     const oldSejour1 = inscription.sejour_attribue_1;
     const oldSejour2 = inscription.sejour_attribue_2;
 
+    // Déterminer si les attributions correspondent aux choix prioritaires ou alternatifs
+    const isAlternatif = 
+      (assignedSejour === inscription.sejour_preference_1_alternatif) ||
+      (assignedSejour === inscription.sejour_preference_2_alternatif) ||
+      (assignedSejour2 && (
+        assignedSejour2 === inscription.sejour_preference_1_alternatif ||
+        assignedSejour2 === inscription.sejour_preference_2_alternatif
+      ));
+
+    // Déterminer le statut en fonction des choix attribués
+    const newStatus = isAlternatif ? 'attribuee_alternatif' : 'attribuee';
+
     // Mettre à jour l'inscription
     const { error } = await supabase
       .from('inscriptions')
       .update({ 
         sejour_attribue_1: assignedSejour,
         sejour_attribue_2: assignedSejour2 || null,
+        status: newStatus,
+        validated_at: new Date().toISOString()
       })
       .eq('id', inscription.id);
 
