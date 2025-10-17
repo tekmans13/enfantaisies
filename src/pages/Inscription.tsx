@@ -23,6 +23,8 @@ export default function Inscription() {
   const [currentStep, setCurrentStep] = useState(1);
   const [childAgeGroup, setChildAgeGroup] = useState<string | null>(null);
   const [showParent2, setShowParent2] = useState(false);
+  const [showUrgencyContact2, setShowUrgencyContact2] = useState(false);
+  const [showAuthorizedPerson2, setShowAuthorizedPerson2] = useState(false);
   const [isDocModalOpen, setIsDocModalOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -888,7 +890,7 @@ export default function Inscription() {
                     </h3>
                     
                     {/* Personne 1 */}
-                    <div className="mb-6">
+                    <div className="mb-4">
                       <h4 className="text-md font-medium text-foreground mb-3">Personne 1</h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
@@ -941,9 +943,39 @@ export default function Inscription() {
                       </div>
                     </div>
 
+                    {!showUrgencyContact2 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowUrgencyContact2(true)}
+                        className="w-full border-dashed"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Ajouter une autre personne à prévenir
+                      </Button>
+                    )}
+
                     {/* Personne 2 */}
-                    <div>
-                      <h4 className="text-md font-medium text-foreground mb-3">Personne 2</h4>
+                    {showUrgencyContact2 && (
+                      <div className="border-t-2 border-destructive/10 pt-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-md font-medium text-foreground">Personne 2</h4>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setShowUrgencyContact2(false);
+                              handleInputChange('urgencyContact2FirstName', '');
+                              handleInputChange('urgencyContact2LastName', '');
+                              handleInputChange('urgencyContact2Relation', '');
+                              handleInputChange('urgencyContact2Mobile', '');
+                              handleInputChange('urgencyContact2OtherPhone', '');
+                            }}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="urgencyContact2FirstName">Prénom</Label>
@@ -994,6 +1026,7 @@ export default function Inscription() {
                         </div>
                       </div>
                     </div>
+                    )}
                   </div>
 
                   {/* Section 2.2 : Personnes autorisées à récupérer l'enfant */}
@@ -1004,7 +1037,7 @@ export default function Inscription() {
                     </h3>
                     
                     {/* Personne 1 */}
-                    <div className="mb-6">
+                    <div className="mb-4">
                       <h4 className="text-md font-medium text-foreground mb-3">Personne 1</h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
@@ -1057,9 +1090,39 @@ export default function Inscription() {
                       </div>
                     </div>
 
+                    {!showAuthorizedPerson2 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowAuthorizedPerson2(true)}
+                        className="w-full border-dashed"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Ajouter une autre personne autorisée
+                      </Button>
+                    )}
+
                     {/* Personne 2 */}
-                    <div>
-                      <h4 className="text-md font-medium text-foreground mb-3">Personne 2</h4>
+                    {showAuthorizedPerson2 && (
+                      <div className="border-t-2 border-accent/10 pt-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-md font-medium text-foreground">Personne 2</h4>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setShowAuthorizedPerson2(false);
+                              handleInputChange('authorizedPerson2FirstName', '');
+                              handleInputChange('authorizedPerson2LastName', '');
+                              handleInputChange('authorizedPerson2Relation', '');
+                              handleInputChange('authorizedPerson2Mobile', '');
+                              handleInputChange('authorizedPerson2OtherPhone', '');
+                            }}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="authorizedPerson2FirstName">Prénom</Label>
@@ -1110,6 +1173,7 @@ export default function Inscription() {
                         </div>
                       </div>
                     </div>
+                    )}
                   </div>
                 </div>
               </div>
