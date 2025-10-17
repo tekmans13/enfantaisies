@@ -813,6 +813,7 @@ export default function Bureau() {
                              </TooltipContent>
                            </Tooltip>
                          </TooltipProvider>
+                         
                          {inscription.status === 'en_attente' && (
                            <>
                              <TooltipProvider>
@@ -832,6 +833,7 @@ export default function Bureau() {
                                  </TooltipContent>
                                </Tooltip>
                              </TooltipProvider>
+                             
                              <TooltipProvider>
                                <Tooltip>
                                  <TooltipTrigger asChild>
@@ -851,95 +853,93 @@ export default function Bureau() {
                              </TooltipProvider>
                            </>
                          )}
-                         <DropdownMenu>
-                           <DropdownMenuTrigger asChild>
-                             <Button
-                               size="sm"
-                               variant="ghost"
-                               className="h-7 w-7 p-0"
-                             >
-                               <MoreVertical className="w-3 h-3" />
-                             </Button>
-                           </DropdownMenuTrigger>
-                           <DropdownMenuContent align="end">
-                             <TooltipProvider>
-                               <Tooltip>
-                                 <TooltipTrigger asChild>
-                                   <DropdownMenuItem
-                                     onClick={() => handleSendPayment(inscription)}
-                                     disabled={sendingPayment === inscription.id}
-                                   >
-                                     <Send className="w-4 h-4 mr-2" />
-                                     {sendingPayment === inscription.id ? 'Envoi...' : 'Envoyer lien paiement'}
-                                   </DropdownMenuItem>
-                                 </TooltipTrigger>
-                                 <TooltipContent side="left">
-                                   <p>Envoyer lien paiement</p>
-                                 </TooltipContent>
-                               </Tooltip>
-                             </TooltipProvider>
-                             <TooltipProvider>
-                               <Tooltip>
-                                 <TooltipTrigger asChild>
-                                   <DropdownMenuItem
-                                     onClick={() => navigate(`/recap-inscription/${inscription.id}`)}
-                                   >
-                                     <Eye className="w-4 h-4 mr-2" />
-                                     Voir le récapitulatif
-                                   </DropdownMenuItem>
-                                 </TooltipTrigger>
-                                 <TooltipContent side="left">
-                                   <p>Voir le récapitulatif</p>
-                                 </TooltipContent>
-                               </Tooltip>
-                             </TooltipProvider>
-                             <TooltipProvider>
-                               <Tooltip>
-                                 <TooltipTrigger asChild>
-                                   <DropdownMenuItem
-                                     onClick={async () => {
-                                       try {
-                                         await downloadAllDocuments(inscription.id);
-                                         toast({
-                                           title: "Téléchargement réussi",
-                                           description: "Documents téléchargés en ZIP",
-                                         });
-                                       } catch (error) {
-                                         toast({
-                                           title: "Erreur",
-                                           description: "Aucun document trouvé",
-                                           variant: "destructive",
-                                         });
-                                       }
-                                     }}
-                                   >
-                                     <FileArchive className="w-4 h-4 mr-2" />
-                                     Télécharger documents
-                                   </DropdownMenuItem>
-                                 </TooltipTrigger>
-                                 <TooltipContent side="left">
-                                   <p>Télécharger documents</p>
-                                 </TooltipContent>
-                               </Tooltip>
-                             </TooltipProvider>
-                             <TooltipProvider>
-                               <Tooltip>
-                                 <TooltipTrigger asChild>
-                                   <DropdownMenuItem
-                                     onClick={() => setDeletingInscriptionId(inscription.id)}
-                                     className="text-destructive focus:text-destructive"
-                                   >
-                                     <Trash2 className="w-4 h-4 mr-2" />
-                                     Supprimer
-                                   </DropdownMenuItem>
-                                 </TooltipTrigger>
-                                 <TooltipContent side="left">
-                                   <p>Supprimer</p>
-                                 </TooltipContent>
-                               </Tooltip>
-                             </TooltipProvider>
-                           </DropdownMenuContent>
-                         </DropdownMenu>
+                         
+                         <TooltipProvider>
+                           <Tooltip>
+                             <TooltipTrigger asChild>
+                               <Button
+                                 size="sm"
+                                 variant="ghost"
+                                 className="h-7 w-7 p-0"
+                                 onClick={() => handleSendPayment(inscription)}
+                                 disabled={sendingPayment === inscription.id}
+                               >
+                                 <Send className="w-3 h-3" />
+                               </Button>
+                             </TooltipTrigger>
+                             <TooltipContent>
+                               <p>Envoyer lien paiement</p>
+                             </TooltipContent>
+                           </Tooltip>
+                         </TooltipProvider>
+                         
+                         <TooltipProvider>
+                           <Tooltip>
+                             <TooltipTrigger asChild>
+                               <Button
+                                 size="sm"
+                                 variant="ghost"
+                                 className="h-7 w-7 p-0"
+                                 onClick={() => navigate(`/recap-inscription/${inscription.id}`)}
+                               >
+                                 <Eye className="w-3 h-3" />
+                               </Button>
+                             </TooltipTrigger>
+                             <TooltipContent>
+                               <p>Voir le récapitulatif</p>
+                             </TooltipContent>
+                           </Tooltip>
+                         </TooltipProvider>
+                         
+                         <TooltipProvider>
+                           <Tooltip>
+                             <TooltipTrigger asChild>
+                               <Button
+                                 size="sm"
+                                 variant="ghost"
+                                 className="h-7 w-7 p-0"
+                                 onClick={async () => {
+                                   try {
+                                     await downloadAllDocuments(inscription.id);
+                                     toast({
+                                       title: "Téléchargement réussi",
+                                       description: "Documents téléchargés en ZIP",
+                                     });
+                                   } catch (error) {
+                                     toast({
+                                       title: "Erreur",
+                                       description: "Aucun document trouvé",
+                                       variant: "destructive",
+                                     });
+                                   }
+                                 }}
+                               >
+                                 <FileArchive className="w-3 h-3" />
+                               </Button>
+                             </TooltipTrigger>
+                             <TooltipContent>
+                               <p>Télécharger documents</p>
+                             </TooltipContent>
+                           </Tooltip>
+                         </TooltipProvider>
+                         
+                         <TooltipProvider>
+                           <Tooltip>
+                             <TooltipTrigger asChild>
+                               <Button
+                                 size="sm"
+                                 variant="ghost"
+                                 className="h-7 w-7 p-0 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                                 onClick={() => setDeletingInscriptionId(inscription.id)}
+                               >
+                                 <Trash2 className="w-3 h-3" />
+                               </Button>
+                             </TooltipTrigger>
+                             <TooltipContent>
+                               <p>Supprimer</p>
+                             </TooltipContent>
+                           </Tooltip>
+                         </TooltipProvider>
                        </div>
                      </TableCell>
                    </TableRow>
