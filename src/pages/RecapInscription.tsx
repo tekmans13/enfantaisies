@@ -28,7 +28,7 @@ export default function RecapInscription() {
           .from('inscriptions')
           .select('*')
           .eq('id', id)
-          .single();
+          .maybeSingle();
 
         if (inscriptionError) throw inscriptionError;
         setInscription(inscriptionData);
