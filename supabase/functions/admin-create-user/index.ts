@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import nodemailer from "https://esm.sh/nodemailer@6.9.8";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -138,21 +138,23 @@ async function sendWelcomeEmail(supabaseAdmin: any, email: string, password: str
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: smtpConfig.host,
-    port: smtpConfig.port,
-    secure: smtpConfig.port === 465,
-    auth: {
-      user: smtpConfig.username,
-      pass: smtpConfig.password,
+  const client = new SMTPClient({
+    connection: {
+      hostname: smtpConfig.host,
+      port: smtpConfig.port,
+      tls: smtpConfig.port === 465,
+      auth: {
+        username: smtpConfig.username,
+        password: smtpConfig.password,
+      },
     },
   });
 
-  await transporter.sendMail({
+  await client.send({
     from: smtpConfig.from_email,
     to: email,
     subject: "Bienvenue - Votre compte a été créé",
-    text: `
+    content: `
 Bonjour,
 
 Votre compte a été créé avec succès.
@@ -168,5 +170,6 @@ L'équipe du Centre Aéré
     `,
   });
 
+  await client.close();
   console.log("Email de bienvenue envoyé à:", email);
 }
