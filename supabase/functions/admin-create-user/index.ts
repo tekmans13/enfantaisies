@@ -142,7 +142,6 @@ async function sendWelcomeEmail(supabaseAdmin: any, email: string, password: str
     connection: {
       hostname: smtpConfig.host,
       port: smtpConfig.port,
-      tls: smtpConfig.port === 465,
       auth: {
         username: smtpConfig.username,
         password: smtpConfig.password,

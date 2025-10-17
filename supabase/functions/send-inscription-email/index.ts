@@ -57,7 +57,6 @@ const handler = async (req: Request): Promise<Response> => {
     connection: {
       hostname: smtpConfig.host,
       port: smtpConfig.port,
-      tls: smtpConfig.port === 465,
       auth: {
         username: smtpConfig.username,
         password: smtpConfig.password,
