@@ -419,6 +419,19 @@ export default function RecapInscription() {
               </div>
             </div>
 
+            {/* Demande spécifique */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Info className="w-5 h-5 text-primary" />
+                <h2 className="text-xl font-semibold">Demande spécifique</h2>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-6">
+                <p className="text-sm text-muted-foreground">
+                  {inscription.demande_specifique || 'Vide'}
+                </p>
+              </div>
+            </div>
+
             {/* Informations complémentaires */}
             {(inscription.has_medication || inscription.has_allergies || inscription.has_food_allergies) && (
               <div>
