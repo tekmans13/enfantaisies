@@ -53,6 +53,7 @@ export default function Bureau() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showDeleteSejoursDialog, setShowDeleteSejoursDialog] = useState(false);
   const [showDeleteInscriptionsDialog, setShowDeleteInscriptionsDialog] = useState(false);
+  const [deletingInscriptionId, setDeletingInscriptionId] = useState<string | null>(null);
 
   useEffect(() => {
     checkAdminRole();
@@ -268,6 +269,41 @@ export default function Bureau() {
         description: error.message || "Impossible de supprimer les inscriptions",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleDeleteInscription = async (id: string) => {
+    try {
+      // Supprimer d'abord les documents associés
+      const { error: docsError } = await supabase
+        .from('inscription_documents')
+        .delete()
+        .eq('inscription_id', id);
+
+      if (docsError) throw docsError;
+
+      // Supprimer l'inscription
+      const { error } = await supabase
+        .from('inscriptions')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Inscription supprimée",
+        description: "L'inscription a été supprimée avec succès",
+      });
+
+      fetchInscriptions();
+      setDeletingInscriptionId(null);
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de supprimer l'inscription",
+        variant: "destructive",
+      });
+      setDeletingInscriptionId(null);
     }
   };
 
@@ -641,7 +677,12 @@ export default function Bureau() {
                   <TableRow key={inscription.id}>
                     <TableCell>
                       <div>
-                        <p className="font-semibold">{inscription.child_first_name} {inscription.child_last_name}</p>
+                        <p 
+                          className="font-semibold cursor-pointer hover:text-primary transition-colors"
+                          onClick={() => setEditingInscription(inscription)}
+                        >
+                          {inscription.child_first_name} {inscription.child_last_name}
+                        </p>
                         <p className="text-sm text-muted-foreground">
                           {inscription.child_gender === 'garcon' ? '👦' : '👧'} {inscription.child_class}
                         </p>
@@ -752,6 +793,14 @@ export default function Bureau() {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => setDeletingInscriptionId(inscription.id)}
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </Button>
                         {inscription.status === 'en_attente' && (
                           <>
                             <Button
@@ -848,6 +897,26 @@ export default function Bureau() {
             <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteAllInscriptions} className="bg-destructive hover:bg-destructive/90">
               Vider les inscriptions
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!deletingInscriptionId} onOpenChange={(open) => !open && setDeletingInscriptionId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer cette inscription ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. L'inscription et tous les documents associés seront définitivement supprimés de la base de données.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => deletingInscriptionId && handleDeleteInscription(deletingInscriptionId)} 
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Supprimer l'inscription
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
