@@ -785,28 +785,32 @@ export default function Bureau() {
                          </Badge>
                        )}
                      </TableCell>
-                     <TableCell className="py-2">
-                       {inscription.paiement_statut === 'paye' && (
-                         <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500 text-xs px-2 py-0">
-                           ✓ Payé
-                         </Badge>
-                       )}
-                       {inscription.paiement_statut === 'en_attente' && (
-                         <Badge variant="outline" className="bg-gray-500/10 text-gray-500 border-gray-500 text-xs px-2 py-0">
-                           En attente
-                         </Badge>
-                       )}
-                       {inscription.paiement_statut === 'echoue' && (
-                         <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500 text-xs px-2 py-0">
-                           Échoué
-                         </Badge>
-                       )}
-                       {inscription.paiement_statut === 'rembourse' && (
-                         <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs px-2 py-0">
-                           Remboursé
-                         </Badge>
-                       )}
-                     </TableCell>
+                      <TableCell className="py-2">
+                        {inscription.stripe_payment_id && (
+                          <>
+                            {inscription.paiement_statut === 'paye' && (
+                              <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500 text-xs px-2 py-0">
+                                ✓ Payé
+                              </Badge>
+                            )}
+                            {inscription.paiement_statut === 'en_attente' && (
+                              <Badge variant="outline" className="bg-gray-500/10 text-gray-500 border-gray-500 text-xs px-2 py-0">
+                                En attente
+                              </Badge>
+                            )}
+                            {inscription.paiement_statut === 'echoue' && (
+                              <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500 text-xs px-2 py-0">
+                                Échoué
+                              </Badge>
+                            )}
+                            {inscription.paiement_statut === 'rembourse' && (
+                              <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs px-2 py-0">
+                                Remboursé
+                              </Badge>
+                            )}
+                          </>
+                        )}
+                      </TableCell>
                      <TableCell className="py-2">
                        <span className="text-xs">{new Date(inscription.created_at).toLocaleDateString('fr-FR')}</span>
                      </TableCell>
