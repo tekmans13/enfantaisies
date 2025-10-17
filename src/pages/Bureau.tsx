@@ -175,54 +175,34 @@ export default function Bureau() {
   };
 
   const handleAttribuer = async (id: string) => {
-    // Récupérer l'inscription pour connaître les séjours choisis
+    // Récupérer l'inscription pour connaître le séjour choisi
     const { data: inscription } = await supabase
       .from('inscriptions')
-      .select('*')
+      .select('sejour_preference_1')
       .eq('id', id)
       .single();
-
-    if (!inscription) return;
 
     const { error } = await supabase
       .from('inscriptions')
       .update({ 
         status: 'attribuee',
-        validated_at: new Date().toISOString(),
-        sejour_attribue_1: inscription.sejour_preference_1,
-        sejour_attribue_2: inscription.nombre_semaines_demandees === 2 ? inscription.sejour_preference_2 : null
+        validated_at: new Date().toISOString()
       })
       .eq('id', id);
 
-    if (!error && inscription.sejour_preference_1) {
-      // Décrémenter les places disponibles du premier séjour
-      const { data: sejour1 } = await supabase
+    if (!error && inscription && inscription.sejour_preference_1) {
+      // Décrémenter les places disponibles du séjour
+      const { data: sejour } = await supabase
         .from('sejours')
         .select('places_disponibles')
         .eq('id', inscription.sejour_preference_1)
         .single();
 
-      if (sejour1 && sejour1.places_disponibles > 0) {
+      if (sejour && sejour.places_disponibles > 0) {
         await supabase
           .from('sejours')
-          .update({ places_disponibles: sejour1.places_disponibles - 1 })
+          .update({ places_disponibles: sejour.places_disponibles - 1 })
           .eq('id', inscription.sejour_preference_1);
-      }
-
-      // Décrémenter les places du deuxième séjour si nécessaire
-      if (inscription.nombre_semaines_demandees === 2 && inscription.sejour_preference_2) {
-        const { data: sejour2 } = await supabase
-          .from('sejours')
-          .select('places_disponibles')
-          .eq('id', inscription.sejour_preference_2)
-          .single();
-
-        if (sejour2 && sejour2.places_disponibles > 0) {
-          await supabase
-            .from('sejours')
-            .update({ places_disponibles: sejour2.places_disponibles - 1 })
-            .eq('id', inscription.sejour_preference_2);
-        }
       }
       
       fetchSejours();
@@ -780,26 +760,14 @@ export default function Bureau() {
                            En attente
                          </Badge>
                        )}
-                       {inscription.status === 'attribuee' && (() => {
-                         // Vérifier si c'est un choix prioritaire ou alternatif
-                         const isPrioritaire = 
-                           (inscription.sejour_attribue_1 === inscription.sejour_preference_1 || !inscription.sejour_attribue_1) &&
-                           (inscription.sejour_attribue_2 === inscription.sejour_preference_2 || !inscription.sejour_attribue_2 || inscription.nombre_semaines_demandees === 1);
-                         
-                         return isPrioritaire ? (
-                           <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500 text-xs px-2 py-0">
-                             <CheckCircle className="w-2 h-2 mr-1" />
-                             Attribuée
-                           </Badge>
-                         ) : (
-                           <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs px-2 py-0">
-                             <CheckCircle className="w-2 h-2 mr-1" />
-                             Attribuée
-                           </Badge>
-                         );
-                       })()}
+                       {inscription.status === 'attribuee' && (
+                         <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500 text-xs px-2 py-0">
+                           <CheckCircle className="w-2 h-2 mr-1" />
+                           Attribuée
+                         </Badge>
+                       )}
                        {inscription.status === 'validee' && (
-                         <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500 text-xs px-2 py-0">
+                         <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs px-2 py-0">
                            <CheckCircle className="w-2 h-2 mr-1" />
                            Validée
                          </Badge>
