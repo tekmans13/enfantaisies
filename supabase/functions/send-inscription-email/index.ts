@@ -1,6 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+import nodemailer from "https://esm.sh/nodemailer@6.9.8";
+import { Buffer } from "node:buffer";
+
+// Polyfill Buffer for nodemailer compatibility
+globalThis.Buffer = globalThis.Buffer || Buffer;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -36,6 +40,8 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
+    console.log("🔧 Récupération config SMTP...");
+    
     const { data: smtpConfig, error: configError } = await supabaseAdmin
       .from("smtp_config")
       .select("*")
@@ -43,7 +49,7 @@ const handler = async (req: Request): Promise<Response> => {
       .maybeSingle();
 
     if (configError || !smtpConfig) {
-      console.error("Configuration SMTP non trouvée");
+      console.error("❌ Configuration SMTP non trouvée:", configError);
       return new Response(
         JSON.stringify({ error: "Configuration SMTP non configurée" }),
         {
@@ -53,22 +59,32 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-  const client = new SMTPClient({
-    connection: {
-      hostname: smtpConfig.host,
+    console.log("✅ Config SMTP récupérée:", {
+      host: smtpConfig.host,
       port: smtpConfig.port,
-      auth: {
-        username: smtpConfig.username,
-        password: smtpConfig.password,
-      },
-    },
-  });
+      from: smtpConfig.from_email,
+      user: smtpConfig.username
+    });
 
-    await client.send({
+    const transporter = nodemailer.createTransport({
+      host: smtpConfig.host,
+      port: smtpConfig.port,
+      secure: false,
+      auth: {
+        user: smtpConfig.username,
+        pass: smtpConfig.password,
+      },
+      logger: true,
+      debug: true,
+    });
+
+    console.log("📧 Transporter créé, envoi de l'email...");
+
+    const info = await transporter.sendMail({
       from: smtpConfig.from_email,
       to: parentEmail,
       subject: "Confirmation de votre inscription - Centre Aéré",
-      content: `
+      text: `
 Bonjour ${parentName},
 
 Nous avons bien reçu votre inscription pour ${childName} au Centre Aéré.
@@ -89,8 +105,8 @@ L'équipe du Centre Aéré
       `,
     });
 
-    await client.close();
-    console.log("Email envoyé avec succès à:", parentEmail);
+    console.log("✅ Email envoyé avec succès:", info.messageId);
+    console.log("Response:", info.response);
 
     return new Response(
       JSON.stringify({ success: true, message: "Email envoyé avec succès" }),
