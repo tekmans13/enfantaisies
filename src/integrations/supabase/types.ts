@@ -102,6 +102,7 @@ export type Database = {
           child_last_name: string
           child_school: string
           created_at: string | null
+          demande_specifique: string | null
           has_allergies: boolean | null
           has_food_allergies: boolean | null
           has_medication: boolean | null
@@ -169,6 +170,7 @@ export type Database = {
           child_last_name: string
           child_school: string
           created_at?: string | null
+          demande_specifique?: string | null
           has_allergies?: boolean | null
           has_food_allergies?: boolean | null
           has_medication?: boolean | null
@@ -236,6 +238,7 @@ export type Database = {
           child_last_name?: string
           child_school?: string
           created_at?: string | null
+          demande_specifique?: string | null
           has_allergies?: boolean | null
           has_food_allergies?: boolean | null
           has_medication?: boolean | null

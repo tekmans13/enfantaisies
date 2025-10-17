@@ -62,6 +62,7 @@ export default function Inscription() {
     sejourPreference2: "",
     sejourPreference1Alternatif: "",
     sejourPreference2Alternatif: "",
+    demandeSpecifique: "",
     // Personnes à prévenir en urgence
     urgencyContact1FirstName: "",
     urgencyContact1LastName: "",
@@ -311,6 +312,7 @@ export default function Inscription() {
         sejour_preference_1_alternatif: formData.sejourPreference1Alternatif || null,
         sejour_preference_2_alternatif: formData.sejourPreference2Alternatif || null,
         nombre_semaines_demandees: parseInt(numberOfWeeks),
+        demande_specifique: formData.demandeSpecifique || null,
         // Contacts d'urgence
         urgency_contact_1_first_name: formData.urgencyContact1FirstName || null,
         urgency_contact_1_last_name: formData.urgencyContact1LastName || null,
@@ -1566,6 +1568,20 @@ export default function Inscription() {
                       </div>
                     </>
                   )}
+
+                  {/* Champ demande spécifique */}
+                  <div className="bg-muted/30 p-4 rounded-lg">
+                    <Label htmlFor="demandeSpecifique" className="text-base mb-2 block font-semibold">
+                      Indiquer toute demande spécifique (regrouper ou non une fratrie, être avec un camarade, autres)
+                    </Label>
+                    <textarea
+                      id="demandeSpecifique"
+                      value={formData.demandeSpecifique}
+                      onChange={(e) => handleInputChange('demandeSpecifique', e.target.value)}
+                      className="w-full min-h-[100px] p-3 rounded-md border border-input bg-background text-foreground resize-y"
+                      placeholder="Saisissez vos demandes spécifiques ici..."
+                    />
+                  </div>
                 </div>
               </div>
             )}
