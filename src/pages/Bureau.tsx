@@ -691,7 +691,10 @@ export default function Bureau() {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <p className="font-semibold text-sm cursor-help">{inscription.child_first_name} {inscription.child_last_name}</p>
+                                <div className="flex items-center gap-1.5">
+                                  <p className="font-semibold text-sm cursor-help">{inscription.child_first_name} {inscription.child_last_name}</p>
+                                  <span className="h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent className="max-w-sm">
                                 <p className="text-xs">{inscription.demande_specifique}</p>
