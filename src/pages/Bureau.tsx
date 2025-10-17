@@ -810,29 +810,9 @@ export default function Bureau() {
                      <TableCell className="py-2">
                        <span className="text-xs">{new Date(inscription.created_at).toLocaleDateString('fr-FR')}</span>
                      </TableCell>
-                     <TableCell className="py-2">
-                       <div className="flex gap-1">
-                         {inscription.status === 'en_attente' && (
-                           <TooltipProvider>
-                             <Tooltip>
-                               <TooltipTrigger asChild>
-                                 <Button
-                                   size="sm"
-                                   variant="outline"
-                                   className="h-7 w-7 p-0 bg-green-500/10 text-green-500 border-green-500 hover:bg-green-500 hover:text-white"
-                                   onClick={() => handleAttribuer(inscription.id)}
-                                 >
-                                   <CheckCircle className="w-3 h-3" />
-                                 </Button>
-                               </TooltipTrigger>
-                               <TooltipContent>
-                                 <p>Valider</p>
-                               </TooltipContent>
-                             </Tooltip>
-                           </TooltipProvider>
-                         )}
-                         
-                         <TooltipProvider>
+                      <TableCell className="py-2">
+                        <div className="flex gap-1">
+                          <TooltipProvider>
                            <Tooltip>
                              <TooltipTrigger asChild>
                                <Button
