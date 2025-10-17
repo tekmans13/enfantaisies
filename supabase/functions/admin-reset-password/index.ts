@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import nodemailer from "https://esm.sh/nodemailer@6.9.8";
-import { Buffer } from "node:buffer";
-
-// Polyfill Buffer for nodemailer compatibility
-globalThis.Buffer = globalThis.Buffer || Buffer;
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -125,8 +121,6 @@ function generateSecurePassword(): string {
 }
 
 async function sendPasswordResetEmail(supabaseAdmin: any, email: string, newPassword: string) {
-  console.log("🔧 Début de sendPasswordResetEmail pour:", email);
-  
   const { data: smtpConfig, error: configError } = await supabaseAdmin
     .from("smtp_config")
     .select("*")
@@ -134,37 +128,26 @@ async function sendPasswordResetEmail(supabaseAdmin: any, email: string, newPass
     .maybeSingle();
 
   if (configError || !smtpConfig) {
-    console.error("❌ Configuration SMTP non trouvée:", configError);
     throw new Error("Configuration SMTP non trouvée");
   }
 
-  console.log("✅ Config SMTP récupérée:", {
-    host: smtpConfig.host,
-    port: smtpConfig.port,
-    from: smtpConfig.from_email,
-    user: smtpConfig.username
+  const client = new SMTPClient({
+    connection: {
+      hostname: smtpConfig.host,
+      port: smtpConfig.port,
+      tls: false,
+      auth: {
+        username: smtpConfig.username,
+        password: smtpConfig.password,
+      },
+    },
   });
 
-  try {
-    const transporter = nodemailer.createTransport({
-      host: smtpConfig.host,
-      port: smtpConfig.port,
-      secure: false, // true pour 465, false pour les autres ports
-      auth: {
-        user: smtpConfig.username,
-        pass: smtpConfig.password,
-      },
-      logger: true,
-      debug: true,
-    });
-
-    console.log("📧 Transporter créé, envoi de l'email...");
-
-    const info = await transporter.sendMail({
-      from: smtpConfig.from_email,
-      to: email,
-      subject: "Réinitialisation de votre mot de passe",
-      text: `
+  await client.send({
+    from: smtpConfig.from_email,
+    to: email,
+    subject: "Réinitialisation de votre mot de passe",
+    content: `
 Bonjour,
 
 Votre mot de passe a été réinitialisé par un administrateur.
@@ -178,13 +161,9 @@ Email de connexion : ${email}
 
 Cordialement,
 L'équipe du Centre Aéré
-      `,
-    });
+    `,
+  });
 
-    console.log("✅ Email envoyé avec succès:", info.messageId);
-    console.log("Response:", info.response);
-  } catch (error) {
-    console.error("❌ Erreur détaillée lors de l'envoi:", error);
-    throw error;
-  }
+  await client.close();
+  console.log("Email de réinitialisation envoyé à:", email);
 }

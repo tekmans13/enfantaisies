@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import nodemailer from "https://esm.sh/nodemailer@6.9.8";
-import { Buffer } from "node:buffer";
-
-// Polyfill Buffer for nodemailer compatibility
-globalThis.Buffer = globalThis.Buffer || Buffer;
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -131,8 +127,6 @@ function generateSecurePassword(): string {
 }
 
 async function sendWelcomeEmail(supabaseAdmin: any, email: string, password: string) {
-  console.log("🔧 Début de sendWelcomeEmail pour:", email);
-  
   const { data: smtpConfig, error: configError } = await supabaseAdmin
     .from("smtp_config")
     .select("*")
@@ -140,37 +134,27 @@ async function sendWelcomeEmail(supabaseAdmin: any, email: string, password: str
     .maybeSingle();
 
   if (configError || !smtpConfig) {
-    console.log("❌ Configuration SMTP non trouvée, email non envoyé");
+    console.log("Configuration SMTP non trouvée, email non envoyé");
     return;
   }
 
-  console.log("✅ Config SMTP récupérée:", {
-    host: smtpConfig.host,
-    port: smtpConfig.port,
-    from: smtpConfig.from_email,
-    user: smtpConfig.username
+  const client = new SMTPClient({
+    connection: {
+      hostname: smtpConfig.host,
+      port: smtpConfig.port,
+      tls: false,
+      auth: {
+        username: smtpConfig.username,
+        password: smtpConfig.password,
+      },
+    },
   });
 
-  try {
-    const transporter = nodemailer.createTransport({
-      host: smtpConfig.host,
-      port: smtpConfig.port,
-      secure: false,
-      auth: {
-        user: smtpConfig.username,
-        pass: smtpConfig.password,
-      },
-      logger: true,
-      debug: true,
-    });
-
-    console.log("📧 Transporter créé, envoi de l'email...");
-
-    const info = await transporter.sendMail({
-      from: smtpConfig.from_email,
-      to: email,
-      subject: "Bienvenue - Votre compte a été créé",
-      text: `
+  await client.send({
+    from: smtpConfig.from_email,
+    to: email,
+    subject: "Bienvenue - Votre compte a été créé",
+    content: `
 Bonjour,
 
 Votre compte a été créé avec succès.
@@ -183,13 +167,9 @@ Pour des raisons de sécurité, nous vous recommandons de changer ce mot de pass
 
 Cordialement,
 L'équipe du Centre Aéré
-      `,
-    });
+    `,
+  });
 
-    console.log("✅ Email envoyé avec succès:", info.messageId);
-    console.log("Response:", info.response);
-  } catch (error) {
-    console.error("❌ Erreur détaillée lors de l'envoi:", error);
-    throw error;
-  }
+  await client.close();
+  console.log("Email de bienvenue envoyé à:", email);
 }
