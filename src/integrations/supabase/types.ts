@@ -298,6 +298,7 @@ export type Database = {
           id: string
           password: string
           port: number
+          tls: boolean
           updated_at: string
           username: string
         }
@@ -308,6 +309,7 @@ export type Database = {
           id?: string
           password: string
           port?: number
+          tls?: boolean
           updated_at?: string
           username: string
         }
@@ -318,6 +320,7 @@ export type Database = {
           id?: string
           password?: string
           port?: number
+          tls?: boolean
           updated_at?: string
           username?: string
         }

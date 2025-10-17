@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Settings } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface EmailConfig {
   id?: string;
@@ -14,6 +15,7 @@ interface EmailConfig {
   username: string;
   password: string;
   from_email: string;
+  tls: boolean;
 }
 
 export const SmtpConfigDialog = () => {
@@ -26,6 +28,7 @@ export const SmtpConfigDialog = () => {
     username: "",
     password: "",
     from_email: "",
+    tls: false,
   });
 
   useEffect(() => {
@@ -67,6 +70,7 @@ export const SmtpConfigDialog = () => {
             username: config.username,
             password: config.password,
             from_email: config.from_email,
+            tls: config.tls,
           })
           .eq("id", config.id);
 
@@ -81,6 +85,7 @@ export const SmtpConfigDialog = () => {
             username: config.username,
             password: config.password,
             from_email: config.from_email,
+            tls: config.tls,
           });
 
         if (error) throw error;
@@ -173,6 +178,17 @@ export const SmtpConfigDialog = () => {
               placeholder="noreply@example.com"
               required
             />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="tls"
+              checked={config.tls}
+              onCheckedChange={(checked) => setConfig({ ...config, tls: checked })}
+            />
+            <Label htmlFor="tls" className="cursor-pointer">
+              Activer TLS/SSL (port 465)
+            </Label>
           </div>
 
           <div className="flex justify-end gap-3">
