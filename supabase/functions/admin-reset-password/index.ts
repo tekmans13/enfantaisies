@@ -135,7 +135,7 @@ async function sendPasswordResetEmail(supabaseAdmin: any, email: string, newPass
     connection: {
       hostname: smtpConfig.host,
       port: smtpConfig.port,
-      tls: smtpConfig.port === 465,
+      tls: true,
       auth: {
         username: smtpConfig.username,
         password: smtpConfig.password,

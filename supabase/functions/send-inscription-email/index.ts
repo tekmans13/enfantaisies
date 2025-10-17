@@ -53,17 +53,17 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const client = new SMTPClient({
-      connection: {
-        hostname: smtpConfig.host,
-        port: smtpConfig.port,
-        tls: smtpConfig.port === 465,
-        auth: {
-          username: smtpConfig.username,
-          password: smtpConfig.password,
-        },
+  const client = new SMTPClient({
+    connection: {
+      hostname: smtpConfig.host,
+      port: smtpConfig.port,
+      tls: true,
+      auth: {
+        username: smtpConfig.username,
+        password: smtpConfig.password,
       },
-    });
+    },
+  });
 
     await client.send({
       from: smtpConfig.from_email,
