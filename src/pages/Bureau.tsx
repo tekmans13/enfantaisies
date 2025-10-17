@@ -696,7 +696,7 @@ export default function Bureau() {
                     return (
                   <TableRow 
                     key={`${inscription.id}-week${weekNumber}`}
-                    className={showTopBorder ? 'border-t border-border' : 'border-t border-transparent'}
+                    className={showTopBorder ? 'border-t-2 border-border' : ''}
                   >
                     <TableCell className="py-2">
                       {weekNumber === 1 ? (
