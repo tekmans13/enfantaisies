@@ -672,7 +672,6 @@ export default function Bureau() {
                   <TableHead>Statut</TableHead>
                   <TableHead>Paiement</TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead>Documents</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -797,58 +796,59 @@ export default function Bureau() {
                      </TableCell>
                      <TableCell className="py-2">
                        <div className="flex gap-1">
-                         <Button
-                           size="sm"
-                           variant="ghost"
-                           className="h-7 w-7 p-0"
-                           onClick={async () => {
-                             try {
-                               await downloadAllDocuments(inscription.id);
-                               toast({
-                                 title: "Téléchargement réussi",
-                                 description: "Documents téléchargés en ZIP",
-                               });
-                             } catch (error) {
-                               toast({
-                                 title: "Erreur",
-                                 description: "Aucun document trouvé",
-                                 variant: "destructive",
-                               });
-                             }
-                           }}
-                         >
-                           <FileArchive className="w-3 h-3" />
-                         </Button>
-                       </div>
-                     </TableCell>
-                     <TableCell className="py-2">
-                       <div className="flex gap-1">
-                         <Button
-                           size="sm"
-                           variant="outline"
-                           className="h-7 w-7 p-0"
-                           onClick={() => setEditingInscription(inscription)}
-                         >
-                           <Edit className="w-3 h-3" />
-                         </Button>
+                         <TooltipProvider>
+                           <Tooltip>
+                             <TooltipTrigger asChild>
+                               <Button
+                                 size="sm"
+                                 variant="outline"
+                                 className="h-7 w-7 p-0"
+                                 onClick={() => setEditingInscription(inscription)}
+                               >
+                                 <Edit className="w-3 h-3" />
+                               </Button>
+                             </TooltipTrigger>
+                             <TooltipContent>
+                               <p>Modifier</p>
+                             </TooltipContent>
+                           </Tooltip>
+                         </TooltipProvider>
                          {inscription.status === 'en_attente' && (
                            <>
-                             <Button
-                               size="sm"
-                               variant="outline"
-                               className="h-7 w-7 p-0 bg-green-500/10 text-green-500 border-green-500 hover:bg-green-500 hover:text-white"
-                               onClick={() => handleValidate(inscription.id, 'validee')}
-                             >
-                               <CheckCircle className="w-3 h-3" />
-                             </Button>
-                             <Button
-                               size="sm"
-                               variant="outline"
-                               className="h-7 w-7 p-0 bg-red-500/10 text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
-                               onClick={() => handleValidate(inscription.id, 'refusee')}
-                             >
-                               <XCircle className="w-3 h-3" />
-                             </Button>
+                             <TooltipProvider>
+                               <Tooltip>
+                                 <TooltipTrigger asChild>
+                                   <Button
+                                     size="sm"
+                                     variant="outline"
+                                     className="h-7 w-7 p-0 bg-green-500/10 text-green-500 border-green-500 hover:bg-green-500 hover:text-white"
+                                     onClick={() => handleValidate(inscription.id, 'validee')}
+                                   >
+                                     <CheckCircle className="w-3 h-3" />
+                                   </Button>
+                                 </TooltipTrigger>
+                                 <TooltipContent>
+                                   <p>Valider</p>
+                                 </TooltipContent>
+                               </Tooltip>
+                             </TooltipProvider>
+                             <TooltipProvider>
+                               <Tooltip>
+                                 <TooltipTrigger asChild>
+                                   <Button
+                                     size="sm"
+                                     variant="outline"
+                                     className="h-7 w-7 p-0 bg-red-500/10 text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+                                     onClick={() => handleValidate(inscription.id, 'refusee')}
+                                   >
+                                     <XCircle className="w-3 h-3" />
+                                   </Button>
+                                 </TooltipTrigger>
+                                 <TooltipContent>
+                                   <p>Refuser</p>
+                                 </TooltipContent>
+                               </Tooltip>
+                             </TooltipProvider>
                            </>
                          )}
                          <DropdownMenu>
@@ -862,26 +862,82 @@ export default function Bureau() {
                              </Button>
                            </DropdownMenuTrigger>
                            <DropdownMenuContent align="end">
-                             <DropdownMenuItem
-                               onClick={() => handleSendPayment(inscription)}
-                               disabled={sendingPayment === inscription.id}
-                             >
-                               <Send className="w-4 h-4 mr-2" />
-                               {sendingPayment === inscription.id ? 'Envoi...' : 'Envoyer lien paiement'}
-                             </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => navigate(`/recap-inscription/${inscription.id}`)}
-                              >
-                                <Eye className="w-4 h-4 mr-2" />
-                                Voir le récapitulatif
-                              </DropdownMenuItem>
-                             <DropdownMenuItem
-                               onClick={() => setDeletingInscriptionId(inscription.id)}
-                               className="text-destructive focus:text-destructive"
-                             >
-                               <Trash2 className="w-4 h-4 mr-2" />
-                               Supprimer
-                             </DropdownMenuItem>
+                             <TooltipProvider>
+                               <Tooltip>
+                                 <TooltipTrigger asChild>
+                                   <DropdownMenuItem
+                                     onClick={() => handleSendPayment(inscription)}
+                                     disabled={sendingPayment === inscription.id}
+                                   >
+                                     <Send className="w-4 h-4 mr-2" />
+                                     {sendingPayment === inscription.id ? 'Envoi...' : 'Envoyer lien paiement'}
+                                   </DropdownMenuItem>
+                                 </TooltipTrigger>
+                                 <TooltipContent side="left">
+                                   <p>Envoyer lien paiement</p>
+                                 </TooltipContent>
+                               </Tooltip>
+                             </TooltipProvider>
+                             <TooltipProvider>
+                               <Tooltip>
+                                 <TooltipTrigger asChild>
+                                   <DropdownMenuItem
+                                     onClick={() => navigate(`/recap-inscription/${inscription.id}`)}
+                                   >
+                                     <Eye className="w-4 h-4 mr-2" />
+                                     Voir le récapitulatif
+                                   </DropdownMenuItem>
+                                 </TooltipTrigger>
+                                 <TooltipContent side="left">
+                                   <p>Voir le récapitulatif</p>
+                                 </TooltipContent>
+                               </Tooltip>
+                             </TooltipProvider>
+                             <TooltipProvider>
+                               <Tooltip>
+                                 <TooltipTrigger asChild>
+                                   <DropdownMenuItem
+                                     onClick={async () => {
+                                       try {
+                                         await downloadAllDocuments(inscription.id);
+                                         toast({
+                                           title: "Téléchargement réussi",
+                                           description: "Documents téléchargés en ZIP",
+                                         });
+                                       } catch (error) {
+                                         toast({
+                                           title: "Erreur",
+                                           description: "Aucun document trouvé",
+                                           variant: "destructive",
+                                         });
+                                       }
+                                     }}
+                                   >
+                                     <FileArchive className="w-4 h-4 mr-2" />
+                                     Télécharger documents
+                                   </DropdownMenuItem>
+                                 </TooltipTrigger>
+                                 <TooltipContent side="left">
+                                   <p>Télécharger documents</p>
+                                 </TooltipContent>
+                               </Tooltip>
+                             </TooltipProvider>
+                             <TooltipProvider>
+                               <Tooltip>
+                                 <TooltipTrigger asChild>
+                                   <DropdownMenuItem
+                                     onClick={() => setDeletingInscriptionId(inscription.id)}
+                                     className="text-destructive focus:text-destructive"
+                                   >
+                                     <Trash2 className="w-4 h-4 mr-2" />
+                                     Supprimer
+                                   </DropdownMenuItem>
+                                 </TooltipTrigger>
+                                 <TooltipContent side="left">
+                                   <p>Supprimer</p>
+                                 </TooltipContent>
+                               </Tooltip>
+                             </TooltipProvider>
                            </DropdownMenuContent>
                          </DropdownMenu>
                        </div>
