@@ -14,7 +14,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Users as UsersIcon, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign, Send, FileDown, FileArchive, FileText, Download, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,7 +53,6 @@ export default function Bureau() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showDeleteSejoursDialog, setShowDeleteSejoursDialog] = useState(false);
   const [showDeleteInscriptionsDialog, setShowDeleteInscriptionsDialog] = useState(false);
-  const [selectedInscriptions, setSelectedInscriptions] = useState<string[]>([]);
 
   useEffect(() => {
     checkAdminRole();
@@ -272,107 +270,6 @@ export default function Bureau() {
       });
     }
   };
-
-  const handleBulkValidate = async (status: 'validee' | 'refusee') => {
-    try {
-      for (const id of selectedInscriptions) {
-        await handleValidate(id, status);
-      }
-      toast({
-        title: "Succès",
-        description: `${selectedInscriptions.length} inscription(s) ${status === 'validee' ? 'validée(s)' : 'refusée(s)'}`,
-      });
-      setSelectedInscriptions([]);
-      fetchInscriptions();
-    } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer ${selectedInscriptions.length} inscription(s) ?`)) return;
-
-    try {
-      const { error } = await supabase
-        .from('inscriptions')
-        .delete()
-        .in('id', selectedInscriptions);
-
-      if (error) throw error;
-
-      toast({
-        title: "Inscriptions supprimées",
-        description: `${selectedInscriptions.length} inscription(s) supprimée(s)`,
-      });
-      setSelectedInscriptions([]);
-      fetchInscriptions();
-    } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleBulkPayment = async () => {
-    try {
-      for (const id of selectedInscriptions) {
-        const inscription = inscriptions.find(i => i.id === id);
-        if (inscription) {
-          await handleSendPayment(inscription);
-        }
-      }
-      toast({
-        title: "Succès",
-        description: `Liens de paiement créés pour ${selectedInscriptions.length} inscription(s)`,
-      });
-      setSelectedInscriptions([]);
-    } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const toggleSelectAll = () => {
-    const filteredInscriptions = inscriptions.filter(
-      inscription => selectedGroupe === "all" || inscription.child_age_group === selectedGroupe
-    );
-    
-    if (selectedInscriptions.length === filteredInscriptions.length) {
-      setSelectedInscriptions([]);
-    } else {
-      setSelectedInscriptions(filteredInscriptions.map(i => i.id));
-    }
-  };
-
-  const toggleSelectInscription = (id: string) => {
-    setSelectedInscriptions(prev => 
-      prev.includes(id) 
-        ? prev.filter(i => i !== id)
-        : [...prev, id]
-    );
-  };
-
-  const eligibleForValidation = selectedInscriptions.filter(id => {
-    const inscription = inscriptions.find(i => i.id === id);
-    return inscription?.status === 'en_attente';
-  });
-
-  const eligibleForPayment = selectedInscriptions.filter(id => {
-    const inscription = inscriptions.find(i => i.id === id);
-    return inscription?.status === 'validee' && inscription?.paiement_statut !== 'paye';
-  });
-
-  const canBulkValidate = eligibleForValidation.length > 0;
-  const canBulkPayment = eligibleForPayment.length > 0;
 
   const handleSendPayment = async (inscription: any) => {
     setSendingPayment(inscription.id);
@@ -701,47 +598,6 @@ export default function Bureau() {
               Liste des inscriptions {selectedGroupe !== "all" && `- ${selectedGroupe.charAt(0).toUpperCase() + selectedGroupe.slice(1)}`}
             </h2>
             <div className="flex gap-2">
-              {selectedInscriptions.length > 0 && (
-                <>
-                  {canBulkValidate && (
-                    <>
-                      <Button
-                        onClick={() => handleBulkValidate('validee')}
-                        className="bg-green-500 hover:bg-green-600 gap-2"
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                        Valider ({eligibleForValidation.length})
-                      </Button>
-                      <Button
-                        onClick={() => handleBulkValidate('refusee')}
-                        variant="destructive"
-                        className="gap-2"
-                      >
-                        <XCircle className="w-4 h-4" />
-                        Refuser ({eligibleForValidation.length})
-                      </Button>
-                    </>
-                  )}
-                  {canBulkPayment && (
-                    <Button
-                      onClick={handleBulkPayment}
-                      variant="outline"
-                      className="gap-2"
-                    >
-                      <Send className="w-4 h-4" />
-                      Paiements ({eligibleForPayment.length})
-                    </Button>
-                  )}
-                  <Button
-                    onClick={handleBulkDelete}
-                    variant="destructive"
-                    className="gap-2"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Supprimer ({selectedInscriptions.length})
-                  </Button>
-                </>
-              )}
               <Button
                 onClick={() => exportInscriptionsToExcel(inscriptions, sejours)}
                 variant="outline"
@@ -766,18 +622,6 @@ export default function Bureau() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12">
-                    <Checkbox
-                      checked={
-                        inscriptions
-                          .filter(inscription => selectedGroupe === "all" || inscription.child_age_group === selectedGroupe)
-                          .length > 0 &&
-                        selectedInscriptions.length === 
-                        inscriptions.filter(inscription => selectedGroupe === "all" || inscription.child_age_group === selectedGroupe).length
-                      }
-                      onCheckedChange={toggleSelectAll}
-                    />
-                  </TableHead>
                   <TableHead>Enfant</TableHead>
                   <TableHead>Âge/Groupe</TableHead>
                   <TableHead>Téléphone</TableHead>
@@ -795,12 +639,6 @@ export default function Bureau() {
                   .filter(inscription => selectedGroupe === "all" || inscription.child_age_group === selectedGroupe)
                   .map((inscription) => (
                   <TableRow key={inscription.id}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedInscriptions.includes(inscription.id)}
-                        onCheckedChange={() => toggleSelectInscription(inscription.id)}
-                      />
-                    </TableCell>
                     <TableCell>
                       <div>
                         <p className="font-semibold">{inscription.child_first_name} {inscription.child_last_name}</p>
