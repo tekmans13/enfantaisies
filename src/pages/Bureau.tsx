@@ -690,180 +690,197 @@ export default function Bureau() {
                     const weekNumber = inscriptionRow.weekNumber;
                     
                     return (
-                  <TableRow key={`${inscription.id}-week${weekNumber}`}>
-                    <TableCell>
-                      <div>
-                        <p className="font-semibold">{inscription.child_first_name} {inscription.child_last_name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {inscription.child_gender === 'garcon' ? '👦' : '👧'} {inscription.child_class}
-                        </p>
-                      </div>
+                  <TableRow 
+                    key={`${inscription.id}-week${weekNumber}`}
+                    className={`${weekNumber === 2 ? 'border-t border-muted/20' : ''}`}
+                  >
+                    <TableCell className="py-2">
+                      {weekNumber === 1 ? (
+                        <div>
+                          <p className="font-semibold text-sm">{inscription.child_first_name} {inscription.child_last_name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {inscription.child_gender === 'garcon' ? '👦' : '👧'} {inscription.child_class}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="h-1"></div>
+                      )}
                     </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="capitalize">
-                        {inscription.child_age_group || 'N/A'}
+                    <TableCell className="py-2">
+                      {weekNumber === 1 && (
+                        <Badge variant="outline" className="capitalize text-xs">
+                          {inscription.child_age_group || 'N/A'}
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="py-2">
+                      {weekNumber === 1 && (
+                        <span className="text-sm">{inscription.parent_mobile}</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="py-2">
+                      <Badge variant="secondary" className="text-xs">
+                        S{weekNumber}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      {inscription.parent_mobile}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">
-                        Semaine {weekNumber}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
+                    <TableCell className="py-2">
                       {isFirstWeek ? (
                         inscription.sejour_preference_1 ? (
-                          <span className="text-sm">
+                          <span className="text-xs">
                             {sejours.find(s => s.id === inscription.sejour_preference_1)?.titre || 'N/A'}
                           </span>
                         ) : (
-                          <span className="text-sm text-muted-foreground">-</span>
+                          <span className="text-xs text-muted-foreground">-</span>
                         )
                       ) : (
                         inscription.sejour_preference_2 ? (
-                          <span className="text-sm">
+                          <span className="text-xs">
                             {sejours.find(s => s.id === inscription.sejour_preference_2)?.titre || 'N/A'}
                           </span>
                         ) : (
-                          <span className="text-sm text-muted-foreground">-</span>
+                          <span className="text-xs text-muted-foreground">-</span>
                         )
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-2">
                       {isFirstWeek ? (
                         inscription.sejour_preference_1_alternatif ? (
-                          <span className="text-sm">
+                          <span className="text-xs">
                             {sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)?.titre || 'N/A'}
                           </span>
                         ) : (
-                          <span className="text-sm text-muted-foreground">-</span>
+                          <span className="text-xs text-muted-foreground">-</span>
                         )
                       ) : (
                         inscription.sejour_preference_2_alternatif ? (
-                          <span className="text-sm">
+                          <span className="text-xs">
                             {sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)?.titre || 'N/A'}
                           </span>
                         ) : (
-                          <span className="text-sm text-muted-foreground">-</span>
+                          <span className="text-xs text-muted-foreground">-</span>
                         )
                       )}
                     </TableCell>
-                    <TableCell>
-                      {weekNumber === 1 && inscription.status === 'en_attente' && (
-                        <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500">
-                          <Clock className="w-3 h-3 mr-1" />
-                          En attente
-                        </Badge>
-                      )}
-                      {inscription.status === 'validee' && (
-                        <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500">
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          Validée
-                        </Badge>
-                      )}
-                      {weekNumber === 1 && inscription.status === 'refusee' && (
-                        <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500">
-                          <XCircle className="w-3 h-3 mr-1" />
-                          Refusée
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {weekNumber === 1 && inscription.paiement_statut === 'paye' && (
-                        <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500">
-                          ✓ Payé
-                        </Badge>
-                      )}
-                      {weekNumber === 1 && inscription.paiement_statut === 'en_attente' && (
-                        <Badge variant="outline" className="bg-gray-500/10 text-gray-500 border-gray-500">
-                          En attente
-                        </Badge>
-                      )}
-                      {weekNumber === 1 && inscription.paiement_statut === 'echoue' && (
-                        <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500">
-                          Échoué
-                        </Badge>
-                      )}
-                      {weekNumber === 1 && inscription.paiement_statut === 'rembourse' && (
-                        <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500">
-                          Remboursé
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {weekNumber === 1 && new Date(inscription.created_at).toLocaleDateString('fr-FR')}
-                    </TableCell>
-                    <TableCell>
-                      {weekNumber === 1 && (
-                      <div className="flex gap-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={async () => {
-                            try {
-                              await downloadAllDocuments(inscription.id);
-                              toast({
-                                title: "Téléchargement réussi",
-                                description: "Documents téléchargés en ZIP",
-                              });
-                            } catch (error) {
-                              toast({
-                                title: "Erreur",
-                                description: "Aucun document trouvé",
-                                variant: "destructive",
-                              });
-                            }
-                          }}
-                        >
-                          <FileArchive className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {weekNumber === 1 && (
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setEditingInscription(inscription)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        {inscription.status === 'en_attente' && (
-                          <>
-                            <Button
-                              size="sm"
-                              onClick={() => handleValidate(inscription.id, 'validee')}
-                              className="bg-green-500 hover:bg-green-600"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => setDeletingInscriptionId(inscription.id)}
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </Button>
-                          </>
-                      )}
-                      {weekNumber === 1 && inscription.status === 'validee' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleSendPayment(inscription)}
-                            disabled={sendingPayment === inscription.id}
-                          >
-                            <Send className="w-4 h-4 mr-1" />
-                            {sendingPayment === inscription.id ? 'Envoi...' : 'Paiement'}
-                          </Button>
-                        )}
-                      </div>
-                      )}
-                    </TableCell>
+                     <TableCell className="py-2">
+                       {weekNumber === 1 && inscription.status === 'en_attente' && (
+                         <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500 text-xs px-2 py-0">
+                           <Clock className="w-2 h-2 mr-1" />
+                           En attente
+                         </Badge>
+                       )}
+                       {weekNumber === 1 && inscription.status === 'validee' && (
+                         <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500 text-xs px-2 py-0">
+                           <CheckCircle className="w-2 h-2 mr-1" />
+                           Validée
+                         </Badge>
+                       )}
+                       {weekNumber === 1 && inscription.status === 'refusee' && (
+                         <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500 text-xs px-2 py-0">
+                           <XCircle className="w-2 h-2 mr-1" />
+                           Refusée
+                         </Badge>
+                       )}
+                     </TableCell>
+                     <TableCell className="py-2">
+                       {weekNumber === 1 && inscription.paiement_statut === 'paye' && (
+                         <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500 text-xs px-2 py-0">
+                           ✓ Payé
+                         </Badge>
+                       )}
+                       {weekNumber === 1 && inscription.paiement_statut === 'en_attente' && (
+                         <Badge variant="outline" className="bg-gray-500/10 text-gray-500 border-gray-500 text-xs px-2 py-0">
+                           En attente
+                         </Badge>
+                       )}
+                       {weekNumber === 1 && inscription.paiement_statut === 'echoue' && (
+                         <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500 text-xs px-2 py-0">
+                           Échoué
+                         </Badge>
+                       )}
+                       {weekNumber === 1 && inscription.paiement_statut === 'rembourse' && (
+                         <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs px-2 py-0">
+                           Remboursé
+                         </Badge>
+                       )}
+                     </TableCell>
+                     <TableCell className="py-2">
+                       {weekNumber === 1 && (
+                         <span className="text-xs">{new Date(inscription.created_at).toLocaleDateString('fr-FR')}</span>
+                       )}
+                     </TableCell>
+                     <TableCell className="py-2">
+                       {weekNumber === 1 && (
+                       <div className="flex gap-1">
+                         <Button
+                           size="sm"
+                           variant="ghost"
+                           className="h-7 w-7 p-0"
+                           onClick={async () => {
+                             try {
+                               await downloadAllDocuments(inscription.id);
+                               toast({
+                                 title: "Téléchargement réussi",
+                                 description: "Documents téléchargés en ZIP",
+                               });
+                             } catch (error) {
+                               toast({
+                                 title: "Erreur",
+                                 description: "Aucun document trouvé",
+                                 variant: "destructive",
+                               });
+                             }
+                           }}
+                         >
+                           <FileArchive className="w-3 h-3" />
+                         </Button>
+                       </div>
+                       )}
+                     </TableCell>
+                     <TableCell className="py-2">
+                       {weekNumber === 1 && (
+                       <div className="flex gap-1">
+                         <Button
+                           size="sm"
+                           variant="outline"
+                           className="h-7 w-7 p-0"
+                           onClick={() => setEditingInscription(inscription)}
+                         >
+                           <Edit className="w-3 h-3" />
+                         </Button>
+                         {inscription.status === 'en_attente' && (
+                           <>
+                             <Button
+                               size="sm"
+                               className="bg-green-500 hover:bg-green-600 h-7 w-7 p-0"
+                               onClick={() => handleValidate(inscription.id, 'validee')}
+                             >
+                               <CheckCircle className="w-3 h-3" />
+                             </Button>
+                             <Button
+                               size="sm"
+                               variant="destructive"
+                               className="h-7 w-7 p-0"
+                               onClick={() => setDeletingInscriptionId(inscription.id)}
+                             >
+                               <XCircle className="w-3 h-3" />
+                             </Button>
+                           </>
+                         )}
+                         {inscription.status === 'validee' && (
+                           <Button
+                             size="sm"
+                             variant="outline"
+                             className="h-7 px-2 text-xs"
+                             onClick={() => handleSendPayment(inscription)}
+                             disabled={sendingPayment === inscription.id}
+                           >
+                             <Send className="w-3 h-3 mr-1" />
+                             {sendingPayment === inscription.id ? 'Envoi' : 'Paiement'}
+                           </Button>
+                         )}
+                       </div>
+                       )}
+                     </TableCell>
                   </TableRow>
                   );
                 })}
