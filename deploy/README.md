@@ -9,7 +9,6 @@ Ce guide vous explique comment déployer l'application ENFANTAISIES sur un serve
 - Un nom de domaine pointant vers votre serveur
 - Un compte Supabase avec votre projet configuré
 - Un compte Stripe avec vos clés API
-- Un compte Resend pour l'envoi d'emails
 
 ## Informations à préparer avant l'installation
 
@@ -31,16 +30,7 @@ Depuis votre tableau de bord Stripe :
   - Mode test : `sk_test_xxxxx`
   - Mode production : `sk_live_xxxxx`
 
-### 3. Configuration Resend
-
-Depuis votre compte Resend :
-
-- **API Key** : API Keys > Create API Key
-  - Format : `re_xxxxx`
-
-⚠️ **Important** : N'oubliez pas de vérifier votre domaine d'envoi dans Resend
-
-### 4. Configuration Git
+### 3. Configuration Git
 
 - **Repository URL** : L'URL de votre repository GitHub
   - Format : `https://github.com/username/repo.git`
@@ -84,8 +74,7 @@ Le script vous posera les questions suivantes :
 6. **Clé Service Role Supabase**
 7. **ID du projet Supabase**
 8. **Clé secrète Stripe**
-9. **Clé API Resend**
-10. **URL du repository Git**
+9. **URL du repository Git**
 
 ### Étape 4 : Configuration DNS
 

@@ -45,11 +45,6 @@ read -sp "Clé secrète Stripe: " STRIPE_SECRET_KEY
 echo ""
 
 echo ""
-echo -e "${YELLOW}=== Configuration Email (Resend) ===${NC}"
-read -sp "Clé API Resend: " RESEND_API_KEY
-echo ""
-
-echo ""
 echo -e "${YELLOW}=== Configuration du repository ===${NC}"
 read -p "URL du repository Git (ex: https://github.com/user/repo.git): " GIT_REPO
 
@@ -130,9 +125,6 @@ SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY
 
 # Configuration Stripe
 STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY
-
-# Configuration Email
-RESEND_API_KEY=$RESEND_API_KEY
 
 # Configuration de l'application
 NODE_ENV=production
