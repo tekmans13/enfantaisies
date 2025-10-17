@@ -869,12 +869,12 @@ export default function Bureau() {
                                <Send className="w-4 h-4 mr-2" />
                                {sendingPayment === inscription.id ? 'Envoi...' : 'Envoyer lien paiement'}
                              </DropdownMenuItem>
-                             <DropdownMenuItem
-                               onClick={() => navigate(`/recap/${inscription.id}`)}
-                             >
-                               <Eye className="w-4 h-4 mr-2" />
-                               Voir le récapitulatif
-                             </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => navigate(`/recap-inscription/${inscription.id}`)}
+                              >
+                                <Eye className="w-4 h-4 mr-2" />
+                                Voir le récapitulatif
+                              </DropdownMenuItem>
                              <DropdownMenuItem
                                onClick={() => setDeletingInscriptionId(inscription.id)}
                                className="text-destructive focus:text-destructive"
