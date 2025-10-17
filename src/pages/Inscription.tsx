@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 const getDebugMode = () => localStorage.getItem('debugMode') === 'true';
 
 export default function Inscription() {
@@ -188,7 +188,7 @@ export default function Inscription() {
     if (getDebugMode()) return { isValid: true }; // Bypass validation en mode debug
 
     switch (step) {
-      case 2: // Étape Enfant
+      case 3: // Étape Enfant
         if (!formData.childFirstName.trim()) return { isValid: false, message: "Le prénom de l'enfant est requis" };
         if (!formData.childLastName.trim()) return { isValid: false, message: "Le nom de l'enfant est requis" };
         if (!formData.childBirthDate) return { isValid: false, message: "La date de naissance est requise" };
@@ -205,7 +205,7 @@ export default function Inscription() {
         if (!formData.parentAddress.trim()) return { isValid: false, message: "L'adresse du domicile est requise" };
         if (!formData.socialSecurityRegime) return { isValid: false, message: "Le régime de sécurité sociale est requis" };
         break;
-      case 3: // Étape Séjours
+      case 4: // Étape Séjours
         if (!numberOfWeeks) return { isValid: false, message: "Le nombre de semaines est requis" };
         if (numberOfWeeks === "1") {
           if (selectedSejours.length === 0) return { isValid: false, message: "Veuillez sélectionner au moins un séjour" };
@@ -217,7 +217,7 @@ export default function Inscription() {
           if (!week2Priority) return { isValid: false, message: "Veuillez indiquer le séjour prioritaire pour la deuxième semaine" };
         }
         break;
-      case 4: // Étape Documents
+      case 5: // Étape Documents
         if (!uploadedFiles.ficheSanitaire1) return { isValid: false, message: "La fiche sanitaire de liaison est requise" };
         if (!uploadedFiles.autorisationParentale) return { isValid: false, message: "L'autorisation parentale est requise" };
         if (!uploadedFiles.assuranceRC) return { isValid: false, message: "L'attestation d'assurance RC est requise" };
@@ -368,10 +368,11 @@ export default function Inscription() {
   };
 
   const steps = [
-    { number: 1, title: "Inscription", icon: FileCheck },
-    { number: 2, title: "Enfant", icon: Users },
-    { number: 3, title: "Séjours", icon: Calendar },
-    { number: 4, title: "Documents", icon: FileCheck },
+    { number: 1, title: "Documents", icon: FileCheck },
+    { number: 2, title: "Préalables", icon: FileCheck },
+    { number: 3, title: "Enfant", icon: Users },
+    { number: 4, title: "Séjours", icon: Calendar },
+    { number: 5, title: "Documents", icon: FileCheck },
   ];
 
   const progressPercentage = (currentStep / TOTAL_STEPS) * 100;
@@ -808,7 +809,7 @@ export default function Inscription() {
               </div>
             )}
 
-            {currentStep === 3 && (
+            {currentStep === 4 && (
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-4">
                   Choix des séjours
@@ -1199,7 +1200,7 @@ export default function Inscription() {
               </div>
             )}
 
-            {currentStep === 4 && (
+            {currentStep === 5 && (
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-4">
                   Documents requis
