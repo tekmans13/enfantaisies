@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+import nodemailer from "https://esm.sh/nodemailer@6.9.8";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -53,23 +53,21 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-  const client = new SMTPClient({
-    connection: {
-      hostname: smtpConfig.host,
-      port: smtpConfig.port,
-      tls: true,
-      auth: {
-        username: smtpConfig.username,
-        password: smtpConfig.password,
-      },
+  const transporter = nodemailer.createTransport({
+    host: smtpConfig.host,
+    port: smtpConfig.port,
+    secure: smtpConfig.port === 465,
+    auth: {
+      user: smtpConfig.username,
+      pass: smtpConfig.password,
     },
   });
 
-    await client.send({
+    await transporter.sendMail({
       from: smtpConfig.from_email,
       to: parentEmail,
       subject: "Confirmation de votre inscription - Centre Aéré",
-      content: `
+      text: `
 Bonjour ${parentName},
 
 Nous avons bien reçu votre inscription pour ${childName} au Centre Aéré.
@@ -89,8 +87,6 @@ Cordialement,
 L'équipe du Centre Aéré
       `,
     });
-
-    await client.close();
     console.log("Email envoyé avec succès à:", parentEmail);
 
     return new Response(
