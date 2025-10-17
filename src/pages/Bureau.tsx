@@ -659,10 +659,10 @@ export default function Bureau() {
                 <TableRow>
                   <TableHead>Enfant</TableHead>
                   <TableHead>Âge/Groupe</TableHead>
-                  <TableHead>Téléphone</TableHead>
-                  <TableHead>Semaine</TableHead>
-                  <TableHead>Choix prioritaire</TableHead>
-                  <TableHead>Choix alternatif</TableHead>
+                  <TableHead>S1 - Choix prioritaire</TableHead>
+                  <TableHead>S1 - Choix alternatif</TableHead>
+                  <TableHead>S2 - Choix prioritaire</TableHead>
+                  <TableHead>S2 - Choix alternatif</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead>Paiement</TableHead>
                   <TableHead>Date</TableHead>
@@ -673,112 +673,75 @@ export default function Bureau() {
               <TableBody>
                 {inscriptions
                   .filter(inscription => selectedGroupe === "all" || inscription.child_age_group === selectedGroupe)
-                  .flatMap((inscription) => {
-                    // Si 2 semaines demandées, créer 2 lignes
-                    if (inscription.nombre_semaines_demandees === 2) {
-                      return [
-                        { ...inscription, weekNumber: 1, isFirstWeek: true },
-                        { ...inscription, weekNumber: 2, isFirstWeek: false }
-                      ];
-                    }
-                    // Sinon, une seule ligne
-                    return [{ ...inscription, weekNumber: 1, isFirstWeek: true }];
-                  })
-                  .map((inscriptionRow, index, array) => {
-                    const inscription = inscriptionRow;
-                    const isFirstWeek = inscriptionRow.isFirstWeek;
-                    const weekNumber = inscriptionRow.weekNumber;
-                    
-                    // Ajouter une bordure uniquement si c'est une inscription différente de la précédente
-                    const prevInscription = index > 0 ? array[index - 1] : null;
-                    const showTopBorder = index > 0 && prevInscription && inscription.id !== prevInscription.id;
-                    
+                  .map((inscription, index) => {
                     return (
                   <TableRow 
-                    key={`${inscription.id}-week${weekNumber}`}
-                    className={showTopBorder ? 'border-t-2 border-border' : ''}
+                    key={inscription.id}
+                    className={index > 0 ? 'border-t' : ''}
                   >
                     <TableCell className="py-2">
-                      {weekNumber === 1 ? (
-                        <div>
-                          <p className="font-semibold text-sm">{inscription.child_first_name} {inscription.child_last_name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {inscription.child_gender === 'garcon' ? '👦' : '👧'} {inscription.child_class}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="h-1"></div>
-                      )}
+                      <div>
+                        <p className="font-semibold text-sm">{inscription.child_first_name} {inscription.child_last_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {inscription.child_gender === 'garcon' ? '👦' : '👧'} {inscription.child_class}
+                        </p>
+                      </div>
                     </TableCell>
                     <TableCell className="py-2">
-                      {weekNumber === 1 && (
-                        <Badge variant="outline" className="capitalize text-xs">
-                          {inscription.child_age_group || 'N/A'}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="py-2">
-                      {weekNumber === 1 && (
-                        <span className="text-sm">{inscription.parent_mobile}</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="py-2">
-                      <Badge variant="secondary" className="text-xs">
-                        S{weekNumber}
+                      <Badge variant="outline" className="capitalize text-xs">
+                        {inscription.child_age_group || 'N/A'}
                       </Badge>
                     </TableCell>
                     <TableCell className="py-2">
-                      {isFirstWeek ? (
-                        inscription.sejour_preference_1 ? (
-                          <span className="text-xs">
-                            {sejours.find(s => s.id === inscription.sejour_preference_1)?.titre || 'N/A'}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">-</span>
-                        )
+                      {inscription.sejour_preference_1 ? (
+                        <span className="text-xs">
+                          {sejours.find(s => s.id === inscription.sejour_preference_1)?.titre || 'N/A'}
+                        </span>
                       ) : (
-                        inscription.sejour_preference_2 ? (
-                          <span className="text-xs">
-                            {sejours.find(s => s.id === inscription.sejour_preference_2)?.titre || 'N/A'}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">-</span>
-                        )
+                        <span className="text-xs text-muted-foreground">-</span>
                       )}
                     </TableCell>
                     <TableCell className="py-2">
-                      {isFirstWeek ? (
-                        inscription.sejour_preference_1_alternatif ? (
-                          <span className="text-xs">
-                            {sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)?.titre || 'N/A'}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">-</span>
-                        )
+                      {inscription.sejour_preference_1_alternatif ? (
+                        <span className="text-xs">
+                          {sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)?.titre || 'N/A'}
+                        </span>
                       ) : (
-                        inscription.sejour_preference_2_alternatif ? (
-                          <span className="text-xs">
-                            {sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)?.titre || 'N/A'}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">-</span>
-                        )
+                        <span className="text-xs text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="py-2">
+                      {inscription.nombre_semaines_demandees === 2 && inscription.sejour_preference_2 ? (
+                        <span className="text-xs">
+                          {sejours.find(s => s.id === inscription.sejour_preference_2)?.titre || 'N/A'}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="py-2">
+                      {inscription.nombre_semaines_demandees === 2 && inscription.sejour_preference_2_alternatif ? (
+                        <span className="text-xs">
+                          {sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)?.titre || 'N/A'}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">-</span>
                       )}
                     </TableCell>
                      <TableCell className="py-2">
-                       {weekNumber === 1 && inscription.status === 'en_attente' && (
+                       {inscription.status === 'en_attente' && (
                          <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500 text-xs px-2 py-0">
                            <Clock className="w-2 h-2 mr-1" />
                            En attente
                          </Badge>
                        )}
-                       {weekNumber === 1 && inscription.status === 'validee' && (
+                       {inscription.status === 'validee' && (
                          <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500 text-xs px-2 py-0">
                            <CheckCircle className="w-2 h-2 mr-1" />
                            Validée
                          </Badge>
                        )}
-                       {weekNumber === 1 && inscription.status === 'refusee' && (
+                       {inscription.status === 'refusee' && (
                          <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500 text-xs px-2 py-0">
                            <XCircle className="w-2 h-2 mr-1" />
                            Refusée
@@ -786,34 +749,31 @@ export default function Bureau() {
                        )}
                      </TableCell>
                      <TableCell className="py-2">
-                       {weekNumber === 1 && inscription.paiement_statut === 'paye' && (
+                       {inscription.paiement_statut === 'paye' && (
                          <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500 text-xs px-2 py-0">
                            ✓ Payé
                          </Badge>
                        )}
-                       {weekNumber === 1 && inscription.paiement_statut === 'en_attente' && (
+                       {inscription.paiement_statut === 'en_attente' && (
                          <Badge variant="outline" className="bg-gray-500/10 text-gray-500 border-gray-500 text-xs px-2 py-0">
                            En attente
                          </Badge>
                        )}
-                       {weekNumber === 1 && inscription.paiement_statut === 'echoue' && (
+                       {inscription.paiement_statut === 'echoue' && (
                          <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500 text-xs px-2 py-0">
                            Échoué
                          </Badge>
                        )}
-                       {weekNumber === 1 && inscription.paiement_statut === 'rembourse' && (
+                       {inscription.paiement_statut === 'rembourse' && (
                          <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs px-2 py-0">
                            Remboursé
                          </Badge>
                        )}
                      </TableCell>
                      <TableCell className="py-2">
-                       {weekNumber === 1 && (
-                         <span className="text-xs">{new Date(inscription.created_at).toLocaleDateString('fr-FR')}</span>
-                       )}
+                       <span className="text-xs">{new Date(inscription.created_at).toLocaleDateString('fr-FR')}</span>
                      </TableCell>
                      <TableCell className="py-2">
-                       {weekNumber === 1 && (
                        <div className="flex gap-1">
                          <Button
                            size="sm"
@@ -838,10 +798,8 @@ export default function Bureau() {
                            <FileArchive className="w-3 h-3" />
                          </Button>
                        </div>
-                       )}
                      </TableCell>
                      <TableCell className="py-2">
-                       {weekNumber === 1 && (
                        <div className="flex gap-1">
                          <Button
                            size="sm"
@@ -855,39 +813,60 @@ export default function Bureau() {
                            <>
                              <Button
                                size="sm"
-                               className="bg-green-500 hover:bg-green-600 h-7 w-7 p-0"
+                               variant="outline"
+                               className="h-7 w-7 p-0 bg-green-500/10 text-green-500 border-green-500 hover:bg-green-500 hover:text-white"
                                onClick={() => handleValidate(inscription.id, 'validee')}
                              >
                                <CheckCircle className="w-3 h-3" />
                              </Button>
                              <Button
                                size="sm"
-                               variant="destructive"
-                               className="h-7 w-7 p-0"
-                               onClick={() => setDeletingInscriptionId(inscription.id)}
+                               variant="outline"
+                               className="h-7 w-7 p-0 bg-red-500/10 text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+                               onClick={() => handleValidate(inscription.id, 'refusee')}
                              >
                                <XCircle className="w-3 h-3" />
                              </Button>
                            </>
                          )}
-                         {inscription.status === 'validee' && (
-                           <Button
-                             size="sm"
-                             variant="outline"
-                             className="h-7 px-2 text-xs"
-                             onClick={() => handleSendPayment(inscription)}
-                             disabled={sendingPayment === inscription.id}
-                           >
-                             <Send className="w-3 h-3 mr-1" />
-                             {sendingPayment === inscription.id ? 'Envoi' : 'Paiement'}
-                           </Button>
-                         )}
+                         <DropdownMenu>
+                           <DropdownMenuTrigger asChild>
+                             <Button
+                               size="sm"
+                               variant="ghost"
+                               className="h-7 w-7 p-0"
+                             >
+                               <MoreVertical className="w-3 h-3" />
+                             </Button>
+                           </DropdownMenuTrigger>
+                           <DropdownMenuContent align="end">
+                             <DropdownMenuItem
+                               onClick={() => handleSendPayment(inscription)}
+                               disabled={sendingPayment === inscription.id}
+                             >
+                               <Send className="w-4 h-4 mr-2" />
+                               {sendingPayment === inscription.id ? 'Envoi...' : 'Envoyer lien paiement'}
+                             </DropdownMenuItem>
+                             <DropdownMenuItem
+                               onClick={() => navigate(`/recap/${inscription.id}`)}
+                             >
+                               <Eye className="w-4 h-4 mr-2" />
+                               Voir le récapitulatif
+                             </DropdownMenuItem>
+                             <DropdownMenuItem
+                               onClick={() => setDeletingInscriptionId(inscription.id)}
+                               className="text-destructive focus:text-destructive"
+                             >
+                               <Trash2 className="w-4 h-4 mr-2" />
+                               Supprimer
+                             </DropdownMenuItem>
+                           </DropdownMenuContent>
+                         </DropdownMenu>
                        </div>
-                       )}
                      </TableCell>
-                  </TableRow>
-                  );
-                })}
+                   </TableRow>
+                   );
+                 })}
               </TableBody>
             </Table>
           </div>
