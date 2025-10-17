@@ -138,17 +138,17 @@ async function sendWelcomeEmail(supabaseAdmin: any, email: string, password: str
     return;
   }
 
-  const client = new SMTPClient({
-    connection: {
-      hostname: smtpConfig.host,
-      port: smtpConfig.port,
-      tls: false,
-      auth: {
-        username: smtpConfig.username,
-        password: smtpConfig.password,
+    const client = new SMTPClient({
+      connection: {
+        hostname: smtpConfig.host,
+        port: smtpConfig.port,
+        tls: true,
+        auth: {
+          username: smtpConfig.username,
+          password: smtpConfig.password,
+        },
       },
-    },
-  });
+    });
 
   await client.send({
     from: smtpConfig.from_email,

@@ -131,17 +131,17 @@ async function sendPasswordResetEmail(supabaseAdmin: any, email: string, newPass
     throw new Error("Configuration SMTP non trouvée");
   }
 
-  const client = new SMTPClient({
-    connection: {
-      hostname: smtpConfig.host,
-      port: smtpConfig.port,
-      tls: false,
-      auth: {
-        username: smtpConfig.username,
-        password: smtpConfig.password,
+    const client = new SMTPClient({
+      connection: {
+        hostname: smtpConfig.host,
+        port: smtpConfig.port,
+        tls: true,
+        auth: {
+          username: smtpConfig.username,
+          password: smtpConfig.password,
+        },
       },
-    },
-  });
+    });
 
   await client.send({
     from: smtpConfig.from_email,
