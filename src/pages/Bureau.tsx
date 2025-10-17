@@ -660,8 +660,9 @@ export default function Bureau() {
                   <TableHead>Enfant</TableHead>
                   <TableHead>Âge/Groupe</TableHead>
                   <TableHead>Téléphone</TableHead>
-                  <TableHead>Choix principal</TableHead>
-                  <TableHead>Choix secondaire</TableHead>
+                  <TableHead>Semaine</TableHead>
+                  <TableHead>Choix prioritaire</TableHead>
+                  <TableHead>Choix alternatif</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead>Paiement</TableHead>
                   <TableHead>Date</TableHead>
@@ -672,8 +673,24 @@ export default function Bureau() {
               <TableBody>
                 {inscriptions
                   .filter(inscription => selectedGroupe === "all" || inscription.child_age_group === selectedGroupe)
-                  .map((inscription) => (
-                  <TableRow key={inscription.id}>
+                  .flatMap((inscription) => {
+                    // Si 2 semaines demandées, créer 2 lignes
+                    if (inscription.nombre_semaines_demandees === 2) {
+                      return [
+                        { ...inscription, weekNumber: 1, isFirstWeek: true },
+                        { ...inscription, weekNumber: 2, isFirstWeek: false }
+                      ];
+                    }
+                    // Sinon, une seule ligne
+                    return [{ ...inscription, weekNumber: 1, isFirstWeek: true }];
+                  })
+                  .map((inscriptionRow, index) => {
+                    const inscription = inscriptionRow;
+                    const isFirstWeek = inscriptionRow.isFirstWeek;
+                    const weekNumber = inscriptionRow.weekNumber;
+                    
+                    return (
+                  <TableRow key={`${inscription.id}-week${weekNumber}`}>
                     <TableCell>
                       <div>
                         <p className="font-semibold">{inscription.child_first_name} {inscription.child_last_name}</p>
@@ -691,25 +708,50 @@ export default function Bureau() {
                       {inscription.parent_mobile}
                     </TableCell>
                     <TableCell>
-                      {inscription.sejour_preference_1 ? (
-                        <span className="text-sm">
-                          {sejours.find(s => s.id === inscription.sejour_preference_1)?.titre || 'N/A'}
-                        </span>
+                      <Badge variant="secondary">
+                        Semaine {weekNumber}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {isFirstWeek ? (
+                        inscription.sejour_preference_1 ? (
+                          <span className="text-sm">
+                            {sejours.find(s => s.id === inscription.sejour_preference_1)?.titre || 'N/A'}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">-</span>
+                        )
                       ) : (
-                        <span className="text-sm text-muted-foreground">-</span>
+                        inscription.sejour_preference_2 ? (
+                          <span className="text-sm">
+                            {sejours.find(s => s.id === inscription.sejour_preference_2)?.titre || 'N/A'}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">-</span>
+                        )
                       )}
                     </TableCell>
                     <TableCell>
-                      {inscription.sejour_preference_2 ? (
-                        <span className="text-sm">
-                          {sejours.find(s => s.id === inscription.sejour_preference_2)?.titre || 'N/A'}
-                        </span>
+                      {isFirstWeek ? (
+                        inscription.sejour_preference_1_alternatif ? (
+                          <span className="text-sm">
+                            {sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)?.titre || 'N/A'}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">-</span>
+                        )
                       ) : (
-                        <span className="text-sm text-muted-foreground">-</span>
+                        inscription.sejour_preference_2_alternatif ? (
+                          <span className="text-sm">
+                            {sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)?.titre || 'N/A'}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">-</span>
+                        )
                       )}
                     </TableCell>
                     <TableCell>
-                      {inscription.status === 'en_attente' && (
+                      {weekNumber === 1 && inscription.status === 'en_attente' && (
                         <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500">
                           <Clock className="w-3 h-3 mr-1" />
                           En attente
@@ -721,7 +763,7 @@ export default function Bureau() {
                           Validée
                         </Badge>
                       )}
-                      {inscription.status === 'refusee' && (
+                      {weekNumber === 1 && inscription.status === 'refusee' && (
                         <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500">
                           <XCircle className="w-3 h-3 mr-1" />
                           Refusée
@@ -729,31 +771,32 @@ export default function Bureau() {
                       )}
                     </TableCell>
                     <TableCell>
-                      {inscription.paiement_statut === 'paye' && (
+                      {weekNumber === 1 && inscription.paiement_statut === 'paye' && (
                         <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500">
                           ✓ Payé
                         </Badge>
                       )}
-                      {inscription.paiement_statut === 'en_attente' && (
+                      {weekNumber === 1 && inscription.paiement_statut === 'en_attente' && (
                         <Badge variant="outline" className="bg-gray-500/10 text-gray-500 border-gray-500">
                           En attente
                         </Badge>
                       )}
-                      {inscription.paiement_statut === 'echoue' && (
+                      {weekNumber === 1 && inscription.paiement_statut === 'echoue' && (
                         <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500">
                           Échoué
                         </Badge>
                       )}
-                      {inscription.paiement_statut === 'rembourse' && (
+                      {weekNumber === 1 && inscription.paiement_statut === 'rembourse' && (
                         <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500">
                           Remboursé
                         </Badge>
                       )}
                     </TableCell>
                     <TableCell>
-                      {new Date(inscription.created_at).toLocaleDateString('fr-FR')}
+                      {weekNumber === 1 && new Date(inscription.created_at).toLocaleDateString('fr-FR')}
                     </TableCell>
                     <TableCell>
+                      {weekNumber === 1 && (
                       <div className="flex gap-1">
                         <Button
                           size="sm"
@@ -777,8 +820,10 @@ export default function Bureau() {
                           <FileArchive className="w-4 h-4" />
                         </Button>
                       </div>
+                      )}
                     </TableCell>
                     <TableCell>
+                      {weekNumber === 1 && (
                       <div className="flex gap-2">
                         <Button
                           size="sm"
@@ -804,8 +849,8 @@ export default function Bureau() {
                               <XCircle className="w-4 h-4" />
                             </Button>
                           </>
-                        )}
-                        {inscription.status === 'validee' && (
+                      )}
+                      {weekNumber === 1 && inscription.status === 'validee' && (
                           <Button
                             size="sm"
                             variant="outline"
@@ -817,9 +862,11 @@ export default function Bureau() {
                           </Button>
                         )}
                       </div>
+                      )}
                     </TableCell>
                   </TableRow>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
