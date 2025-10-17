@@ -10,13 +10,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle, Info, Plus, X, AlertCircle } from "lucide-react";
+import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle, Info, Plus, X, AlertCircle, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 const getDebugMode = () => localStorage.getItem('debugMode') === 'true';
 
 export default function Inscription() {
@@ -60,6 +60,28 @@ export default function Inscription() {
     sejourPreference2: "",
     sejourPreference1Alternatif: "",
     sejourPreference2Alternatif: "",
+    // Personnes à prévenir en urgence
+    urgencyContact1FirstName: "",
+    urgencyContact1LastName: "",
+    urgencyContact1Relation: "",
+    urgencyContact1Mobile: "",
+    urgencyContact1OtherPhone: "",
+    urgencyContact2FirstName: "",
+    urgencyContact2LastName: "",
+    urgencyContact2Relation: "",
+    urgencyContact2Mobile: "",
+    urgencyContact2OtherPhone: "",
+    // Personnes autorisées à récupérer l'enfant
+    authorizedPerson1FirstName: "",
+    authorizedPerson1LastName: "",
+    authorizedPerson1Relation: "",
+    authorizedPerson1Mobile: "",
+    authorizedPerson1OtherPhone: "",
+    authorizedPerson2FirstName: "",
+    authorizedPerson2LastName: "",
+    authorizedPerson2Relation: "",
+    authorizedPerson2Mobile: "",
+    authorizedPerson2OtherPhone: "",
   });
 
   const [uploadedFiles, setUploadedFiles] = useState<{
@@ -213,7 +235,7 @@ export default function Inscription() {
         if (!formData.parentAddress.trim()) return { isValid: false, message: "L'adresse du domicile est requise" };
         if (!formData.socialSecurityRegime) return { isValid: false, message: "Le régime de sécurité sociale est requis" };
         break;
-      case 3: // Étape Séjours
+      case 4: // Étape Séjours
         if (!numberOfWeeks) return { isValid: false, message: "Le nombre de semaines est requis" };
         if (numberOfWeeks === "1") {
           if (selectedSejours.length === 0) return { isValid: false, message: "Veuillez sélectionner au moins un séjour" };
@@ -225,7 +247,7 @@ export default function Inscription() {
           if (!week2Priority) return { isValid: false, message: "Veuillez indiquer le séjour prioritaire pour la deuxième semaine" };
         }
         break;
-      case 4: // Étape Documents
+      case 5: // Étape Documents
         if (!uploadedFiles.ficheSanitaire1) return { isValid: false, message: "La fiche sanitaire de liaison est requise" };
         if (!uploadedFiles.autorisationParentale) return { isValid: false, message: "L'autorisation parentale est requise" };
         if (!uploadedFiles.assuranceRC) return { isValid: false, message: "L'attestation d'assurance RC est requise" };
@@ -287,6 +309,28 @@ export default function Inscription() {
         sejour_preference_1_alternatif: formData.sejourPreference1Alternatif || null,
         sejour_preference_2_alternatif: formData.sejourPreference2Alternatif || null,
         nombre_semaines_demandees: parseInt(numberOfWeeks),
+        // Contacts d'urgence
+        urgency_contact_1_first_name: formData.urgencyContact1FirstName || null,
+        urgency_contact_1_last_name: formData.urgencyContact1LastName || null,
+        urgency_contact_1_relation: formData.urgencyContact1Relation || null,
+        urgency_contact_1_mobile: formData.urgencyContact1Mobile || null,
+        urgency_contact_1_other_phone: formData.urgencyContact1OtherPhone || null,
+        urgency_contact_2_first_name: formData.urgencyContact2FirstName || null,
+        urgency_contact_2_last_name: formData.urgencyContact2LastName || null,
+        urgency_contact_2_relation: formData.urgencyContact2Relation || null,
+        urgency_contact_2_mobile: formData.urgencyContact2Mobile || null,
+        urgency_contact_2_other_phone: formData.urgencyContact2OtherPhone || null,
+        // Personnes autorisées
+        authorized_person_1_first_name: formData.authorizedPerson1FirstName || null,
+        authorized_person_1_last_name: formData.authorizedPerson1LastName || null,
+        authorized_person_1_relation: formData.authorizedPerson1Relation || null,
+        authorized_person_1_mobile: formData.authorizedPerson1Mobile || null,
+        authorized_person_1_other_phone: formData.authorizedPerson1OtherPhone || null,
+        authorized_person_2_first_name: formData.authorizedPerson2FirstName || null,
+        authorized_person_2_last_name: formData.authorizedPerson2LastName || null,
+        authorized_person_2_relation: formData.authorizedPerson2Relation || null,
+        authorized_person_2_mobile: formData.authorizedPerson2Mobile || null,
+        authorized_person_2_other_phone: formData.authorizedPerson2OtherPhone || null,
       };
 
       const { data, error } = await supabase
@@ -378,8 +422,9 @@ export default function Inscription() {
   const steps = [
     { number: 1, title: "Préalables", icon: FileCheck },
     { number: 2, title: "Enfant", icon: Users },
-    { number: 3, title: "Séjours", icon: Calendar },
-    { number: 4, title: "Documents", icon: FileCheck },
+    { number: 3, title: "Urgence", icon: Phone },
+    { number: 4, title: "Séjours", icon: Calendar },
+    { number: 5, title: "Documents", icon: FileCheck },
   ];
 
   const progressPercentage = (currentStep / TOTAL_STEPS) * 100;
@@ -830,6 +875,248 @@ export default function Inscription() {
 
             {currentStep === 3 && (
               <div>
+                <h2 className="text-2xl font-bold text-foreground mb-6">
+                  En cas d'urgence
+                </h2>
+                
+                <div className="space-y-6">
+                  {/* Section 2.1 : Personnes à prévenir en cas d'urgence */}
+                  <div className="bg-destructive/5 p-4 rounded-lg border-2 border-destructive/20">
+                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                      <Phone className="w-5 h-5 text-destructive" />
+                      Personnes à prévenir en cas d'urgence (si parents injoignables)
+                    </h3>
+                    
+                    {/* Personne 1 */}
+                    <div className="mb-6">
+                      <h4 className="text-md font-medium text-foreground mb-3">Personne 1</h4>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="urgencyContact1FirstName">Prénom</Label>
+                          <Input
+                            id="urgencyContact1FirstName"
+                            value={formData.urgencyContact1FirstName}
+                            onChange={(e) => handleInputChange('urgencyContact1FirstName', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="urgencyContact1LastName">Nom</Label>
+                          <Input
+                            id="urgencyContact1LastName"
+                            value={formData.urgencyContact1LastName}
+                            onChange={(e) => handleInputChange('urgencyContact1LastName', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="urgencyContact1Relation">Lien de parenté (ou ami)</Label>
+                          <Input
+                            id="urgencyContact1Relation"
+                            value={formData.urgencyContact1Relation}
+                            onChange={(e) => handleInputChange('urgencyContact1Relation', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="urgencyContact1Mobile">Téléphone Portable</Label>
+                          <Input
+                            id="urgencyContact1Mobile"
+                            type="tel"
+                            value={formData.urgencyContact1Mobile}
+                            onChange={(e) => handleInputChange('urgencyContact1Mobile', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="urgencyContact1OtherPhone">Autre numéro de téléphone</Label>
+                          <Input
+                            id="urgencyContact1OtherPhone"
+                            type="tel"
+                            value={formData.urgencyContact1OtherPhone}
+                            onChange={(e) => handleInputChange('urgencyContact1OtherPhone', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Personne 2 */}
+                    <div>
+                      <h4 className="text-md font-medium text-foreground mb-3">Personne 2</h4>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="urgencyContact2FirstName">Prénom</Label>
+                          <Input
+                            id="urgencyContact2FirstName"
+                            value={formData.urgencyContact2FirstName}
+                            onChange={(e) => handleInputChange('urgencyContact2FirstName', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="urgencyContact2LastName">Nom</Label>
+                          <Input
+                            id="urgencyContact2LastName"
+                            value={formData.urgencyContact2LastName}
+                            onChange={(e) => handleInputChange('urgencyContact2LastName', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="urgencyContact2Relation">Lien de parenté (ou ami)</Label>
+                          <Input
+                            id="urgencyContact2Relation"
+                            value={formData.urgencyContact2Relation}
+                            onChange={(e) => handleInputChange('urgencyContact2Relation', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="urgencyContact2Mobile">Téléphone Portable</Label>
+                          <Input
+                            id="urgencyContact2Mobile"
+                            type="tel"
+                            value={formData.urgencyContact2Mobile}
+                            onChange={(e) => handleInputChange('urgencyContact2Mobile', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="urgencyContact2OtherPhone">Autre numéro de téléphone</Label>
+                          <Input
+                            id="urgencyContact2OtherPhone"
+                            type="tel"
+                            value={formData.urgencyContact2OtherPhone}
+                            onChange={(e) => handleInputChange('urgencyContact2OtherPhone', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 2.2 : Personnes autorisées à récupérer l'enfant */}
+                  <div className="bg-accent/5 p-4 rounded-lg border-2 border-accent/20">
+                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                      <Users className="w-5 h-5 text-accent" />
+                      Personnes autorisées à récupérer l'enfant au centre (muni d'une pièce d'identité)
+                    </h3>
+                    
+                    {/* Personne 1 */}
+                    <div className="mb-6">
+                      <h4 className="text-md font-medium text-foreground mb-3">Personne 1</h4>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="authorizedPerson1FirstName">Prénom</Label>
+                          <Input
+                            id="authorizedPerson1FirstName"
+                            value={formData.authorizedPerson1FirstName}
+                            onChange={(e) => handleInputChange('authorizedPerson1FirstName', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="authorizedPerson1LastName">Nom</Label>
+                          <Input
+                            id="authorizedPerson1LastName"
+                            value={formData.authorizedPerson1LastName}
+                            onChange={(e) => handleInputChange('authorizedPerson1LastName', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="authorizedPerson1Relation">Lien de parenté (ou ami)</Label>
+                          <Input
+                            id="authorizedPerson1Relation"
+                            value={formData.authorizedPerson1Relation}
+                            onChange={(e) => handleInputChange('authorizedPerson1Relation', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="authorizedPerson1Mobile">Téléphone Portable</Label>
+                          <Input
+                            id="authorizedPerson1Mobile"
+                            type="tel"
+                            value={formData.authorizedPerson1Mobile}
+                            onChange={(e) => handleInputChange('authorizedPerson1Mobile', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="authorizedPerson1OtherPhone">Autre numéro de téléphone</Label>
+                          <Input
+                            id="authorizedPerson1OtherPhone"
+                            type="tel"
+                            value={formData.authorizedPerson1OtherPhone}
+                            onChange={(e) => handleInputChange('authorizedPerson1OtherPhone', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Personne 2 */}
+                    <div>
+                      <h4 className="text-md font-medium text-foreground mb-3">Personne 2</h4>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="authorizedPerson2FirstName">Prénom</Label>
+                          <Input
+                            id="authorizedPerson2FirstName"
+                            value={formData.authorizedPerson2FirstName}
+                            onChange={(e) => handleInputChange('authorizedPerson2FirstName', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="authorizedPerson2LastName">Nom</Label>
+                          <Input
+                            id="authorizedPerson2LastName"
+                            value={formData.authorizedPerson2LastName}
+                            onChange={(e) => handleInputChange('authorizedPerson2LastName', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="authorizedPerson2Relation">Lien de parenté (ou ami)</Label>
+                          <Input
+                            id="authorizedPerson2Relation"
+                            value={formData.authorizedPerson2Relation}
+                            onChange={(e) => handleInputChange('authorizedPerson2Relation', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="authorizedPerson2Mobile">Téléphone Portable</Label>
+                          <Input
+                            id="authorizedPerson2Mobile"
+                            type="tel"
+                            value={formData.authorizedPerson2Mobile}
+                            onChange={(e) => handleInputChange('authorizedPerson2Mobile', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="authorizedPerson2OtherPhone">Autre numéro de téléphone</Label>
+                          <Input
+                            id="authorizedPerson2OtherPhone"
+                            type="tel"
+                            value={formData.authorizedPerson2OtherPhone}
+                            onChange={(e) => handleInputChange('authorizedPerson2OtherPhone', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 4 && (
+              <div>
                 <h2 className="text-2xl font-bold text-foreground mb-4">
                   Choix des séjours
                 </h2>
@@ -1219,7 +1506,7 @@ export default function Inscription() {
               </div>
             )}
 
-            {currentStep === 4 && (
+            {currentStep === 5 && (
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-4">
                   Documents requis

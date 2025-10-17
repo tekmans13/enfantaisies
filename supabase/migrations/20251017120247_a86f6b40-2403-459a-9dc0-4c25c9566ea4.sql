@@ -1,0 +1,22 @@
+-- Ajouter les colonnes pour les contacts d'urgence et les personnes autorisées
+ALTER TABLE public.inscriptions
+ADD COLUMN IF NOT EXISTS urgency_contact_1_first_name TEXT,
+ADD COLUMN IF NOT EXISTS urgency_contact_1_last_name TEXT,
+ADD COLUMN IF NOT EXISTS urgency_contact_1_relation TEXT,
+ADD COLUMN IF NOT EXISTS urgency_contact_1_mobile TEXT,
+ADD COLUMN IF NOT EXISTS urgency_contact_1_other_phone TEXT,
+ADD COLUMN IF NOT EXISTS urgency_contact_2_first_name TEXT,
+ADD COLUMN IF NOT EXISTS urgency_contact_2_last_name TEXT,
+ADD COLUMN IF NOT EXISTS urgency_contact_2_relation TEXT,
+ADD COLUMN IF NOT EXISTS urgency_contact_2_mobile TEXT,
+ADD COLUMN IF NOT EXISTS urgency_contact_2_other_phone TEXT,
+ADD COLUMN IF NOT EXISTS authorized_person_1_first_name TEXT,
+ADD COLUMN IF NOT EXISTS authorized_person_1_last_name TEXT,
+ADD COLUMN IF NOT EXISTS authorized_person_1_relation TEXT,
+ADD COLUMN IF NOT EXISTS authorized_person_1_mobile TEXT,
+ADD COLUMN IF NOT EXISTS authorized_person_1_other_phone TEXT,
+ADD COLUMN IF NOT EXISTS authorized_person_2_first_name TEXT,
+ADD COLUMN IF NOT EXISTS authorized_person_2_last_name TEXT,
+ADD COLUMN IF NOT EXISTS authorized_person_2_relation TEXT,
+ADD COLUMN IF NOT EXISTS authorized_person_2_mobile TEXT,
+ADD COLUMN IF NOT EXISTS authorized_person_2_other_phone TEXT;

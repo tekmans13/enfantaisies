@@ -83,6 +83,16 @@ export type Database = {
       }
       inscriptions: {
         Row: {
+          authorized_person_1_first_name: string | null
+          authorized_person_1_last_name: string | null
+          authorized_person_1_mobile: string | null
+          authorized_person_1_other_phone: string | null
+          authorized_person_1_relation: string | null
+          authorized_person_2_first_name: string | null
+          authorized_person_2_last_name: string | null
+          authorized_person_2_mobile: string | null
+          authorized_person_2_other_phone: string | null
+          authorized_person_2_relation: string | null
           caf_number: string | null
           child_age_group: Database["public"]["Enums"]["age_group"] | null
           child_birth_date: string
@@ -126,10 +136,30 @@ export type Database = {
           status: string | null
           stripe_payment_id: string | null
           updated_at: string | null
+          urgency_contact_1_first_name: string | null
+          urgency_contact_1_last_name: string | null
+          urgency_contact_1_mobile: string | null
+          urgency_contact_1_other_phone: string | null
+          urgency_contact_1_relation: string | null
+          urgency_contact_2_first_name: string | null
+          urgency_contact_2_last_name: string | null
+          urgency_contact_2_mobile: string | null
+          urgency_contact_2_other_phone: string | null
+          urgency_contact_2_relation: string | null
           validated_at: string | null
           validated_by: string | null
         }
         Insert: {
+          authorized_person_1_first_name?: string | null
+          authorized_person_1_last_name?: string | null
+          authorized_person_1_mobile?: string | null
+          authorized_person_1_other_phone?: string | null
+          authorized_person_1_relation?: string | null
+          authorized_person_2_first_name?: string | null
+          authorized_person_2_last_name?: string | null
+          authorized_person_2_mobile?: string | null
+          authorized_person_2_other_phone?: string | null
+          authorized_person_2_relation?: string | null
           caf_number?: string | null
           child_age_group?: Database["public"]["Enums"]["age_group"] | null
           child_birth_date: string
@@ -173,10 +203,30 @@ export type Database = {
           status?: string | null
           stripe_payment_id?: string | null
           updated_at?: string | null
+          urgency_contact_1_first_name?: string | null
+          urgency_contact_1_last_name?: string | null
+          urgency_contact_1_mobile?: string | null
+          urgency_contact_1_other_phone?: string | null
+          urgency_contact_1_relation?: string | null
+          urgency_contact_2_first_name?: string | null
+          urgency_contact_2_last_name?: string | null
+          urgency_contact_2_mobile?: string | null
+          urgency_contact_2_other_phone?: string | null
+          urgency_contact_2_relation?: string | null
           validated_at?: string | null
           validated_by?: string | null
         }
         Update: {
+          authorized_person_1_first_name?: string | null
+          authorized_person_1_last_name?: string | null
+          authorized_person_1_mobile?: string | null
+          authorized_person_1_other_phone?: string | null
+          authorized_person_1_relation?: string | null
+          authorized_person_2_first_name?: string | null
+          authorized_person_2_last_name?: string | null
+          authorized_person_2_mobile?: string | null
+          authorized_person_2_other_phone?: string | null
+          authorized_person_2_relation?: string | null
           caf_number?: string | null
           child_age_group?: Database["public"]["Enums"]["age_group"] | null
           child_birth_date?: string
@@ -220,6 +270,16 @@ export type Database = {
           status?: string | null
           stripe_payment_id?: string | null
           updated_at?: string | null
+          urgency_contact_1_first_name?: string | null
+          urgency_contact_1_last_name?: string | null
+          urgency_contact_1_mobile?: string | null
+          urgency_contact_1_other_phone?: string | null
+          urgency_contact_1_relation?: string | null
+          urgency_contact_2_first_name?: string | null
+          urgency_contact_2_last_name?: string | null
+          urgency_contact_2_mobile?: string | null
+          urgency_contact_2_other_phone?: string | null
+          urgency_contact_2_relation?: string | null
           validated_at?: string | null
           validated_by?: string | null
         }
