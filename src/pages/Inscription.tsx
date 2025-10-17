@@ -23,6 +23,7 @@ export default function Inscription() {
   const [currentStep, setCurrentStep] = useState(1);
   const [childAgeGroup, setChildAgeGroup] = useState<string | null>(null);
   const [showParent2, setShowParent2] = useState(false);
+  const [isDocModalOpen, setIsDocModalOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -159,6 +160,12 @@ export default function Inscription() {
       setChildAgeGroup(group);
     }
   }, [formData.childClass]);
+
+  useEffect(() => {
+    if (currentStep === 1) {
+      setIsDocModalOpen(true);
+    }
+  }, [currentStep]);
 
   const handleCheckboxChange = (field: string) => {
     setFormData(prev => ({
@@ -448,7 +455,7 @@ export default function Inscription() {
                   <h2 className="text-2xl font-bold text-foreground">
                     Informations préalables
                   </h2>
-                  <Dialog>
+                  <Dialog open={isDocModalOpen} onOpenChange={setIsDocModalOpen}>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm">
                         <AlertCircle className="w-4 h-4 mr-2" />
