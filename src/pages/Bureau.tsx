@@ -12,6 +12,12 @@ import {
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { Users as UsersIcon, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign, Send, FileDown, FileArchive, FileText, Download, Shield } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import {
@@ -681,7 +687,20 @@ export default function Bureau() {
                   >
                     <TableCell className="py-2">
                       <div>
-                        <p className="font-semibold text-sm">{inscription.child_first_name} {inscription.child_last_name}</p>
+                        {inscription.demande_specifique ? (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <p className="font-semibold text-sm cursor-help">{inscription.child_first_name} {inscription.child_last_name}</p>
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-sm">
+                                <p className="text-xs">{inscription.demande_specifique}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : (
+                          <p className="font-semibold text-sm">{inscription.child_first_name} {inscription.child_last_name}</p>
+                        )}
                         <p className="text-xs text-muted-foreground">
                           {inscription.child_gender === 'garcon' ? '👦' : '👧'} {inscription.child_class}
                         </p>
