@@ -820,7 +820,7 @@ export default function Bureau() {
                                  </Button>
                                </TooltipTrigger>
                                <TooltipContent>
-                                 <p>Attribuer</p>
+                                 <p>Valider</p>
                                </TooltipContent>
                              </Tooltip>
                            </TooltipProvider>
