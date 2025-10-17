@@ -689,8 +689,9 @@ export default function Bureau() {
                     const isFirstWeek = inscriptionRow.isFirstWeek;
                     const weekNumber = inscriptionRow.weekNumber;
                     
-                    // Ajouter une bordure uniquement entre les inscriptions différentes
-                    const showTopBorder = weekNumber === 1 && index > 0;
+                    // Ajouter une bordure uniquement si c'est une inscription différente de la précédente
+                    const prevInscription = index > 0 ? array[index - 1] : null;
+                    const showTopBorder = index > 0 && prevInscription && inscription.id !== prevInscription.id;
                     
                     return (
                   <TableRow 
