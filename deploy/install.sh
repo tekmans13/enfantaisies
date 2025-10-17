@@ -75,6 +75,8 @@ fi
 if ! command -v nginx &> /dev/null; then
     echo "Installation de Nginx..."
     apt install -y nginx
+else
+    echo "Nginx déjà installé, passage à l'étape suivante..."
 fi
 
 # Installation de Certbot pour SSL
@@ -207,8 +209,8 @@ ln -sf "/etc/nginx/sites-available/$DOMAIN_NAME" "/etc/nginx/sites-enabled/$DOMA
 # Test de la configuration
 nginx -t
 
-# Redémarrage de Nginx
-systemctl restart nginx
+# Rechargement de Nginx (reload au lieu de restart pour ne pas interrompre les autres sites)
+systemctl reload nginx
 systemctl enable nginx
 
 # 10. CONFIGURATION SSL AVEC LET'S ENCRYPT
