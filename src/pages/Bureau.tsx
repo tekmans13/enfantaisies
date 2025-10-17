@@ -361,15 +361,18 @@ export default function Bureau() {
     );
   };
 
-  const canBulkValidate = selectedInscriptions.some(id => {
+  const eligibleForValidation = selectedInscriptions.filter(id => {
     const inscription = inscriptions.find(i => i.id === id);
     return inscription?.status === 'en_attente';
   });
 
-  const canBulkPayment = selectedInscriptions.some(id => {
+  const eligibleForPayment = selectedInscriptions.filter(id => {
     const inscription = inscriptions.find(i => i.id === id);
-    return inscription?.status === 'validee';
+    return inscription?.status === 'validee' && inscription?.paiement_statut !== 'paye';
   });
+
+  const canBulkValidate = eligibleForValidation.length > 0;
+  const canBulkPayment = eligibleForPayment.length > 0;
 
   const handleSendPayment = async (inscription: any) => {
     setSendingPayment(inscription.id);
@@ -707,7 +710,7 @@ export default function Bureau() {
                         className="bg-green-500 hover:bg-green-600 gap-2"
                       >
                         <CheckCircle className="w-4 h-4" />
-                        Valider ({selectedInscriptions.length})
+                        Valider ({eligibleForValidation.length})
                       </Button>
                       <Button
                         onClick={() => handleBulkValidate('refusee')}
@@ -715,7 +718,7 @@ export default function Bureau() {
                         className="gap-2"
                       >
                         <XCircle className="w-4 h-4" />
-                        Refuser ({selectedInscriptions.length})
+                        Refuser ({eligibleForValidation.length})
                       </Button>
                     </>
                   )}
@@ -726,7 +729,7 @@ export default function Bureau() {
                       className="gap-2"
                     >
                       <Send className="w-4 h-4" />
-                      Paiements ({selectedInscriptions.length})
+                      Paiements ({eligibleForPayment.length})
                     </Button>
                   )}
                   <Button
