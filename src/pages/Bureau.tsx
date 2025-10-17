@@ -684,15 +684,18 @@ export default function Bureau() {
                     // Sinon, une seule ligne
                     return [{ ...inscription, weekNumber: 1, isFirstWeek: true }];
                   })
-                  .map((inscriptionRow, index) => {
+                  .map((inscriptionRow, index, array) => {
                     const inscription = inscriptionRow;
                     const isFirstWeek = inscriptionRow.isFirstWeek;
                     const weekNumber = inscriptionRow.weekNumber;
                     
+                    // Ajouter une bordure uniquement entre les inscriptions différentes
+                    const showTopBorder = weekNumber === 1 && index > 0;
+                    
                     return (
                   <TableRow 
                     key={`${inscription.id}-week${weekNumber}`}
-                    className={`${weekNumber === 2 ? 'border-t border-muted/20' : ''}`}
+                    className={showTopBorder ? 'border-t' : ''}
                   >
                     <TableCell className="py-2">
                       {weekNumber === 1 ? (
