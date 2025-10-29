@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Users as UsersIcon, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign, Send, FileDown, FileArchive, FileText, Download, Shield } from "lucide-react";
+import { Users as UsersIcon, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign, Send, FileDown, FileArchive, FileText, Download, Shield, LogOut } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -113,6 +113,23 @@ export default function Bureau() {
         _role: 'admin'
       });
       setIsAdmin(isAdminRole || false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Déconnexion réussie",
+        description: "À bientôt !",
+      });
+      navigate("/");
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de se déconnecter",
+        variant: "destructive",
+      });
     }
   };
 
@@ -457,6 +474,10 @@ export default function Bureau() {
             <Button onClick={() => navigate("/tarifs")} variant="outline" className="gap-2">
               <DollarSign className="h-4 w-4" />
               Gérer les tarifs
+            </Button>
+            <Button onClick={handleLogout} variant="outline" className="gap-2">
+              <LogOut className="h-4 w-4" />
+              Se déconnecter
             </Button>
           </div>
         </div>
