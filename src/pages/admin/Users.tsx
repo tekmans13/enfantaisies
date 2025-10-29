@@ -63,6 +63,7 @@ export default function Users() {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentUserRole, setCurrentUserRole] = useState<"admin" | "user">("user");
   const [newUser, setNewUser] = useState({
     email: "",
     role: "user" as "admin" | "user",
@@ -83,20 +84,29 @@ export default function Users() {
         return;
       }
 
+      // Vérifier si l'utilisateur a le rôle admin ou user
       const { data: isAdmin } = await supabase.rpc("has_role", {
         _user_id: session.user.id,
         _role: "admin",
       });
+      
+      const { data: isUser } = await supabase.rpc("has_role", {
+        _user_id: session.user.id,
+        _role: "user",
+      });
 
-      if (!isAdmin) {
+      if (!isAdmin && !isUser) {
         toast({
           title: "Accès refusé",
-          description: "Vous devez être administrateur",
+          description: "Vous devez avoir un rôle admin ou utilisateur",
           variant: "destructive",
         });
         navigate("/");
         return;
       }
+      
+      // Stocker le rôle pour l'utiliser dans l'UI
+      setCurrentUserRole(isAdmin ? "admin" : "user");
 
       await fetchUsers();
     } catch (error) {
@@ -309,7 +319,7 @@ export default function Users() {
           </div>
 
           <div className="flex gap-3">
-            <SmtpConfigDialog />
+            {currentUserRole === "admin" && <SmtpConfigDialog />}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button>

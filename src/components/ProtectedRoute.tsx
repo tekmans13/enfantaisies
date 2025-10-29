@@ -6,15 +6,20 @@ import { useToast } from "@/hooks/use-toast";
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
+  requireRole?: "admin" | "user" | "both"; // both = admin ou user
 }
 
-export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ 
+  children, 
+  requireAdmin = false,
+  requireRole
+}: ProtectedRouteProps) => {
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     checkAuth();
-  }, [requireAdmin]);
+  }, [requireAdmin, requireRole]);
 
   const checkAuth = async () => {
     try {
@@ -25,7 +30,61 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
         return;
       }
 
-      if (requireAdmin) {
+      // Si requireRole est spécifié, on l'utilise (priorité)
+      if (requireRole) {
+        if (requireRole === "both") {
+          // Vérifier si l'utilisateur a le rôle admin OU user
+          const { data: isAdmin } = await supabase.rpc('has_role', {
+            _user_id: session.user.id,
+            _role: 'admin'
+          });
+          
+          const { data: isUser } = await supabase.rpc('has_role', {
+            _user_id: session.user.id,
+            _role: 'user'
+          });
+
+          if (!isAdmin && !isUser) {
+            toast({
+              title: "Accès refusé",
+              description: "Vous devez avoir un rôle admin ou utilisateur",
+              variant: "destructive",
+            });
+            setIsAuthorized(false);
+            return;
+          }
+          
+          setIsAuthorized(true);
+        } else {
+          // Vérifier un rôle spécifique
+          const { data: hasRole, error } = await supabase.rpc('has_role', {
+            _user_id: session.user.id,
+            _role: requireRole
+          });
+
+          if (error) {
+            console.error('Error checking role:', error);
+            setIsAuthorized(false);
+            toast({
+              title: "Erreur",
+              description: "Impossible de vérifier vos permissions",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          if (!hasRole) {
+            toast({
+              title: "Accès refusé",
+              description: `Vous devez avoir le rôle ${requireRole}`,
+              variant: "destructive",
+            });
+          }
+
+          setIsAuthorized(hasRole || false);
+        }
+      } else if (requireAdmin) {
+        // Ancien comportement pour compatibilité
         const { data: isAdmin, error } = await supabase.rpc('has_role', {
           _user_id: session.user.id,
           _role: 'admin'
