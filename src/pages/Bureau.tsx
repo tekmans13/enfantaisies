@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InscriptionEditDialog } from "@/components/InscriptionEditDialog";
+import { InscriptionStatusBadge } from "@/components/InscriptionStatusBadge";
 import { SejourManageDialog } from "@/components/SejourManageDialog";
 import { SejourDetailsDialog } from "@/components/SejourDetailsDialog";
 import { exportInscriptionsToExcel } from "@/lib/excelExport";
@@ -754,36 +755,7 @@ export default function Bureau() {
                       )}
                     </TableCell>
                      <TableCell className="py-2">
-                       {inscription.status === 'en_attente' && (
-                         <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500 text-xs px-2 py-0">
-                           <Clock className="w-2 h-2 mr-1" />
-                           En attente
-                         </Badge>
-                       )}
-                       {inscription.status === 'attribuee' && (
-                         <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500 text-xs px-2 py-0">
-                           <CheckCircle className="w-2 h-2 mr-1" />
-                           Attribuée
-                         </Badge>
-                       )}
-                       {inscription.status === 'attribuee_alternatif' && (
-                         <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs px-2 py-0">
-                           <CheckCircle className="w-2 h-2 mr-1" />
-                           Attribuée
-                         </Badge>
-                       )}
-                       {inscription.status === 'validee' && (
-                         <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs px-2 py-0">
-                           <CheckCircle className="w-2 h-2 mr-1" />
-                           Validée
-                         </Badge>
-                       )}
-                       {inscription.status === 'refusee' && (
-                         <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500 text-xs px-2 py-0">
-                           <XCircle className="w-2 h-2 mr-1" />
-                           Refusée
-                         </Badge>
-                       )}
+                       <InscriptionStatusBadge status={inscription.status} size="sm" />
                      </TableCell>
                       <TableCell className="py-2">
                         {inscription.stripe_payment_id && (

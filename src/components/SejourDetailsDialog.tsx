@@ -17,7 +17,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, Users, AlertTriangle, Pill, FileDown, Clock, CheckCircle } from "lucide-react";
+import { Calendar, Users, AlertTriangle, Pill, FileDown } from "lucide-react";
+import { InscriptionStatusBadge } from "./InscriptionStatusBadge";
 import { exportSejourInscriptionsToExcel } from "@/lib/excelExport";
 
 interface SejourDetailsDialogProps {
@@ -57,34 +58,6 @@ export function SejourDetailsDialog({
     if (inscription.no_meat) dietary.push("Sans viande");
     if (inscription.has_food_allergies) dietary.push("Allergies alimentaires");
     return dietary;
-  };
-
-  const getStatusBadge = (status: string) => {
-    if (status === 'en_attente') {
-      return (
-        <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500 text-xs">
-          <Clock className="w-3 h-3 mr-1" />
-          En attente
-        </Badge>
-      );
-    }
-    if (status === 'attribuee' || status === 'attribuee_alternatif') {
-      return (
-        <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500 text-xs">
-          <CheckCircle className="w-3 h-3 mr-1" />
-          Attribuée
-        </Badge>
-      );
-    }
-    if (status === 'validee') {
-      return (
-        <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs">
-          <CheckCircle className="w-3 h-3 mr-1" />
-          Validée
-        </Badge>
-      );
-    }
-    return <Badge variant="outline">{status}</Badge>;
   };
 
   // Calcul des statistiques alimentaires sur toutes les inscriptions
@@ -260,7 +233,7 @@ export function SejourDetailsDialog({
                             </div>
                           </TableCell>
                           <TableCell>
-                            {getStatusBadge(inscription.status)}
+                            <InscriptionStatusBadge status={inscription.status} />
                           </TableCell>
                         </TableRow>
                       );
