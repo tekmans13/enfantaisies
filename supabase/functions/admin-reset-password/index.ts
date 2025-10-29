@@ -86,8 +86,12 @@ serve(async (req) => {
       await sendPasswordResetEmail(supabaseAdmin, email, newPassword);
     } catch (emailError: any) {
       console.error('Error sending email:', emailError);
+      console.error('Email error details:', emailError.message || emailError);
       return new Response(
-        JSON.stringify({ error: 'Password reset but email failed to send' }),
+        JSON.stringify({ 
+          error: 'Password reset but email failed to send',
+          details: emailError.message || 'Unknown error'
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
