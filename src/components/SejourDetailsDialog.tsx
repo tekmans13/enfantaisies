@@ -59,16 +59,13 @@ export function SejourDetailsDialog({
     return dietary;
   };
 
-  const validatedInscriptions = inscriptions.filter(i => i.status === 'validee');
-  const pendingInscriptions = inscriptions.filter(i => i.status === 'en_attente');
-
-  // Calcul des statistiques alimentaires
+  // Calcul des statistiques alimentaires sur toutes les inscriptions
   const dietaryStats = {
-    noPork: validatedInscriptions.filter(i => i.no_pork).length,
-    noMeat: validatedInscriptions.filter(i => i.no_meat).length,
-    foodAllergies: validatedInscriptions.filter(i => i.has_food_allergies).length,
-    medication: validatedInscriptions.filter(i => i.has_medication).length,
-    allergies: validatedInscriptions.filter(i => i.has_allergies).length,
+    noPork: inscriptions.filter(i => i.no_pork).length,
+    noMeat: inscriptions.filter(i => i.no_meat).length,
+    foodAllergies: inscriptions.filter(i => i.has_food_allergies).length,
+    medication: inscriptions.filter(i => i.has_medication).length,
+    allergies: inscriptions.filter(i => i.has_allergies).length,
   };
 
   if (!sejour) return null;
@@ -115,22 +112,22 @@ export function SejourDetailsDialog({
             <Card className="p-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                 <Users className="w-4 h-4" />
-                Places
+                Inscrits
               </div>
               <p className="font-semibold">
-                {validatedInscriptions.length} / {sejour.places_disponibles}
+                {inscriptions.length} / {sejour.places_disponibles}
               </p>
             </Card>
             <Card className="p-4">
-              <div className="text-sm text-muted-foreground mb-1">En attente</div>
-              <p className="font-semibold text-orange-500">
-                {pendingInscriptions.length}
+              <div className="text-sm text-muted-foreground mb-1">Type</div>
+              <p className="font-semibold capitalize">
+                {sejour.type}
               </p>
             </Card>
           </div>
 
           {/* Résumé régimes alimentaires et santé */}
-          {validatedInscriptions.length > 0 && (
+          {inscriptions.length > 0 && (
             <Card className="p-4 bg-muted/50">
               <h3 className="font-semibold mb-3">Résumé des besoins spécifiques</h3>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -158,11 +155,11 @@ export function SejourDetailsDialog({
             </Card>
           )}
 
-          {/* Liste des inscrits validés */}
+          {/* Liste de tous les inscrits */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Inscrits validés ({validatedInscriptions.length})</h3>
-            {validatedInscriptions.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">Aucun inscrit validé</p>
+            <h3 className="text-lg font-semibold mb-4">Inscrits ({inscriptions.length})</h3>
+            {inscriptions.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">Aucun inscrit</p>
             ) : (
               <div className="border rounded-lg overflow-hidden">
                 <Table>
@@ -173,10 +170,11 @@ export function SejourDetailsDialog({
                       <TableHead>Contact</TableHead>
                       <TableHead>Régime alimentaire</TableHead>
                       <TableHead>Santé</TableHead>
+                      <TableHead>Statut</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {validatedInscriptions.map((inscription) => {
+                    {inscriptions.map((inscription) => {
                       const dietary = getDietaryInfo(inscription);
                       return (
                         <TableRow key={inscription.id}>
@@ -233,6 +231,14 @@ export function SejourDetailsDialog({
                               )}
                             </div>
                           </TableCell>
+                          <TableCell>
+                            <Badge 
+                              variant={inscription.status === 'en_attente' ? 'outline' : 'default'}
+                              className={inscription.status === 'en_attente' ? 'text-orange-500 border-orange-500' : ''}
+                            >
+                              {inscription.status === 'en_attente' ? 'En attente' : inscription.status}
+                            </Badge>
+                          </TableCell>
                         </TableRow>
                       );
                     })}
@@ -241,51 +247,6 @@ export function SejourDetailsDialog({
               </div>
             )}
           </div>
-
-          {/* Liste d'attente */}
-          {pendingInscriptions.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-orange-500">
-                En attente de validation ({pendingInscriptions.length})
-              </h3>
-              <div className="border rounded-lg overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Enfant</TableHead>
-                      <TableHead>Parent</TableHead>
-                      <TableHead>Contact</TableHead>
-                      <TableHead>Choix</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pendingInscriptions.map((inscription) => (
-                      <TableRow key={inscription.id}>
-                        <TableCell>
-                          <p className="font-semibold">
-                            {inscription.child_first_name} {inscription.child_last_name}
-                          </p>
-                        </TableCell>
-                        <TableCell>
-                          {inscription.parent_first_name} {inscription.parent_last_name}
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            <p>{inscription.parent_mobile}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={inscription.sejour_preference_1 === sejour.id ? "default" : "outline"}>
-                            {inscription.sejour_preference_1 === sejour.id ? "1er choix" : "2ème choix"}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
-          )}
         </div>
       </DialogContent>
     </Dialog>
