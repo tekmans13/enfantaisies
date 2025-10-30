@@ -17,6 +17,7 @@ interface StepPrealablesProps {
     hasMedication: boolean;
     hasAllergies: boolean;
     allergiesDetails: string;
+    hasFoodAllergies: boolean;
     foodAllergiesDetails: string;
   };
   onCheckboxChange: (field: string) => void;
@@ -39,6 +40,7 @@ export function StepPrealables({
     { id: 'isFirstInscription', label: "C'est votre 1ère inscription" },
     { id: 'hasMedication', label: 'Votre enfant prend un traitement médicamenteux' },
     { id: 'hasAllergies', label: 'Votre enfant a des allergies' },
+    { id: 'hasFoodAllergies', label: 'Votre enfant a des allergies alimentaires / pratiques alimentaires spécifiques' },
   ];
 
   return (
@@ -116,19 +118,21 @@ export function StepPrealables({
           </div>
         )}
         
-        <div className="p-4 bg-muted/50 rounded-lg">
-          <Label htmlFor="foodAllergiesDetails" className="text-sm font-medium">
-            Allergies alimentaires / pratiques alimentaires spécifiques
-          </Label>
-          <Textarea
-            id="foodAllergiesDetails"
-            value={formData.foodAllergiesDetails}
-            onChange={(e) => onInputChange('foodAllergiesDetails', e.target.value)}
-            className="mt-2"
-            placeholder="Décrivez les allergies alimentaires ou pratiques alimentaires spécifiques de votre enfant..."
-            rows={3}
-          />
-        </div>
+        {formData.hasFoodAllergies && (
+          <div className="p-4 bg-muted/50 rounded-lg">
+            <Label htmlFor="foodAllergiesDetails" className="text-sm font-medium">
+              Détails des allergies alimentaires / pratiques alimentaires spécifiques
+            </Label>
+            <Textarea
+              id="foodAllergiesDetails"
+              value={formData.foodAllergiesDetails}
+              onChange={(e) => onInputChange('foodAllergiesDetails', e.target.value)}
+              className="mt-2"
+              placeholder="Décrivez les allergies alimentaires ou pratiques alimentaires spécifiques de votre enfant..."
+              rows={3}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

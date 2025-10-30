@@ -43,6 +43,7 @@ export default function Inscription() {
     hasMedication: false,
     hasAllergies: false,
     allergiesDetails: "",
+    hasFoodAllergies: false,
     foodAllergiesDetails: "",
     childFirstName: "",
     childLastName: "",
@@ -436,6 +437,7 @@ export default function Inscription() {
                   hasMedication: formData.hasMedication,
                   hasAllergies: formData.hasAllergies,
                   allergiesDetails: formData.allergiesDetails,
+                  hasFoodAllergies: formData.hasFoodAllergies,
                   foodAllergiesDetails: formData.foodAllergiesDetails,
                 }}
                 onCheckboxChange={handleCheckboxChange}
