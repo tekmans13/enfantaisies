@@ -122,6 +122,12 @@ export default function Inscription() {
   const [week2Selected, setWeek2Selected] = useState<string[]>([]);
   const [week2Priority, setWeek2Priority] = useState<string>("");
 
+  // Hooks pour les données
+  const { data: sejours } = useSejours(childAgeGroup || undefined);
+  const { calculatePrice } = useTarifCalculator(
+    formData.quotientFamilial ? parseInt(formData.quotientFamilial) : null
+  );
+
   /**
    * Calcule le groupe d'âge automatiquement selon la classe
    */
