@@ -181,8 +181,8 @@ export default function RecapInscription() {
             <p className="text-muted-foreground">
               Nous avons bien reçu votre demande d'inscription
             </p>
-            <div className="mt-4 text-sm text-muted-foreground">
-              <p>Référence de l'inscription : {inscription.id}</p>
+            <div className="mt-4 text-xs text-muted-foreground">
+              Référence de l'inscription : #{inscription.id.slice(0, 8)}
             </div>
           </div>
 
@@ -536,6 +536,19 @@ export default function RecapInscription() {
                 </div>
               </div>
             )}
+
+            {/* Informations importantes */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex items-start gap-2">
+                <Info className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div className="space-y-1">
+                  <h3 className="font-semibold text-yellow-900">Informations importantes</h3>
+                  <p className="text-sm text-yellow-800">
+                    {inscription.has_allergies ? 'Allergies' : 'Aucune allergie signalée'}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <Separator className="my-8" />
@@ -545,7 +558,7 @@ export default function RecapInscription() {
               Un email de confirmation a été envoyé à <strong>{inscription.parent_email}</strong>
             </p>
             <p className="text-sm text-muted-foreground">
-              Votre inscription sera traitée par notre équipe. Vous recevrez une notification une fois validée.
+              Votre inscription sera traitée par notre équipe. Vous recevrez une notification par les voies officielles.
             </p>
             <Button onClick={() => navigate('/')} className="gap-2">
               <Home className="w-4 h-4" />

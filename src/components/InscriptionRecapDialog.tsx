@@ -170,14 +170,17 @@ export function InscriptionRecapDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3">
+          <DialogTitle className="text-center space-y-2">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-2">
               <CheckCircle className="w-6 h-6 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold">Récapitulatif de l'inscription</h2>
+            <h2 className="text-2xl font-bold">Inscription enregistrée !</h2>
+            <p className="text-sm font-normal text-muted-foreground">
+              Nous avons bien reçu votre demande d'inscription
+            </p>
             {inscription && (
-              <div className="mt-2 text-xs text-muted-foreground">
-                <p>Référence de l'inscription : {inscription.id}</p>
+              <div className="mt-3 text-xs text-muted-foreground">
+                Référence de l'inscription : #{inscription.id.slice(0, 8)}
               </div>
             )}
           </DialogTitle>
@@ -594,6 +597,29 @@ export function InscriptionRecapDialog({
                 </div>
               </div>
             )}
+
+            {/* Informations importantes */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex items-start gap-2">
+                <Info className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div className="space-y-1">
+                  <h3 className="font-semibold text-yellow-900">Informations importantes</h3>
+                  <p className="text-sm text-yellow-800">
+                    {inscription.has_allergies ? 'Allergies' : 'Aucune allergie signalée'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Pied de page */}
+            <div className="text-center space-y-2 pt-4 border-t">
+              <p className="text-xs text-muted-foreground">
+                Un email de confirmation a été envoyé à <span className="font-medium">{inscription.parent_email}</span>
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Votre inscription sera traitée par notre équipe. Vous recevrez une notification par les voies officielles.
+              </p>
+            </div>
           </div>
         ) : null}
       </DialogContent>
