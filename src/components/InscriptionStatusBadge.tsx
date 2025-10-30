@@ -14,7 +14,7 @@ export function InscriptionStatusBadge({ status, size = "md" }: InscriptionStatu
     return (
       <Badge variant="outline" className={`bg-orange-500/10 text-orange-500 border-orange-500 ${textSize}`}>
         <Clock className={`${iconSize} mr-1`} />
-        En attente
+        Attente
       </Badge>
     );
   }
@@ -24,6 +24,38 @@ export function InscriptionStatusBadge({ status, size = "md" }: InscriptionStatu
       <Badge variant="outline" className={`bg-green-500/10 text-green-500 border-green-500 ${textSize}`}>
         <CheckCircle className={`${iconSize} mr-1`} />
         Attribuée
+      </Badge>
+    );
+  }
+  
+  if (status === 'envoye') {
+    return (
+      <Badge variant="outline" className={`bg-blue-500/10 text-blue-500 border-blue-500 ${textSize}`}>
+        📧 Envoyé
+      </Badge>
+    );
+  }
+  
+  if (status === 'paye') {
+    return (
+      <Badge variant="outline" className={`bg-green-600/10 text-green-600 border-green-600 ${textSize}`}>
+        ✓ Payé
+      </Badge>
+    );
+  }
+  
+  if (status === 'echoue') {
+    return (
+      <Badge variant="outline" className={`bg-red-500/10 text-red-500 border-red-500 ${textSize}`}>
+        ✗ Échoué
+      </Badge>
+    );
+  }
+  
+  if (status === 'rembourse') {
+    return (
+      <Badge variant="outline" className={`bg-purple-500/10 text-purple-500 border-purple-500 ${textSize}`}>
+        ↩ Remboursé
       </Badge>
     );
   }

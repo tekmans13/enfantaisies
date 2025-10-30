@@ -407,6 +407,12 @@ export default function Bureau() {
       if (error) throw error;
 
       if (data.success) {
+        // Mettre à jour le statut à "envoyé"
+        await supabase
+          .from('inscriptions')
+          .update({ status: 'envoye' })
+          .eq('id', inscription.id);
+        
         // Copier le lien dans le presse-papier
         await navigator.clipboard.writeText(data.paymentUrl);
         
@@ -417,6 +423,9 @@ export default function Bureau() {
           title: "Lien de paiement créé",
           description: `Lien copié et ouvert. Montant: ${montantTotal.toFixed(2)}€`,
         });
+        
+        // Rafraîchir les inscriptions
+        fetchInscriptions();
         
         // Afficher aussi dans une alerte pour pouvoir copier manuellement si besoin
         setTimeout(() => {
@@ -697,7 +706,6 @@ export default function Bureau() {
                   <TableHead>S2 - Choix prioritaire</TableHead>
                   <TableHead>S2 - Choix alternatif</TableHead>
                   <TableHead>Statut</TableHead>
-                  <TableHead>Paiement</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -780,34 +788,8 @@ export default function Bureau() {
                        <InscriptionStatusBadge status={inscription.status} size="sm" />
                      </TableCell>
                       <TableCell className="py-2">
-                        {inscription.stripe_payment_id && (
-                          <>
-                            {inscription.paiement_statut === 'paye' && (
-                              <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500 text-xs px-2 py-0">
-                                ✓ Payé
-                              </Badge>
-                            )}
-                            {inscription.paiement_statut === 'en_attente' && (
-                              <Badge variant="outline" className="bg-gray-500/10 text-gray-500 border-gray-500 text-xs px-2 py-0">
-                                En attente
-                              </Badge>
-                            )}
-                            {inscription.paiement_statut === 'echoue' && (
-                              <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500 text-xs px-2 py-0">
-                                Échoué
-                              </Badge>
-                            )}
-                            {inscription.paiement_statut === 'rembourse' && (
-                              <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500 text-xs px-2 py-0">
-                                Remboursé
-                              </Badge>
-                            )}
-                          </>
-                        )}
+                        <span className="text-xs">{new Date(inscription.created_at).toLocaleDateString('fr-FR')}</span>
                       </TableCell>
-                     <TableCell className="py-2">
-                       <span className="text-xs">{new Date(inscription.created_at).toLocaleDateString('fr-FR')}</span>
-                     </TableCell>
                       <TableCell className="py-2">
                         <div className="flex gap-1">
                           <TooltipProvider>

@@ -66,7 +66,7 @@ const handler = async (req: Request): Promise<Response> => {
           const { error } = await supabase
             .from('inscriptions')
             .update({
-              paiement_statut: 'paye',
+              status: 'paye',
               stripe_payment_id: session.id,
               paiement_date: new Date().toISOString(),
             })
@@ -92,7 +92,7 @@ const handler = async (req: Request): Promise<Response> => {
           await supabase
             .from('inscriptions')
             .update({
-              paiement_statut: 'echoue',
+              status: 'echoue',
               stripe_payment_id: paymentIntent.id,
             })
             .eq('id', inscriptionId);
@@ -116,7 +116,7 @@ const handler = async (req: Request): Promise<Response> => {
           await supabase
             .from('inscriptions')
             .update({
-              paiement_statut: 'rembourse',
+              status: 'rembourse',
             })
             .eq('id', inscription.id);
         }
