@@ -455,41 +455,43 @@ export default function Inscription() {
             <Progress value={progressPercentage} className="h-2" />
           </div>
 
-          <div className="flex justify-between items-center">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              const isActive = currentStep === step.number;
-              const isCompleted = currentStep > step.number;
+          <div className="overflow-x-auto pb-2">
+            <div className="flex justify-between items-center min-w-max sm:min-w-0">
+              {steps.map((step, index) => {
+                const Icon = step.icon;
+                const isActive = currentStep === step.number;
+                const isCompleted = currentStep > step.number;
 
-              return (
-                <div key={step.number} className="flex items-center">
-                  <button
-                    onClick={() => setCurrentStep(step.number)}
-                    className={`flex flex-col items-center transition-all hover:scale-105 cursor-pointer ${
-                      isActive ? "text-primary" : isCompleted ? "text-secondary" : "text-muted-foreground"
-                    }`}
-                    type="button"
-                  >
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
-                        isActive
-                          ? "bg-primary text-primary-foreground shadow-lg scale-110"
-                          : isCompleted
-                          ? "bg-secondary text-secondary-foreground"
-                          : "bg-muted hover:bg-muted/80"
+                return (
+                  <div key={step.number} className="flex items-center">
+                    <button
+                      onClick={() => setCurrentStep(step.number)}
+                      className={`flex flex-col items-center transition-all hover:scale-105 cursor-pointer ${
+                        isActive ? "text-primary" : isCompleted ? "text-secondary" : "text-muted-foreground"
                       }`}
+                      type="button"
                     >
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <span className="text-xs font-medium text-center hidden sm:block">
-                      {step.title}
-                    </span>
-                  </button>
-                  {index < steps.length - 1 && (
-                    <div className={`h-0.5 w-8 sm:w-16 mx-2 ${isCompleted ? "bg-secondary" : "bg-border"}`} />
-                  )}
-                </div>
-              );
-            })}
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-1 sm:mb-2 transition-all ${
+                          isActive
+                            ? "bg-primary text-primary-foreground shadow-lg scale-110"
+                            : isCompleted
+                            ? "bg-secondary text-secondary-foreground"
+                            : "bg-muted hover:bg-muted/80"
+                        }`}
+                      >
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </div>
+                      <span className="text-[10px] sm:text-xs font-medium text-center whitespace-nowrap px-1">
+                        {step.title}
+                      </span>
+                    </button>
+                    {index < steps.length - 1 && (
+                      <div className={`h-0.5 w-4 sm:w-8 md:w-16 mx-1 sm:mx-2 ${isCompleted ? "bg-secondary" : "bg-border"}`} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </Card>
 
@@ -508,7 +510,7 @@ export default function Inscription() {
                         Documents requis
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>Documents requis</DialogTitle>
                       </DialogHeader>
