@@ -39,6 +39,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InscriptionEditDialog } from "@/components/InscriptionEditDialog";
 import { InscriptionStatusBadge } from "@/components/InscriptionStatusBadge";
+import { InscriptionRecapDialog } from "@/components/InscriptionRecapDialog";
 import { SejourManageDialog } from "@/components/SejourManageDialog";
 import { SejourDetailsDialog } from "@/components/SejourDetailsDialog";
 import { exportInscriptionsToExcel } from "@/lib/excelExport";
@@ -61,6 +62,7 @@ export default function Bureau() {
   const [showDeleteSejoursDialog, setShowDeleteSejoursDialog] = useState(false);
   const [showDeleteInscriptionsDialog, setShowDeleteInscriptionsDialog] = useState(false);
   const [deletingInscriptionId, setDeletingInscriptionId] = useState<string | null>(null);
+  const [viewingInscriptionId, setViewingInscriptionId] = useState<string | null>(null);
 
   useEffect(() => {
     checkAdminRole();
@@ -795,23 +797,23 @@ export default function Bureau() {
                            </Tooltip>
                          </TooltipProvider>
                          
-                         <TooltipProvider>
-                           <Tooltip>
-                             <TooltipTrigger asChild>
-                               <Button
-                                 size="sm"
-                                 variant="ghost"
-                                 className="h-7 w-7 p-0"
-                                 onClick={() => navigate(`/recap-inscription/${inscription.id}`)}
-                               >
-                                 <Eye className="w-3 h-3" />
-                               </Button>
-                             </TooltipTrigger>
-                             <TooltipContent>
-                               <p>Voir le récapitulatif</p>
-                             </TooltipContent>
-                           </Tooltip>
-                         </TooltipProvider>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-7 w-7 p-0"
+                                  onClick={() => setViewingInscriptionId(inscription.id)}
+                                >
+                                  <Eye className="w-3 h-3" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Voir le récapitulatif</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                          
                          <TooltipProvider>
                            <Tooltip>
@@ -917,6 +919,12 @@ export default function Bureau() {
         sejour={viewingSejour}
         open={!!viewingSejour}
         onOpenChange={(open) => !open && setViewingSejour(null)}
+      />
+
+      <InscriptionRecapDialog
+        inscriptionId={viewingInscriptionId}
+        open={!!viewingInscriptionId}
+        onOpenChange={(open) => !open && setViewingInscriptionId(null)}
       />
 
       <AlertDialog open={showDeleteSejoursDialog} onOpenChange={setShowDeleteSejoursDialog}>
