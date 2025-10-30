@@ -8,6 +8,7 @@ import Inscription from "./pages/Inscription";
 import Bureau from "./pages/Bureau";
 import RecapInscription from "./pages/RecapInscription";
 import Tarifs from "./pages/Tarifs";
+import Documents from "./pages/Documents";
 import Auth from "./pages/Auth";
 import Users from "./pages/admin/Users";
 import Configuration from "./pages/admin/Configuration";
@@ -39,6 +40,14 @@ const App = () => (
             element={
               <ProtectedRoute requireRole="both">
                 <Tarifs />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/documents" 
+            element={
+              <ProtectedRoute requireRole="both">
+                <Documents />
               </ProtectedRoute>
             } 
           />

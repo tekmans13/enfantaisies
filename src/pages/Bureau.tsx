@@ -42,7 +42,6 @@ import { InscriptionStatusBadge } from "@/components/InscriptionStatusBadge";
 import { InscriptionRecapDialog } from "@/components/InscriptionRecapDialog";
 import { SejourManageDialog } from "@/components/SejourManageDialog";
 import { SejourDetailsDialog } from "@/components/SejourDetailsDialog";
-import { DocumentsManagement } from "@/components/DocumentsManagement";
 import { exportInscriptionsToExcel } from "@/lib/excelExport";
 import { downloadAllDocuments } from "@/lib/downloadDocuments";
 
@@ -64,7 +63,6 @@ export default function Bureau() {
   const [showDeleteInscriptionsDialog, setShowDeleteInscriptionsDialog] = useState(false);
   const [deletingInscriptionId, setDeletingInscriptionId] = useState<string | null>(null);
   const [viewingInscriptionId, setViewingInscriptionId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("gestion");
 
   useEffect(() => {
     checkAdminRole();
@@ -473,6 +471,10 @@ export default function Bureau() {
               <DollarSign className="h-4 w-4" />
               Gérer les tarifs
             </Button>
+            <Button onClick={() => navigate("/documents")} variant="outline" className="gap-2">
+              <FileText className="h-4 w-4" />
+              Documents
+            </Button>
             <Button onClick={handleLogout} variant="outline" className="gap-2">
               <LogOut className="h-4 w-4" />
               Se déconnecter
@@ -480,14 +482,7 @@ export default function Bureau() {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
-            <TabsTrigger value="gestion">Gestion</TabsTrigger>
-            <TabsTrigger value="documents">Documents</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="gestion" className="space-y-8">
-            {/* Statistiques générales */}
+        {/* Statistiques générales */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card className="p-6">
             <div className="flex items-center gap-4">
@@ -900,12 +895,6 @@ export default function Bureau() {
             </Table>
           </div>
         </Card>
-          </TabsContent>
-
-          <TabsContent value="documents">
-            <DocumentsManagement />
-          </TabsContent>
-        </Tabs>
       </div>
 
       <InscriptionEditDialog
