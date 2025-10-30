@@ -498,7 +498,7 @@ export default function Configuration() {
               <CardHeader>
                 <CardTitle>Configuration Backend (Supabase)</CardTitle>
                 <CardDescription>
-                  Informations de connexion à votre backend Lovable Cloud
+                  Informations de connexion à votre backend Supabase
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -506,11 +506,11 @@ export default function Configuration() {
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-green-500"></div>
                     <p className="text-sm font-semibold text-green-600 dark:text-green-400">
-                      Backend Lovable Cloud configuré
+                      Backend Supabase configuré
                     </p>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Votre projet est connecté à Lovable Cloud avec toutes les fonctionnalités backend actives.
+                    Votre projet est connecté à Supabase avec toutes les fonctionnalités backend actives.
                   </p>
                 </div>
 
@@ -574,7 +574,7 @@ export default function Configuration() {
 
                 <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                   <p className="text-sm text-blue-600 dark:text-blue-400">
-                    ℹ️ Ces paramètres sont gérés automatiquement par Lovable Cloud. Les clés secrètes (Service Role Key) ne sont pas affichées pour des raisons de sécurité.
+                    ℹ️ Ces paramètres sont gérés automatiquement. Les clés secrètes (Service Role Key) ne sont pas affichées pour des raisons de sécurité.
                   </p>
                 </div>
 
