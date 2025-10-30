@@ -83,6 +83,7 @@ export type Database = {
       }
       inscriptions: {
         Row: {
+          allergies_details: string | null
           authorized_person_1_first_name: string | null
           authorized_person_1_last_name: string | null
           authorized_person_1_mobile: string | null
@@ -108,6 +109,7 @@ export type Database = {
           has_medication: boolean | null
           id: string
           is_first_inscription: boolean | null
+          medication_details: string | null
           nombre_semaines_demandees: number | null
           paiement_date: string | null
           paiement_statut: string | null
@@ -149,6 +151,7 @@ export type Database = {
           validated_by: string | null
         }
         Insert: {
+          allergies_details?: string | null
           authorized_person_1_first_name?: string | null
           authorized_person_1_last_name?: string | null
           authorized_person_1_mobile?: string | null
@@ -174,6 +177,7 @@ export type Database = {
           has_medication?: boolean | null
           id?: string
           is_first_inscription?: boolean | null
+          medication_details?: string | null
           nombre_semaines_demandees?: number | null
           paiement_date?: string | null
           paiement_statut?: string | null
@@ -215,6 +219,7 @@ export type Database = {
           validated_by?: string | null
         }
         Update: {
+          allergies_details?: string | null
           authorized_person_1_first_name?: string | null
           authorized_person_1_last_name?: string | null
           authorized_person_1_mobile?: string | null
@@ -240,6 +245,7 @@ export type Database = {
           has_medication?: boolean | null
           id?: string
           is_first_inscription?: boolean | null
+          medication_details?: string | null
           nombre_semaines_demandees?: number | null
           paiement_date?: string | null
           paiement_statut?: string | null
