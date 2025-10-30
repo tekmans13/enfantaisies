@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
@@ -33,9 +34,7 @@ export default function Inscription() {
     isFirstInscription: false,
     hasMedication: false,
     hasAllergies: false,
-    hasFoodAllergies: false,
-    noPork: false,
-    noMeat: false,
+    foodAllergiesDetails: "",
     childFirstName: "",
     childLastName: "",
     childBirthDate: "",
@@ -281,9 +280,7 @@ export default function Inscription() {
         is_first_inscription: formData.isFirstInscription,
         has_medication: formData.hasMedication,
         has_allergies: formData.hasAllergies,
-        has_food_allergies: formData.hasFoodAllergies,
-        no_pork: formData.noPork,
-        no_meat: formData.noMeat,
+        food_allergies_details: formData.foodAllergiesDetails || null,
         child_first_name: formData.childFirstName,
         child_last_name: formData.childLastName,
         child_birth_date: formData.childBirthDate || null,
@@ -548,9 +545,6 @@ export default function Inscription() {
                     { id: 'isFirstInscription', label: "C'est votre 1ère inscription" },
                     { id: 'hasMedication', label: 'Votre enfant prend un traitement médicamenteux' },
                     { id: 'hasAllergies', label: 'Votre enfant a des allergies' },
-                    { id: 'hasFoodAllergies', label: 'Votre enfant a des allergies alimentaires / pratiques alimentaires spécifiques' },
-                    { id: 'noPork', label: 'Votre enfant ne mange pas de porc' },
-                    { id: 'noMeat', label: 'Votre enfant ne mange pas de viande' },
                   ].map((item) => (
                     <div key={item.id} className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
                       <Checkbox
@@ -563,6 +557,20 @@ export default function Inscription() {
                       </Label>
                     </div>
                   ))}
+                  
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <Label htmlFor="foodAllergiesDetails" className="text-sm font-medium">
+                      Allergies alimentaires / pratiques alimentaires spécifiques
+                    </Label>
+                    <Textarea
+                      id="foodAllergiesDetails"
+                      value={formData.foodAllergiesDetails}
+                      onChange={(e) => handleInputChange('foodAllergiesDetails', e.target.value)}
+                      className="mt-2"
+                      placeholder="Décrivez les allergies alimentaires ou pratiques alimentaires spécifiques de votre enfant..."
+                      rows={3}
+                    />
+                  </div>
                 </div>
               </div>
             )}

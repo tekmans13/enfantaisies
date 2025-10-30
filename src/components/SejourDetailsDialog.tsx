@@ -54,17 +54,15 @@ export function SejourDetailsDialog({
 
   const getDietaryInfo = (inscription: any) => {
     const dietary = [];
-    if (inscription.no_pork) dietary.push("Sans porc");
-    if (inscription.no_meat) dietary.push("Sans viande");
-    if (inscription.has_food_allergies) dietary.push("Allergies alimentaires");
+    if (inscription.food_allergies_details) {
+      dietary.push(`Allergies/pratiques alimentaires: ${inscription.food_allergies_details}`);
+    }
     return dietary;
   };
 
   // Calcul des statistiques alimentaires sur toutes les inscriptions
   const dietaryStats = {
-    noPork: inscriptions.filter(i => i.no_pork).length,
-    noMeat: inscriptions.filter(i => i.no_meat).length,
-    foodAllergies: inscriptions.filter(i => i.has_food_allergies).length,
+    foodAllergies: inscriptions.filter(i => i.food_allergies_details).length,
     medication: inscriptions.filter(i => i.has_medication).length,
     allergies: inscriptions.filter(i => i.has_allergies).length,
   };
@@ -131,15 +129,7 @@ export function SejourDetailsDialog({
           {inscriptions.length > 0 && (
             <Card className="p-4 bg-muted/50">
               <h3 className="font-semibold mb-3">Résumé des besoins spécifiques</h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <div className="text-center p-2 bg-background rounded-lg">
-                  <p className="text-2xl font-bold text-primary">{dietaryStats.noPork}</p>
-                  <p className="text-xs text-muted-foreground">Sans porc</p>
-                </div>
-                <div className="text-center p-2 bg-background rounded-lg">
-                  <p className="text-2xl font-bold text-primary">{dietaryStats.noMeat}</p>
-                  <p className="text-xs text-muted-foreground">Sans viande</p>
-                </div>
+              <div className="grid grid-cols-3 gap-3">
                 <div className="text-center p-2 bg-background rounded-lg">
                   <p className="text-2xl font-bold text-orange-500">{dietaryStats.foodAllergies}</p>
                   <p className="text-xs text-muted-foreground">Allergies alim.</p>

@@ -433,7 +433,7 @@ export default function RecapInscription() {
             </div>
 
             {/* Informations complémentaires */}
-            {(inscription.has_medication || inscription.has_allergies || inscription.has_food_allergies) && (
+            {(inscription.has_medication || inscription.has_allergies || inscription.food_allergies_details) && (
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <FileText className="w-5 h-5 text-primary" />
@@ -452,11 +452,16 @@ export default function RecapInscription() {
                       Allergies
                     </p>
                   )}
-                  {inscription.has_food_allergies && (
-                    <p className="text-sm flex items-center gap-2">
-                      <Badge variant="outline" className="bg-amber-100 dark:bg-amber-900">⚠️</Badge>
-                      Allergies alimentaires
-                    </p>
+                  {inscription.food_allergies_details && (
+                    <div>
+                      <p className="text-sm font-semibold mb-2 flex items-center gap-2">
+                        <Badge variant="outline" className="bg-amber-100 dark:bg-amber-900">⚠️</Badge>
+                        Allergies alimentaires / pratiques alimentaires spécifiques
+                      </p>
+                      <p className="text-sm ml-8 p-3 bg-background rounded border border-amber-200 dark:border-amber-800">
+                        {inscription.food_allergies_details}
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>

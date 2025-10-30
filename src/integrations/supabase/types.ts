@@ -103,13 +103,11 @@ export type Database = {
           child_school: string
           created_at: string | null
           demande_specifique: string | null
+          food_allergies_details: string | null
           has_allergies: boolean | null
-          has_food_allergies: boolean | null
           has_medication: boolean | null
           id: string
           is_first_inscription: boolean | null
-          no_meat: boolean | null
-          no_pork: boolean | null
           nombre_semaines_demandees: number | null
           paiement_date: string | null
           paiement_statut: string | null
@@ -171,13 +169,11 @@ export type Database = {
           child_school: string
           created_at?: string | null
           demande_specifique?: string | null
+          food_allergies_details?: string | null
           has_allergies?: boolean | null
-          has_food_allergies?: boolean | null
           has_medication?: boolean | null
           id?: string
           is_first_inscription?: boolean | null
-          no_meat?: boolean | null
-          no_pork?: boolean | null
           nombre_semaines_demandees?: number | null
           paiement_date?: string | null
           paiement_statut?: string | null
@@ -239,13 +235,11 @@ export type Database = {
           child_school?: string
           created_at?: string | null
           demande_specifique?: string | null
+          food_allergies_details?: string | null
           has_allergies?: boolean | null
-          has_food_allergies?: boolean | null
           has_medication?: boolean | null
           id?: string
           is_first_inscription?: boolean | null
-          no_meat?: boolean | null
-          no_pork?: boolean | null
           nombre_semaines_demandees?: number | null
           paiement_date?: string | null
           paiement_statut?: string | null
