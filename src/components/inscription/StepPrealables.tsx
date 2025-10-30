@@ -15,6 +15,7 @@ interface StepPrealablesProps {
   formData: {
     isFirstInscription: boolean;
     hasMedication: boolean;
+    medicationDetails: string;
     hasAllergies: boolean;
     allergiesDetails: string;
     hasFoodAllergies: boolean;
@@ -37,10 +38,35 @@ export function StepPrealables({
   const impositionYear = new Date().getFullYear() - 1;
   
   const checkboxItems = [
-    { id: 'isFirstInscription', label: "C'est votre 1ère inscription" },
-    { id: 'hasMedication', label: 'Votre enfant prend un traitement médicamenteux' },
-    { id: 'hasAllergies', label: 'Votre enfant a des allergies' },
-    { id: 'hasFoodAllergies', label: 'Votre enfant a des allergies alimentaires / pratiques alimentaires spécifiques' },
+    { 
+      id: 'isFirstInscription', 
+      label: "C'est votre 1ère inscription",
+      hasDetails: false
+    },
+    { 
+      id: 'hasMedication', 
+      label: 'Votre enfant prend un traitement médicamenteux',
+      hasDetails: true,
+      detailsField: 'medicationDetails',
+      detailsLabel: 'Détails du traitement médicamenteux',
+      detailsPlaceholder: 'Décrivez le traitement médicamenteux de votre enfant...'
+    },
+    { 
+      id: 'hasAllergies', 
+      label: 'Votre enfant a des allergies',
+      hasDetails: true,
+      detailsField: 'allergiesDetails',
+      detailsLabel: 'Détails des allergies',
+      detailsPlaceholder: 'Décrivez les allergies de votre enfant...'
+    },
+    { 
+      id: 'hasFoodAllergies', 
+      label: 'Votre enfant a des allergies alimentaires / pratiques alimentaires spécifiques',
+      hasDetails: true,
+      detailsField: 'foodAllergiesDetails',
+      detailsLabel: 'Détails des allergies alimentaires / pratiques alimentaires spécifiques',
+      detailsPlaceholder: 'Décrivez les allergies alimentaires ou pratiques alimentaires spécifiques de votre enfant...'
+    },
   ];
 
   return (
@@ -90,49 +116,35 @@ export function StepPrealables({
       </p>
       <div className="space-y-4">
         {checkboxItems.map((item) => (
-          <div key={item.id} className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
-            <Checkbox
-              id={item.id}
-              checked={formData[item.id as keyof typeof formData] as boolean}
-              onCheckedChange={() => onCheckboxChange(item.id)}
-            />
-            <Label htmlFor={item.id} className="text-sm font-medium cursor-pointer">
-              {item.label}
-            </Label>
+          <div key={item.id}>
+            <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
+              <Checkbox
+                id={item.id}
+                checked={formData[item.id as keyof typeof formData] as boolean}
+                onCheckedChange={() => onCheckboxChange(item.id)}
+              />
+              <Label htmlFor={item.id} className="text-sm font-medium cursor-pointer">
+                {item.label}
+              </Label>
+            </div>
+            
+            {item.hasDetails && formData[item.id as keyof typeof formData] && (
+              <div className="mt-2 p-4 bg-muted/50 rounded-lg">
+                <Label htmlFor={item.detailsField} className="text-sm font-medium">
+                  {item.detailsLabel}
+                </Label>
+                <Textarea
+                  id={item.detailsField}
+                  value={formData[item.detailsField as keyof typeof formData] as string}
+                  onChange={(e) => onInputChange(item.detailsField!, e.target.value)}
+                  className="mt-2"
+                  placeholder={item.detailsPlaceholder}
+                  rows={3}
+                />
+              </div>
+            )}
           </div>
         ))}
-        
-        {formData.hasAllergies && (
-          <div className="p-4 bg-muted/50 rounded-lg">
-            <Label htmlFor="allergiesDetails" className="text-sm font-medium">
-              Détails des allergies
-            </Label>
-            <Textarea
-              id="allergiesDetails"
-              value={formData.allergiesDetails}
-              onChange={(e) => onInputChange('allergiesDetails', e.target.value)}
-              className="mt-2"
-              placeholder="Décrivez les allergies de votre enfant..."
-              rows={3}
-            />
-          </div>
-        )}
-        
-        {formData.hasFoodAllergies && (
-          <div className="p-4 bg-muted/50 rounded-lg">
-            <Label htmlFor="foodAllergiesDetails" className="text-sm font-medium">
-              Détails des allergies alimentaires / pratiques alimentaires spécifiques
-            </Label>
-            <Textarea
-              id="foodAllergiesDetails"
-              value={formData.foodAllergiesDetails}
-              onChange={(e) => onInputChange('foodAllergiesDetails', e.target.value)}
-              className="mt-2"
-              placeholder="Décrivez les allergies alimentaires ou pratiques alimentaires spécifiques de votre enfant..."
-              rows={3}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

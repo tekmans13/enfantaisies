@@ -41,6 +41,7 @@ export default function Inscription() {
   const [formData, setFormData] = useState({
     isFirstInscription: false,
     hasMedication: false,
+    medicationDetails: "",
     hasAllergies: false,
     allergiesDetails: "",
     hasFoodAllergies: false,
@@ -435,6 +436,7 @@ export default function Inscription() {
                 formData={{
                   isFirstInscription: formData.isFirstInscription,
                   hasMedication: formData.hasMedication,
+                  medicationDetails: formData.medicationDetails,
                   hasAllergies: formData.hasAllergies,
                   allergiesDetails: formData.allergiesDetails,
                   hasFoodAllergies: formData.hasFoodAllergies,
