@@ -1,5 +1,15 @@
+/**
+ * Utilitaires pour l'export des données en Excel
+ * Permet d'exporter les inscriptions et séjours au format XLSX
+ */
+
 import * as XLSX from 'xlsx';
 
+/**
+ * Exporte toutes les inscriptions vers un fichier Excel
+ * @param inscriptions - Liste des inscriptions à exporter
+ * @param sejours - Liste des séjours pour récupérer les titres
+ */
 export const exportInscriptionsToExcel = (inscriptions: any[], sejours: any[]) => {
   const getSejourTitle = (sejourId: string) => {
     const sejour = sejours.find(s => s.id === sejourId);
@@ -54,6 +64,11 @@ export const exportInscriptionsToExcel = (inscriptions: any[], sejours: any[]) =
   XLSX.writeFile(workbook, fileName);
 };
 
+/**
+ * Exporte les inscriptions d'un séjour spécifique vers un fichier Excel
+ * @param sejour - Séjour concerné
+ * @param inscriptions - Inscriptions pour ce séjour
+ */
 export const exportSejourInscriptionsToExcel = (sejour: any, inscriptions: any[]) => {
   const data = inscriptions.map(inscription => ({
     'Statut': inscription.status,

@@ -1,3 +1,8 @@
+/**
+ * Page d'accueil de l'application
+ * Présente le centre aéré et permet d'accéder au formulaire d'inscription
+ */
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";

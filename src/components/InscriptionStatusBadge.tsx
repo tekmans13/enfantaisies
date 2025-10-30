@@ -1,11 +1,22 @@
+/**
+ * Composant Badge de statut d'inscription
+ * Affiche un badge coloré selon le statut avec une icône appropriée
+ */
+
 import { Badge } from "@/components/ui/badge";
 import { Clock, CheckCircle, XCircle } from "lucide-react";
 
 interface InscriptionStatusBadgeProps {
+  /** Statut de l'inscription */
   status: string;
+  /** Taille du badge */
   size?: "sm" | "md";
 }
 
+/**
+ * Badge visuel représentant l'état d'une inscription
+ * Les couleurs et icônes changent selon le statut
+ */
 export function InscriptionStatusBadge({ status, size = "md" }: InscriptionStatusBadgeProps) {
   const iconSize = size === "sm" ? "w-2 h-2" : "w-3 h-3";
   const textSize = size === "sm" ? "text-xs px-2 py-0" : "text-xs";

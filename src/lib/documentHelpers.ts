@@ -1,0 +1,81 @@
+/**
+ * Helpers pour la gestion des documents
+ */
+
+import { supabase } from '@/integrations/supabase/client';
+import { formatFileName } from './formatters';
+
+export interface DocumentToUpload {
+  file: File | null;
+  type: string;
+}
+
+/**
+ * Upload un document dans le storage Supabase
+ * @returns Le chemin du fichier uploadé
+ */
+export const uploadDocument = async (
+  inscriptionId: string,
+  document: DocumentToUpload,
+  childLastName: string,
+  childFirstName: string
+): Promise<string | null> => {
+  if (!document.file) return null;
+
+  const formattedFileName = formatFileName(
+    childLastName,
+    childFirstName,
+    document.type,
+    document.file
+  );
+  
+  const filePath = `${inscriptionId}/${formattedFileName}`;
+  
+  const { error: uploadError } = await supabase.storage
+    .from('inscription-documents')
+    .upload(filePath, document.file);
+
+  if (uploadError) {
+    console.error('Erreur upload:', uploadError);
+    throw uploadError;
+  }
+
+  // Enregistrer le document dans la table
+  await supabase.from('inscription_documents').insert({
+    inscription_id: inscriptionId,
+    document_type: document.type,
+    file_path: filePath,
+    file_name: formattedFileName,
+  });
+
+  return filePath;
+};
+
+/**
+ * Upload plusieurs documents en parallèle
+ */
+export const uploadDocuments = async (
+  inscriptionId: string,
+  documents: DocumentToUpload[],
+  childLastName: string,
+  childFirstName: string
+): Promise<void> => {
+  const uploadPromises = documents
+    .filter(doc => doc.file !== null)
+    .map(doc => uploadDocument(inscriptionId, doc, childLastName, childFirstName));
+  
+  await Promise.all(uploadPromises);
+};
+
+/**
+ * Labels des types de documents
+ */
+export const DOCUMENT_TYPE_LABELS: Record<string, string> = {
+  fiche_sanitaire_1: 'Fiche sanitaire de liaison (page 1)',
+  fiche_sanitaire_2: 'Fiche sanitaire de liaison (page 2)',
+  autorisation_parentale: 'Autorisation parentale',
+  assurance_rc: 'Attestation d\'assurance RC',
+  certificat_medical: 'Certificat médical',
+  attestation_caf: 'Attestation CAF ou avis d\'imposition',
+  test_aisance_aquatique: 'Test d\'aisance aquatique',
+};
