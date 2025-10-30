@@ -176,13 +176,8 @@ export function InscriptionRecapDialog({
             </div>
             <h2 className="text-2xl font-bold">Récapitulatif de l'inscription</h2>
             {inscription && (
-              <div className="mt-2 space-y-1">
-                <Badge variant="outline" className="font-mono text-xs">
-                  ID: {inscription.id}
-                </Badge>
-                <p className="text-xs text-muted-foreground">
-                  URL: {window.location.origin}/recap-inscription/{inscription.id}
-                </p>
+              <div className="mt-2 text-xs text-muted-foreground">
+                <p>Référence de l'inscription : {inscription.id}</p>
               </div>
             )}
           </DialogTitle>

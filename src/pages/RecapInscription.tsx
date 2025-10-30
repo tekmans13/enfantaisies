@@ -181,13 +181,8 @@ export default function RecapInscription() {
             <p className="text-muted-foreground">
               Nous avons bien reçu votre demande d'inscription
             </p>
-            <div className="mt-4 space-y-2">
-              <Badge variant="outline" className="font-mono text-xs">
-                ID: {inscription.id}
-              </Badge>
-              <p className="text-xs text-muted-foreground">
-                URL: {window.location.origin}/recap-inscription/{inscription.id}
-              </p>
+            <div className="mt-4 text-sm text-muted-foreground">
+              <p>Référence de l'inscription : {inscription.id}</p>
             </div>
           </div>
 
