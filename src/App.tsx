@@ -10,6 +10,7 @@ import RecapInscription from "./pages/RecapInscription";
 import Tarifs from "./pages/Tarifs";
 import Auth from "./pages/Auth";
 import Users from "./pages/admin/Users";
+import Configuration from "./pages/admin/Configuration";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
@@ -50,7 +51,15 @@ const App = () => (
             } 
           />
           <Route 
-            path="/recap-inscription/:id" 
+            path="/admin/configuration" 
+            element={
+              <ProtectedRoute requireRole="both">
+                <Configuration />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/recap-inscription/:id"
             element={
               <ProtectedRoute>
                 <RecapInscription />

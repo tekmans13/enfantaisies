@@ -48,7 +48,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, Shield, User, Trash2, ArrowLeft, Mail } from "lucide-react";
+import { UserPlus, Shield, User, Trash2, ArrowLeft, Mail, Settings } from "lucide-react";
 
 interface UserWithRole {
   id: string;
@@ -319,7 +319,13 @@ export default function Users() {
           </div>
 
           <div className="flex gap-3">
-            {currentUserRole === "admin" && <SmtpConfigDialog />}
+            <Button
+              variant="outline"
+              onClick={() => navigate("/admin/configuration")}
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Configuration
+            </Button>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
