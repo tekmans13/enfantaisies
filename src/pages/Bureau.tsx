@@ -42,6 +42,7 @@ import { InscriptionStatusBadge } from "@/components/InscriptionStatusBadge";
 import { InscriptionRecapDialog } from "@/components/InscriptionRecapDialog";
 import { SejourManageDialog } from "@/components/SejourManageDialog";
 import { SejourDetailsDialog } from "@/components/SejourDetailsDialog";
+import { HomeContentManageDialog } from "@/components/HomeContentManageDialog";
 import { exportInscriptionsToExcel } from "@/lib/excelExport";
 import { downloadAllDocuments } from "@/lib/downloadDocuments";
 
@@ -63,6 +64,7 @@ export default function Bureau() {
   const [showDeleteInscriptionsDialog, setShowDeleteInscriptionsDialog] = useState(false);
   const [deletingInscriptionId, setDeletingInscriptionId] = useState<string | null>(null);
   const [viewingInscriptionId, setViewingInscriptionId] = useState<string | null>(null);
+  const [showHomeContentDialog, setShowHomeContentDialog] = useState(false);
 
   useEffect(() => {
     checkAdminRole();
@@ -467,6 +469,10 @@ export default function Bureau() {
                 Configuration
               </Button>
             )}
+            <Button onClick={() => setShowHomeContentDialog(true)} variant="outline" className="gap-2">
+              <FileText className="h-4 w-4" />
+              Page Accueil
+            </Button>
             <Button onClick={() => navigate("/tarifs")} variant="outline" className="gap-2">
               <DollarSign className="h-4 w-4" />
               Gérer les tarifs
@@ -984,6 +990,11 @@ export default function Bureau() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <HomeContentManageDialog
+        open={showHomeContentDialog}
+        onOpenChange={setShowHomeContentDialog}
+      />
     </div>
   );
 }

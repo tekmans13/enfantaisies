@@ -46,6 +46,33 @@ export type Database = {
           },
         ]
       }
+      home_content: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          section_key: string
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          section_key: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          section_key?: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       inscription_documents: {
         Row: {
           document_type: string

@@ -7,9 +7,36 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Users, Calendar, FileCheck } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+
+interface HomeContent {
+  section_key: string;
+  title: string | null;
+  description: string;
+}
 
 const Index = () => {
   const navigate = useNavigate();
+  const [contents, setContents] = useState<Record<string, HomeContent>>({});
+
+  useEffect(() => {
+    fetchContents();
+  }, []);
+
+  const fetchContents = async () => {
+    const { data } = await supabase
+      .from("home_content")
+      .select("*");
+
+    if (data) {
+      const contentMap = data.reduce((acc, item) => {
+        acc[item.section_key] = item;
+        return acc;
+      }, {} as Record<string, HomeContent>);
+      setContents(contentMap);
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -39,16 +66,26 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-foreground">
             Pourquoi choisir notre centre ?
           </h2>
+          
+          {/* Texte d'introduction */}
+          {contents.intro && (
+            <div className="max-w-4xl mx-auto mb-12 text-center">
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                {contents.intro.description}
+              </p>
+            </div>
+          )}
+          
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="p-6 shadow-soft hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                 <Users className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-foreground">
-                Groupes adaptés
+                {contents.groupes?.title || "Groupes adaptés"}
               </h3>
               <p className="text-muted-foreground">
-                Pitchouns, Minots et Mias : chaque enfant dans le groupe qui lui correspond
+                {contents.groupes?.description || "Pitchouns, Minots et Mias : chaque enfant dans le groupe qui lui correspond"}
               </p>
             </Card>
 
@@ -57,10 +94,10 @@ const Index = () => {
                 <Calendar className="w-6 h-6 text-secondary" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-foreground">
-                Séjours variés
+                {contents.sejours?.title || "Séjours variés"}
               </h3>
               <p className="text-muted-foreground">
-                Animations au centre ou séjours découverte selon vos préférences
+                {contents.sejours?.description || "Animations au centre ou séjours découverte selon vos préférences"}
               </p>
             </Card>
 
@@ -69,10 +106,10 @@ const Index = () => {
                 <FileCheck className="w-6 h-6 text-accent" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-foreground">
-                Inscription simplifiée
+                {contents.inscription?.title || "Inscription simplifiée"}
               </h3>
               <p className="text-muted-foreground">
-                Formulaire progressif, validation du bureau et suivi en ligne
+                {contents.inscription?.description || "Formulaire progressif, validation du bureau et suivi en ligne"}
               </p>
             </Card>
           </div>
