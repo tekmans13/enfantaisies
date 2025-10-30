@@ -1062,9 +1062,19 @@ export default function Inscription() {
                   Choix des séjours
                 </h2>
                 <p className="text-muted-foreground mb-4">
-                  Groupe : <strong className="text-primary capitalize">
-                    {childAgeGroup || 'Non défini'}
-                  </strong>
+                  Groupe : {childAgeGroup ? (
+                    <strong className="text-primary capitalize">
+                      {childAgeGroup}
+                    </strong>
+                  ) : (
+                    <Button 
+                      variant="link" 
+                      className="text-orange-600 hover:text-orange-700 font-semibold p-0 h-auto"
+                      onClick={() => setCurrentStep(2)}
+                    >
+                      Non défini - Cliquez ici pour sélectionner la classe
+                    </Button>
+                  )}
                 </p>
 
                 <Alert className="mb-6 border-primary/50 bg-primary/5">
