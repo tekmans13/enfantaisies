@@ -275,6 +275,7 @@ export default function Configuration() {
                       onChange={(e) =>
                         setStripeConfig({ ...stripeConfig, publishableKey: e.target.value })
                       }
+                      autoComplete="off"
                     />
                     <p className="text-sm text-muted-foreground">
                       Clé publique visible côté client (optionnel)
@@ -292,6 +293,7 @@ export default function Configuration() {
                         onChange={(e) =>
                           setStripeConfig({ ...stripeConfig, secretKey: e.target.value })
                         }
+                        autoComplete="off"
                       />
                       <Button
                         type="button"
@@ -323,6 +325,7 @@ export default function Configuration() {
                         onChange={(e) =>
                           setStripeConfig({ ...stripeConfig, webhookSecret: e.target.value })
                         }
+                        autoComplete="off"
                       />
                       <Button
                         type="button"
