@@ -5,16 +5,16 @@ export const useSejours = (ageGroup?: string) => {
   return useQuery({
     queryKey: ['sejours', ageGroup],
     queryFn: async () => {
-      let query = supabase
-        .from('sejours')
-        .select('*')
-        .order('date_debut', { ascending: true });
-      
-      if (ageGroup && ['pitchouns', 'minots', 'mias'].includes(ageGroup)) {
-        query = query.eq('groupe_age', ageGroup as 'pitchouns' | 'minots' | 'mias');
+      // Si le groupe d'âge n'est pas défini, retourner une liste vide
+      if (!ageGroup || !['pitchouns', 'minots', 'mias'].includes(ageGroup)) {
+        return [];
       }
       
-      const { data, error } = await query;
+      const { data, error } = await supabase
+        .from('sejours')
+        .select('*')
+        .eq('groupe_age', ageGroup as 'pitchouns' | 'minots' | 'mias')
+        .order('date_debut', { ascending: true });
       
       if (error) throw error;
       return data;
