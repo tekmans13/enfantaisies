@@ -193,7 +193,7 @@ export function InscriptionRecapDialog({
                 <User className="w-4 h-4 text-primary" />
                 <h3 className="text-lg font-semibold">Informations de l'enfant</h3>
               </div>
-              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+              <div className="bg-muted/50 rounded-lg p-4 space-y-3">
                 <div className="grid md:grid-cols-2 gap-3 text-sm">
                   <div>
                     <p className="text-muted-foreground">Nom complet</p>
@@ -220,6 +220,47 @@ export function InscriptionRecapDialog({
                     <p className="font-medium">{inscription.child_gender === 'garcon' ? 'Garçon' : 'Fille'}</p>
                   </div>
                 </div>
+
+                {/* Santé et allergies */}
+                <Separator />
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-sm">Informations médicales</h4>
+                  <div className="grid gap-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <p className="text-muted-foreground">Allergies:</p>
+                      <Badge variant={inscription.has_allergies ? "destructive" : "secondary"} className="text-xs">
+                        {inscription.has_allergies ? 'Oui' : 'Non'}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-muted-foreground">Médicaments:</p>
+                      <Badge variant={inscription.has_medication ? "destructive" : "secondary"} className="text-xs">
+                        {inscription.has_medication ? 'Oui' : 'Non'}
+                      </Badge>
+                    </div>
+                    {inscription.food_allergies_details && (
+                      <div>
+                        <p className="text-muted-foreground mb-1">Allergies/pratiques alimentaires:</p>
+                        <p className="font-medium text-xs bg-background p-2 rounded border">
+                          {inscription.food_allergies_details}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Demande spécifique */}
+                {inscription.demande_specifique && (
+                  <>
+                    <Separator />
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-sm">Demande spécifique</h4>
+                      <p className="text-sm bg-background p-3 rounded border">
+                        {inscription.demande_specifique}
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -356,7 +397,13 @@ export function InscriptionRecapDialog({
                       <p className="text-muted-foreground">Mobile</p>
                       <p className="font-medium">{inscription.parent_mobile}</p>
                     </div>
-                    <div>
+                    {inscription.parent_office_phone && (
+                      <div>
+                        <p className="text-muted-foreground">Tél. bureau</p>
+                        <p className="font-medium">{inscription.parent_office_phone}</p>
+                      </div>
+                    )}
+                    <div className="md:col-span-2">
                       <p className="text-muted-foreground">Adresse</p>
                       <p className="font-medium text-xs">{inscription.parent_address}</p>
                     </div>
@@ -379,8 +426,140 @@ export function InscriptionRecapDialog({
                         <p className="text-muted-foreground">Mobile</p>
                         <p className="font-medium">{inscription.parent2_mobile}</p>
                       </div>
+                      {inscription.parent2_office_phone && (
+                        <div>
+                          <p className="text-muted-foreground">Tél. bureau</p>
+                          <p className="font-medium">{inscription.parent2_office_phone}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
+                )}
+
+                {/* Contacts d'urgence */}
+                {(inscription.urgency_contact_1_first_name || inscription.urgency_contact_2_first_name) && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Contacts d'urgence</h4>
+                      <div className="space-y-3">
+                        {inscription.urgency_contact_1_first_name && (
+                          <div className="bg-background rounded-lg p-3 border">
+                            <p className="font-medium text-sm mb-2">Contact d'urgence 1</p>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div>
+                                <p className="text-muted-foreground">Nom</p>
+                                <p className="font-medium">{inscription.urgency_contact_1_first_name} {inscription.urgency_contact_1_last_name}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">Relation</p>
+                                <p className="font-medium capitalize">{inscription.urgency_contact_1_relation}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">Mobile</p>
+                                <p className="font-medium">{inscription.urgency_contact_1_mobile}</p>
+                              </div>
+                              {inscription.urgency_contact_1_other_phone && (
+                                <div>
+                                  <p className="text-muted-foreground">Autre tél.</p>
+                                  <p className="font-medium">{inscription.urgency_contact_1_other_phone}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {inscription.urgency_contact_2_first_name && (
+                          <div className="bg-background rounded-lg p-3 border">
+                            <p className="font-medium text-sm mb-2">Contact d'urgence 2</p>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div>
+                                <p className="text-muted-foreground">Nom</p>
+                                <p className="font-medium">{inscription.urgency_contact_2_first_name} {inscription.urgency_contact_2_last_name}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">Relation</p>
+                                <p className="font-medium capitalize">{inscription.urgency_contact_2_relation}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">Mobile</p>
+                                <p className="font-medium">{inscription.urgency_contact_2_mobile}</p>
+                              </div>
+                              {inscription.urgency_contact_2_other_phone && (
+                                <div>
+                                  <p className="text-muted-foreground">Autre tél.</p>
+                                  <p className="font-medium">{inscription.urgency_contact_2_other_phone}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Personnes autorisées */}
+                {(inscription.authorized_person_1_first_name || inscription.authorized_person_2_first_name) && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="font-semibold mb-3 text-sm">Personnes autorisées à récupérer l'enfant</h4>
+                      <div className="space-y-3">
+                        {inscription.authorized_person_1_first_name && (
+                          <div className="bg-background rounded-lg p-3 border">
+                            <p className="font-medium text-sm mb-2">Personne autorisée 1</p>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div>
+                                <p className="text-muted-foreground">Nom</p>
+                                <p className="font-medium">{inscription.authorized_person_1_first_name} {inscription.authorized_person_1_last_name}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">Relation</p>
+                                <p className="font-medium capitalize">{inscription.authorized_person_1_relation}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">Mobile</p>
+                                <p className="font-medium">{inscription.authorized_person_1_mobile}</p>
+                              </div>
+                              {inscription.authorized_person_1_other_phone && (
+                                <div>
+                                  <p className="text-muted-foreground">Autre tél.</p>
+                                  <p className="font-medium">{inscription.authorized_person_1_other_phone}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {inscription.authorized_person_2_first_name && (
+                          <div className="bg-background rounded-lg p-3 border">
+                            <p className="font-medium text-sm mb-2">Personne autorisée 2</p>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div>
+                                <p className="text-muted-foreground">Nom</p>
+                                <p className="font-medium">{inscription.authorized_person_2_first_name} {inscription.authorized_person_2_last_name}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">Relation</p>
+                                <p className="font-medium capitalize">{inscription.authorized_person_2_relation}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">Mobile</p>
+                                <p className="font-medium">{inscription.authorized_person_2_mobile}</p>
+                              </div>
+                              {inscription.authorized_person_2_other_phone && (
+                                <div>
+                                  <p className="text-muted-foreground">Autre tél.</p>
+                                  <p className="font-medium">{inscription.authorized_person_2_other_phone}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
