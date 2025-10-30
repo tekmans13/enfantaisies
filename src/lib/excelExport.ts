@@ -82,6 +82,31 @@ export const exportSejourInscriptionsToExcel = (sejour: any, inscriptions: any[]
     'Parent - Email': inscription.parent_email,
     'Parent - Mobile': inscription.parent_mobile,
     'Adresse': inscription.parent_address,
+    
+    // Contacts d'urgence
+    'Urgence 1 - Prénom': inscription.urgency_contact_1_first_name || '',
+    'Urgence 1 - Nom': inscription.urgency_contact_1_last_name || '',
+    'Urgence 1 - Relation': inscription.urgency_contact_1_relation || '',
+    'Urgence 1 - Mobile': inscription.urgency_contact_1_mobile || '',
+    'Urgence 1 - Autre tél': inscription.urgency_contact_1_other_phone || '',
+    'Urgence 2 - Prénom': inscription.urgency_contact_2_first_name || '',
+    'Urgence 2 - Nom': inscription.urgency_contact_2_last_name || '',
+    'Urgence 2 - Relation': inscription.urgency_contact_2_relation || '',
+    'Urgence 2 - Mobile': inscription.urgency_contact_2_mobile || '',
+    'Urgence 2 - Autre tél': inscription.urgency_contact_2_other_phone || '',
+    
+    // Personnes autorisées
+    'Autorisé 1 - Prénom': inscription.authorized_person_1_first_name || '',
+    'Autorisé 1 - Nom': inscription.authorized_person_1_last_name || '',
+    'Autorisé 1 - Relation': inscription.authorized_person_1_relation || '',
+    'Autorisé 1 - Mobile': inscription.authorized_person_1_mobile || '',
+    'Autorisé 1 - Autre tél': inscription.authorized_person_1_other_phone || '',
+    'Autorisé 2 - Prénom': inscription.authorized_person_2_first_name || '',
+    'Autorisé 2 - Nom': inscription.authorized_person_2_last_name || '',
+    'Autorisé 2 - Relation': inscription.authorized_person_2_relation || '',
+    'Autorisé 2 - Mobile': inscription.authorized_person_2_mobile || '',
+    'Autorisé 2 - Autre tél': inscription.authorized_person_2_other_phone || '',
+    
     'Préférences': inscription.demande_specifique || '',
     'Allergies alimentaires (détails)': inscription.food_allergies_details || '',
     'Traitement médicamenteux': inscription.has_medication ? 'Oui' : 'Non',
