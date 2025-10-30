@@ -16,6 +16,7 @@ interface StepPrealablesProps {
     isFirstInscription: boolean;
     hasMedication: boolean;
     hasAllergies: boolean;
+    allergiesDetails: string;
     foodAllergiesDetails: string;
   };
   onCheckboxChange: (field: string) => void;
@@ -98,6 +99,22 @@ export function StepPrealables({
             </Label>
           </div>
         ))}
+        
+        {formData.hasAllergies && (
+          <div className="p-4 bg-muted/50 rounded-lg">
+            <Label htmlFor="allergiesDetails" className="text-sm font-medium">
+              Détails des allergies
+            </Label>
+            <Textarea
+              id="allergiesDetails"
+              value={formData.allergiesDetails}
+              onChange={(e) => onInputChange('allergiesDetails', e.target.value)}
+              className="mt-2"
+              placeholder="Décrivez les allergies de votre enfant..."
+              rows={3}
+            />
+          </div>
+        )}
         
         <div className="p-4 bg-muted/50 rounded-lg">
           <Label htmlFor="foodAllergiesDetails" className="text-sm font-medium">
