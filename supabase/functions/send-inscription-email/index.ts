@@ -65,6 +65,8 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
 
+    console.log("Envoi depuis:", smtpConfig.from_email);
+    
     await client.send({
       from: smtpConfig.from_email,
       to: parentEmail,
