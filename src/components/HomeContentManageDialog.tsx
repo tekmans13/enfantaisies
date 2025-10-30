@@ -43,8 +43,7 @@ export function HomeContentManageDialog({
   const fetchContents = async () => {
     const { data, error } = await supabase
       .from("home_content")
-      .select("*")
-      .order("section_key");
+      .select("*");
 
     if (error) {
       toast({
@@ -55,7 +54,13 @@ export function HomeContentManageDialog({
       return;
     }
 
-    setContents(data || []);
+    // Trier dans l'ordre d'affichage
+    const order = ["intro", "groupes", "sejours", "inscription"];
+    const sortedData = (data || []).sort((a, b) => 
+      order.indexOf(a.section_key) - order.indexOf(b.section_key)
+    );
+
+    setContents(sortedData);
   };
 
   const handleUpdate = (sectionKey: string, field: "title" | "description", value: string) => {
