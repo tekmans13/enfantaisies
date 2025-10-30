@@ -1,23 +1,31 @@
+/**
+ * Page : Formulaire d'inscription
+ * Formulaire multi-étapes pour l'inscription au centre aéré
+ */
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Progress } from "@/components/ui/progress";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle, Info, Plus, X, AlertCircle, Phone } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { ChevronRight, ChevronLeft, FileCheck, Users, Calendar, CheckCircle, Phone, Info, Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useSejours } from "@/hooks/use-sejours";
+import { useTarifCalculator } from "@/hooks/use-tarif-calculator";
+import { validateEmail, validatePhone } from "@/lib/formatters";
+import { uploadDocuments, DocumentToUpload } from "@/lib/documentHelpers";
+import { CLASS_TO_AGE_GROUP, TOTAL_INSCRIPTION_STEPS, CLASS_LABELS } from "@/lib/constants";
+import { StepPrealables } from "@/components/inscription/StepPrealables";
 
-const TOTAL_STEPS = 5;
 const getDebugMode = () => localStorage.getItem('debugMode') === 'true';
 
 export default function Inscription() {
@@ -114,73 +122,12 @@ export default function Inscription() {
   const [week2Selected, setWeek2Selected] = useState<string[]>([]);
   const [week2Priority, setWeek2Priority] = useState<string>("");
 
-  const { data: sejours } = useQuery({
-    queryKey: ['sejours', childAgeGroup],
-    queryFn: async () => {
-      let query = supabase
-        .from('sejours')
-        .select('*')
-        .order('date_debut', { ascending: true });
-      
-      if (childAgeGroup) {
-        query = query.eq('groupe_age', childAgeGroup as any);
-      }
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!childAgeGroup,
-  });
-
-  const { data: tarifs } = useQuery({
-    queryKey: ['tarifs'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('tarifs')
-        .select('*')
-        .eq('annee', 2025)
-        .order('qf_min', { ascending: true });
-      
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  const calculatePrice = (sejour: any) => {
-    if (!sejour || !tarifs) return null;
-    
-    const qf = parseInt(formData.quotientFamilial) || 999999;
-    const tarif = tarifs.find(t => 
-      qf >= t.qf_min && (t.qf_max === null || qf <= t.qf_max)
-    );
-    
-    if (!tarif) return null;
-    
-    // Calculer le nombre de jours
-    const dateDebut = new Date(sejour.date_debut);
-    const dateFin = new Date(sejour.date_fin);
-    const nbJours = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    
-    // Appliquer le tarif journalier selon le type (animation = centre_aere)
-    const isCentreAere = sejour.type === 'centre_aere' || sejour.type === 'animation';
-    const tarifJournalier = isCentreAere
-      ? tarif.tarif_journee_centre_aere 
-      : tarif.tarif_journee_sejour;
-    
-    return tarifJournalier * nbJours;
-  };
-
+  /**
+   * Calcule le groupe d'âge automatiquement selon la classe
+   */
   useEffect(() => {
     if (formData.childClass) {
-      let group = null;
-      if (['ms', 'gs', 'cp'].includes(formData.childClass)) {
-        group = 'pitchouns';
-      } else if (['ce1', 'ce2', 'cm1'].includes(formData.childClass)) {
-        group = 'minots';
-      } else if (['cm2', '6eme', '5eme', '4eme'].includes(formData.childClass)) {
-        group = 'mias';
-      }
+      const group = CLASS_TO_AGE_GROUP[formData.childClass] || null;
       setChildAgeGroup(group);
     }
   }, [formData.childClass]);
@@ -205,17 +152,9 @@ export default function Inscription() {
     }));
   };
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const validatePhone = (phone: string): boolean => {
-    // Accepte les formats: 0612345678, 06 12 34 56 78, 06.12.34.56.78, 06-12-34-56-78, +33612345678
-    const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
-    return phoneRegex.test(phone.trim());
-  };
-
+  /**
+   * Valide les données d'une étape donnée
+   */
   const validateStep = (step: number): { isValid: boolean; message?: string } => {
     if (getDebugMode()) return { isValid: true }; // Bypass validation en mode debug
 
@@ -260,9 +199,12 @@ export default function Inscription() {
     return { isValid: true };
   };
 
+  /**
+   * Soumet le formulaire d'inscription complet
+   */
   const handleSubmit = async () => {
     // Validation complète de toutes les étapes avant soumission
-    for (let step = 1; step <= TOTAL_STEPS; step++) {
+    for (let step = 1; step <= TOTAL_INSCRIPTION_STEPS; step++) {
       const validation = validateStep(step);
       if (!validation.isValid) {
         toast({
@@ -345,16 +287,7 @@ export default function Inscription() {
       // Upload des documents
       const inscriptionId = data.id;
       
-      // Helper pour créer le nom de fichier formaté
-      const formatFileName = (type: string, originalFile: File) => {
-        const lastName = formData.childLastName.toLowerCase().replace(/\s+/g, '-');
-        const firstName = formData.childFirstName.toLowerCase().replace(/\s+/g, '-');
-        const fileExt = originalFile.name.split('.').pop();
-        const docName = type.replace(/_/g, '-');
-        return `${lastName}_${firstName}_${docName}.${fileExt}`;
-      };
-      
-      const documentsToUpload = [
+      const documentsToUpload: DocumentToUpload[] = [
         { file: uploadedFiles.ficheSanitaire1, type: 'fiche_sanitaire_1' },
         { file: uploadedFiles.ficheSanitaire2, type: 'fiche_sanitaire_2' },
         { file: uploadedFiles.autorisationParentale, type: 'autorisation_parentale' },
@@ -364,26 +297,12 @@ export default function Inscription() {
         { file: uploadedFiles.testAisanceAquatique, type: 'test_aisance_aquatique' },
       ];
 
-      for (const doc of documentsToUpload) {
-        if (doc.file) {
-          const formattedFileName = formatFileName(doc.type, doc.file);
-          const filePath = `${inscriptionId}/${formattedFileName}`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('inscription-documents')
-            .upload(filePath, doc.file);
-
-          if (!uploadError) {
-            // Enregistrer le document dans la table
-            await supabase.from('inscription_documents').insert({
-              inscription_id: inscriptionId,
-              document_type: doc.type,
-              file_path: filePath,
-              file_name: formattedFileName,
-            });
-          }
-        }
-      }
+      await uploadDocuments(
+        inscriptionId, 
+        documentsToUpload,
+        formData.childLastName,
+        formData.childFirstName
+      );
 
 
       // Envoyer l'email de confirmation
@@ -428,7 +347,7 @@ export default function Inscription() {
     { number: 5, title: "Documents", icon: FileCheck },
   ];
 
-  const progressPercentage = (currentStep / TOTAL_STEPS) * 100;
+  const progressPercentage = (currentStep / TOTAL_INSCRIPTION_STEPS) * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
@@ -446,7 +365,7 @@ export default function Inscription() {
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium text-foreground">
-                Étape {currentStep} sur {TOTAL_STEPS}
+                Étape {currentStep} sur {TOTAL_INSCRIPTION_STEPS}
               </span>
               <span className="text-sm text-muted-foreground">
                 {Math.round(progressPercentage)}% complété
@@ -498,83 +417,18 @@ export default function Inscription() {
         <Card className="p-8 shadow-soft">
           <div className="min-h-[400px]">
             {currentStep === 1 && (
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold text-foreground">
-                    Informations préalables
-                  </h2>
-                  <Dialog open={isDocModalOpen} onOpenChange={setIsDocModalOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm">
-                        <AlertCircle className="w-4 h-4 mr-2" />
-                        Documents requis
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Documents requis</DialogTitle>
-                      </DialogHeader>
-                      <Alert variant="default" className="border-amber-500/50 bg-amber-500/10">
-                        <AlertCircle className="h-5 w-5 text-amber-600" />
-                        <AlertDescription className="text-sm mt-2">
-                          <p className="font-medium mb-3 text-amber-900 dark:text-amber-100">
-                            Chers parents, vérifiez que vous êtes bien en possession des documents suivants avant de commencer l'inscription :
-                          </p>
-                          <div className="space-y-2">
-                            <div className="flex items-start gap-2">
-                              <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                              <p className="text-amber-900 dark:text-amber-100">Attestation de la CAF (moins de 3 mois) - OU - Avis d'imposition 2024</p>
-                            </div>
-                            <div className="flex items-start gap-2">
-                              <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                              <p className="text-amber-900 dark:text-amber-100">Certificat médical</p>
-                            </div>
-                            <div className="flex items-start gap-2">
-                              <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                              <p className="text-amber-900 dark:text-amber-100">Responsabilité civile (avec le nom de l'enfant)</p>
-                            </div>
-                          </div>
-                        </AlertDescription>
-                      </Alert>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-                <p className="text-muted-foreground mb-6">
-                  Avant de commencer, merci de cocher les cases correspondantes à votre inscription :
-                </p>
-                <div className="space-y-4">
-                  {[
-                    { id: 'isFirstInscription', label: "C'est votre 1ère inscription" },
-                    { id: 'hasMedication', label: 'Votre enfant prend un traitement médicamenteux' },
-                    { id: 'hasAllergies', label: 'Votre enfant a des allergies' },
-                  ].map((item) => (
-                    <div key={item.id} className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
-                      <Checkbox
-                        id={item.id}
-                        checked={formData[item.id as keyof typeof formData] as boolean}
-                        onCheckedChange={() => handleCheckboxChange(item.id)}
-                      />
-                      <Label htmlFor={item.id} className="text-sm font-medium cursor-pointer">
-                        {item.label}
-                      </Label>
-                    </div>
-                  ))}
-                  
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <Label htmlFor="foodAllergiesDetails" className="text-sm font-medium">
-                      Allergies alimentaires / pratiques alimentaires spécifiques
-                    </Label>
-                    <Textarea
-                      id="foodAllergiesDetails"
-                      value={formData.foodAllergiesDetails}
-                      onChange={(e) => handleInputChange('foodAllergiesDetails', e.target.value)}
-                      className="mt-2"
-                      placeholder="Décrivez les allergies alimentaires ou pratiques alimentaires spécifiques de votre enfant..."
-                      rows={3}
-                    />
-                  </div>
-                </div>
-              </div>
+              <StepPrealables
+                formData={{
+                  isFirstInscription: formData.isFirstInscription,
+                  hasMedication: formData.hasMedication,
+                  hasAllergies: formData.hasAllergies,
+                  foodAllergiesDetails: formData.foodAllergiesDetails,
+                }}
+                onCheckboxChange={handleCheckboxChange}
+                onInputChange={handleInputChange}
+                isDocModalOpen={isDocModalOpen}
+                setIsDocModalOpen={setIsDocModalOpen}
+              />
             )}
 
             {currentStep === 2 && (
@@ -622,16 +476,9 @@ export default function Inscription() {
                             <SelectValue placeholder="Sélectionner une classe" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="ms">Moyenne Section</SelectItem>
-                            <SelectItem value="gs">Grande Section</SelectItem>
-                            <SelectItem value="cp">CP</SelectItem>
-                            <SelectItem value="ce1">CE1</SelectItem>
-                            <SelectItem value="ce2">CE2</SelectItem>
-                            <SelectItem value="cm1">CM1</SelectItem>
-                            <SelectItem value="cm2">CM2</SelectItem>
-                            <SelectItem value="6eme">6ème</SelectItem>
-                            <SelectItem value="5eme">5ème</SelectItem>
-                            <SelectItem value="4eme">4ème</SelectItem>
+                            {Object.entries(CLASS_LABELS).map(([value, label]) => (
+                              <SelectItem key={value} value={value}>{label}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>
@@ -1257,11 +1104,11 @@ export default function Inscription() {
                       <Label className="text-base mb-3 block font-semibold">
                         Sélectionnez une semaine prioritaire et une alternative
                       </Label>
-                      <div className="space-y-3">
-                        {sejours?.map((sejour) => {
-                          const isSelected = selectedSejours.includes(sejour.id);
-                          const isPriority = prioritySejour === sejour.id;
-                          const price = calculatePrice(sejour);
+                       <div className="space-y-3">
+                         {sejours?.map((sejour) => {
+                           const isSelected = selectedSejours.includes(sejour.id);
+                           const isPriority = prioritySejour === sejour.id;
+                           const price = calculatePrice(sejour);
                           
                           return (
                             <div 
@@ -1368,7 +1215,7 @@ export default function Inscription() {
                         <Label className="text-base mb-3 block font-semibold text-accent-foreground">
                           Première semaine - Sélectionnez une semaine prioritaire et une alternative.
                         </Label>
-                        <div className="space-y-3">
+                         <div className="space-y-3">
                            {sejours?.map((sejour) => {
                              const isSelected = week1Selected.includes(sejour.id);
                              const isPriority = week1Priority === sejour.id;
@@ -1475,7 +1322,7 @@ export default function Inscription() {
                         <Label className="text-base mb-3 block font-semibold">
                           Deuxième semaine - Sélectionnez une semaine prioritaire et une alternative.
                         </Label>
-                        <div className="space-y-3">
+                         <div className="space-y-3">
                            {sejours?.map((sejour) => {
                              const isSelected = week2Selected.includes(sejour.id);
                              const isPriority = week2Priority === sejour.id;
@@ -1813,7 +1660,7 @@ export default function Inscription() {
               <ChevronLeft className="w-4 h-4 mr-2" />
               Précédent
             </Button>
-            {currentStep < TOTAL_STEPS ? (
+            {currentStep < TOTAL_INSCRIPTION_STEPS ? (
               <Button onClick={() => {
                 const validation = validateStep(currentStep);
                 if (!validation.isValid) {
@@ -1824,7 +1671,7 @@ export default function Inscription() {
                   });
                   return;
                 }
-                setCurrentStep(Math.min(TOTAL_STEPS, currentStep + 1));
+                setCurrentStep(Math.min(TOTAL_INSCRIPTION_STEPS, currentStep + 1));
               }}>
                 Suivant
                 <ChevronRight className="w-4 h-4 ml-2" />
