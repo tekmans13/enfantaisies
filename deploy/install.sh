@@ -30,18 +30,21 @@ read -p "Port de l'application (défaut: 3000): " APP_PORT
 APP_PORT=${APP_PORT:-3000}
 
 echo ""
-echo -e "${YELLOW}=== Configuration Supabase ===${NC}"
-echo "Ces informations se trouvent dans votre projet Supabase"
-read -p "URL Supabase (ex: https://xxx.supabase.co): " SUPABASE_URL
-read -sp "Clé anonyme Supabase: " SUPABASE_ANON_KEY
+echo -e "${YELLOW}=== Configuration Lovable Cloud / Supabase ===${NC}"
+echo "Ces informations se trouvent dans Lovable (Project Settings > Backend)"
+echo "ou dans votre projet Supabase (Settings > API)"
+read -p "URL du backend (ex: https://xxx.supabase.co): " SUPABASE_URL
+read -sp "Clé anonyme (Anon Key): " SUPABASE_ANON_KEY
 echo ""
-read -sp "Clé Service Role Supabase: " SUPABASE_SERVICE_ROLE_KEY
+read -sp "Clé Service Role: " SUPABASE_SERVICE_ROLE_KEY
 echo ""
-read -p "ID du projet Supabase: " SUPABASE_PROJECT_ID
+read -p "ID du projet: " SUPABASE_PROJECT_ID
 
 echo ""
 echo -e "${YELLOW}=== Configuration Stripe ===${NC}"
-read -sp "Clé secrète Stripe: " STRIPE_SECRET_KEY
+echo "Ces informations se trouvent dans Stripe (Developers > API keys)"
+read -p "Clé publique Stripe (pk_test_xxx ou pk_live_xxx): " STRIPE_PUBLISHABLE_KEY
+read -sp "Clé secrète Stripe (sk_test_xxx ou sk_live_xxx): " STRIPE_SECRET_KEY
 echo ""
 
 echo ""
@@ -115,18 +118,13 @@ cd "$APP_DIR"
 echo ""
 echo -e "${GREEN}=== Configuration des variables d'environnement ===${NC}"
 cat > "$APP_DIR/.env" <<EOF
-# Configuration Supabase
+# Configuration Lovable Cloud / Supabase (Frontend)
 VITE_SUPABASE_URL=$SUPABASE_URL
-VITE_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
+VITE_SUPABASE_PUBLISHABLE_KEY=$SUPABASE_ANON_KEY
 VITE_SUPABASE_PROJECT_ID=$SUPABASE_PROJECT_ID
 
-# Configuration pour les Edge Functions
-SUPABASE_URL=$SUPABASE_URL
-SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
-SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY
-
-# Configuration Stripe
-STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY
+# Configuration Stripe (Frontend)
+VITE_STRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY
 
 # Configuration de l'application
 NODE_ENV=production
@@ -135,6 +133,22 @@ EOF
 
 chown appuser:appuser "$APP_DIR/.env"
 chmod 600 "$APP_DIR/.env"
+
+echo ""
+echo -e "${YELLOW}⚠️  Configuration des Edge Functions${NC}"
+echo "Les Edge Functions nécessitent des secrets configurés dans votre backend."
+echo ""
+echo "Avec Lovable Cloud :"
+echo "  1. Allez dans Project Settings > Secrets"
+echo "  2. Ajoutez les secrets suivants :"
+echo "     - STRIPE_SECRET_KEY = $STRIPE_SECRET_KEY"
+echo "     - SUPABASE_SERVICE_ROLE_KEY = [votre service role key]"
+echo ""
+echo "Avec Supabase externe, exécutez :"
+echo "  supabase secrets set STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY"
+echo "  supabase secrets set SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY"
+echo ""
+read -p "Appuyez sur Entrée une fois les secrets configurés..."
 
 # 7. INSTALLATION DES DÉPENDANCES ET BUILD
 echo ""
@@ -249,9 +263,34 @@ echo ""
 echo -e "${GREEN}Votre application est maintenant accessible à: https://$DOMAIN_NAME${NC}"
 echo ""
 echo -e "${YELLOW}N'oubliez pas de :${NC}"
-echo "1. Configurer les URL de redirection dans Supabase (Auth > URL Configuration)"
+echo ""
+echo "1. Configurer les URL de redirection dans votre backend :"
+echo "   Lovable Cloud : Project Settings > Backend > Authentication"
+echo "   Supabase : Authentication > URL Configuration"
 echo "   - Site URL: https://$DOMAIN_NAME"
 echo "   - Redirect URLs: https://$DOMAIN_NAME/**"
-echo "2. Vérifier que votre domaine pointe bien vers ce serveur"
-echo "3. Configurer les webhooks Stripe si nécessaire"
+echo ""
+echo "2. Déployer les Edge Functions (si Supabase externe) :"
+echo "   cd $APP_DIR"
+echo "   supabase functions deploy send-inscription-email"
+echo "   supabase functions deploy create-stripe-payment-link"
+echo "   supabase functions deploy stripe-webhook"
+echo "   supabase functions deploy admin-create-user"
+echo "   supabase functions deploy admin-delete-user"
+echo "   supabase functions deploy admin-reset-password"
+echo "   supabase functions deploy get-users-list"
+echo ""
+echo "3. Configurer le webhook Stripe :"
+echo "   - URL: https://[votre-projet].supabase.co/functions/v1/stripe-webhook"
+echo "   - Events: checkout.session.completed, payment_intent.succeeded"
+echo "   - Ajoutez le signing secret dans les secrets backend"
+echo ""
+echo "4. Configurer SMTP depuis l'interface admin :"
+echo "   - Connectez-vous sur https://$DOMAIN_NAME/auth"
+echo "   - Allez dans Configuration"
+echo "   - Remplissez les informations SMTP"
+echo ""
+echo "5. Créer le premier utilisateur admin :"
+echo "   - Inscrivez-vous sur https://$DOMAIN_NAME/auth"
+echo "   - Dans votre backend, ajoutez un rôle 'admin' dans user_roles"
 echo ""
