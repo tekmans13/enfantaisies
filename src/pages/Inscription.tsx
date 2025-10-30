@@ -456,22 +456,22 @@ export default function Inscription() {
           </div>
 
           <div className="overflow-x-auto pb-2">
-            <div className="flex justify-between items-center min-w-max sm:min-w-0">
+            <div className="flex justify-between items-center gap-0.5 sm:gap-2">
               {steps.map((step, index) => {
                 const Icon = step.icon;
                 const isActive = currentStep === step.number;
                 const isCompleted = currentStep > step.number;
 
                 return (
-                  <div key={step.number} className="flex items-center">
+                  <div key={step.number} className="flex items-center flex-1">
                     <button
                       onClick={() => setCurrentStep(step.number)}
-                      className={`flex flex-col items-center transition-all hover:scale-105 cursor-pointer ${
+                      className={`flex flex-col items-center transition-all hover:scale-105 cursor-pointer w-full ${
                         isActive ? "text-primary" : isCompleted ? "text-secondary" : "text-muted-foreground"
                       }`}
                       type="button"
                     >
-                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-1 sm:mb-2 transition-all ${
+                      <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-1 sm:mb-2 transition-all ${
                           isActive
                             ? "bg-primary text-primary-foreground shadow-lg scale-110"
                             : isCompleted
@@ -481,12 +481,12 @@ export default function Inscription() {
                       >
                         <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
-                      <span className="text-[10px] sm:text-xs font-medium text-center whitespace-nowrap px-1">
+                      <span className="text-[9px] sm:text-xs font-medium text-center whitespace-nowrap px-0.5">
                         {step.title}
                       </span>
                     </button>
                     {index < steps.length - 1 && (
-                      <div className={`h-0.5 w-4 sm:w-8 md:w-16 mx-1 sm:mx-2 ${isCompleted ? "bg-secondary" : "bg-border"}`} />
+                      <div className={`h-0.5 w-2 sm:w-8 md:w-16 ${isCompleted ? "bg-secondary" : "bg-border"}`} />
                     )}
                   </div>
                 );
