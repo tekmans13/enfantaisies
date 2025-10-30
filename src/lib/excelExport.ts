@@ -82,11 +82,12 @@ export const exportSejourInscriptionsToExcel = (sejour: any, inscriptions: any[]
     'Parent - Email': inscription.parent_email,
     'Parent - Mobile': inscription.parent_mobile,
     'Adresse': inscription.parent_address,
-    'Médicaments': inscription.has_medication ? 'Oui' : 'Non',
+    'Préférences': inscription.demande_specifique || '',
+    'Allergies alimentaires (détails)': inscription.food_allergies_details || '',
+    'Traitement médicamenteux': inscription.has_medication ? 'Oui' : 'Non',
+    'Traitement médicamenteux (détails)': inscription.medication_details || '',
     'Allergies': inscription.has_allergies ? 'Oui' : 'Non',
-    'Allergies alimentaires': inscription.has_food_allergies ? 'Oui' : 'Non',
-    'Sans porc': inscription.no_pork ? 'Oui' : 'Non',
-    'Sans viande': inscription.no_meat ? 'Oui' : 'Non',
+    'Allergies (détails)': inscription.allergies_details || '',
     'Choix': inscription.sejour_preference_1 === sejour.id ? '1er choix' : '2ème choix',
   }));
 
