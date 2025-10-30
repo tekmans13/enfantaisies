@@ -78,9 +78,23 @@ export const exportSejourInscriptionsToExcel = (sejour: any, inscriptions: any[]
     'Classe': inscription.child_class?.toUpperCase(),
     'Sexe': inscription.child_gender === 'garcon' ? 'Garçon' : 'Fille',
     'École': inscription.child_school,
-    'Parent - Nom': `${inscription.parent_first_name} ${inscription.parent_last_name}`,
-    'Parent - Email': inscription.parent_email,
-    'Parent - Mobile': inscription.parent_mobile,
+    
+    // Parent 1
+    'Parent 1 - Prénom': inscription.parent_first_name,
+    'Parent 1 - Nom': inscription.parent_last_name,
+    'Parent 1 - Email': inscription.parent_email,
+    'Parent 1 - Mobile': inscription.parent_mobile,
+    'Parent 1 - Tél bureau': inscription.parent_office_phone || '',
+    'Parent 1 - Autorité': inscription.parent_authority,
+    
+    // Parent 2
+    'Parent 2 - Prénom': inscription.parent2_first_name || '',
+    'Parent 2 - Nom': inscription.parent2_last_name || '',
+    'Parent 2 - Email': inscription.parent2_email || '',
+    'Parent 2 - Mobile': inscription.parent2_mobile || '',
+    'Parent 2 - Tél bureau': inscription.parent2_office_phone || '',
+    'Parent 2 - Autorité': inscription.parent2_authority || '',
+    
     'Adresse': inscription.parent_address,
     
     // Contacts d'urgence
