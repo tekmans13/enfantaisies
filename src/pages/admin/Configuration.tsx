@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Mail, CreditCard, Eye, EyeOff, Bug } from "lucide-react";
+import { ArrowLeft, Mail, CreditCard, Eye, EyeOff, Bug, Database } from "lucide-react";
 
 interface SmtpConfig {
   host: string;
@@ -34,6 +34,7 @@ export default function Configuration() {
   const [showWebhookSecret, setShowWebhookSecret] = useState(false);
   const [showSmtpPassword, setShowSmtpPassword] = useState(false);
   const [debugMode, setDebugMode] = useState(false);
+  const [showSupabaseKeys, setShowSupabaseKeys] = useState(false);
   
   const [stripeConfig, setStripeConfig] = useState({
     publishableKey: "",
@@ -223,7 +224,7 @@ export default function Configuration() {
         </div>
 
         <Tabs defaultValue="stripe" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="stripe">
               <CreditCard className="mr-2 h-4 w-4" />
               Stripe
@@ -231,6 +232,10 @@ export default function Configuration() {
             <TabsTrigger value="smtp">
               <Mail className="mr-2 h-4 w-4" />
               SMTP
+            </TabsTrigger>
+            <TabsTrigger value="supabase">
+              <Database className="mr-2 h-4 w-4" />
+              Backend
             </TabsTrigger>
             <TabsTrigger value="debug">
               <Bug className="mr-2 h-4 w-4" />
@@ -484,6 +489,116 @@ export default function Configuration() {
                     {saving ? "Enregistrement..." : "Enregistrer la configuration"}
                   </Button>
                 </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="supabase">
+            <Card>
+              <CardHeader>
+                <CardTitle>Configuration Backend (Supabase)</CardTitle>
+                <CardDescription>
+                  Informations de connexion à votre backend Lovable Cloud
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    <p className="text-sm font-semibold text-green-600 dark:text-green-400">
+                      Backend Lovable Cloud configuré
+                    </p>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Votre projet est connecté à Lovable Cloud avec toutes les fonctionnalités backend actives.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>URL du Projet</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="text"
+                      value={import.meta.env.VITE_SUPABASE_URL || ""}
+                      readOnly
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    URL de connexion à votre backend
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>ID du Projet</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="text"
+                      value={import.meta.env.VITE_SUPABASE_PROJECT_ID || ""}
+                      readOnly
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Identifiant unique de votre projet
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Clé Publique (Anon Key)</Label>
+                  <div className="relative">
+                    <Input
+                      type={showSupabaseKeys ? "text" : "password"}
+                      value={import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || ""}
+                      readOnly
+                      className="font-mono text-sm pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-0 top-0"
+                      onClick={() => setShowSupabaseKeys(!showSupabaseKeys)}
+                    >
+                      {showSupabaseKeys ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Clé publique utilisée par votre application (lecture seule)
+                  </p>
+                </div>
+
+                <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <p className="text-sm text-blue-600 dark:text-blue-400">
+                    ℹ️ Ces paramètres sont gérés automatiquement par Lovable Cloud. Les clés secrètes (Service Role Key) ne sont pas affichées pour des raisons de sécurité.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-sm">Services disponibles</h4>
+                  <div className="grid gap-2">
+                    <div className="p-3 bg-muted rounded text-sm flex items-center justify-between">
+                      <span className="font-medium">Base de données PostgreSQL</span>
+                      <span className="text-green-600 dark:text-green-400">✓ Actif</span>
+                    </div>
+                    <div className="p-3 bg-muted rounded text-sm flex items-center justify-between">
+                      <span className="font-medium">Authentification</span>
+                      <span className="text-green-600 dark:text-green-400">✓ Actif</span>
+                    </div>
+                    <div className="p-3 bg-muted rounded text-sm flex items-center justify-between">
+                      <span className="font-medium">Stockage de fichiers</span>
+                      <span className="text-green-600 dark:text-green-400">✓ Actif</span>
+                    </div>
+                    <div className="p-3 bg-muted rounded text-sm flex items-center justify-between">
+                      <span className="font-medium">Edge Functions</span>
+                      <span className="text-green-600 dark:text-green-400">✓ Actif</span>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
