@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Users as UsersIcon, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign, Send, FileDown, FileArchive, FileText, Download, Shield, LogOut } from "lucide-react";
+import { Users as UsersIcon, Calendar, CheckCircle, XCircle, Clock, Edit, Plus, Trash2, Eye, MoreVertical, DollarSign, Send, FileDown, FileArchive, FileText, Download, Shield, LogOut, Settings } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -460,26 +460,10 @@ export default function Bureau() {
           </div>
           <div className="flex gap-2 flex-wrap">
             {isAdmin && (
-              <>
-                <Button 
-                  onClick={() => {
-                    const currentMode = localStorage.getItem('debugMode') === 'true';
-                    localStorage.setItem('debugMode', (!currentMode).toString());
-                    toast({
-                      title: currentMode ? "Mode Debug désactivé" : "Mode Debug activé",
-                      description: currentMode ? "La validation des champs est maintenant active" : "La validation des champs est désactivée",
-                    });
-                  }} 
-                  variant={localStorage.getItem('debugMode') === 'true' ? "default" : "outline"}
-                  className="gap-2"
-                >
-                  {localStorage.getItem('debugMode') === 'true' ? "Debug: ON" : "Debug: OFF"}
-                </Button>
-                <Button onClick={() => navigate("/admin/users")} variant="outline" className="gap-2">
-                  <Shield className="h-4 w-4" />
-                  Gérer les utilisateurs
-                </Button>
-              </>
+              <Button onClick={() => navigate("/admin/configuration")} variant="outline" className="gap-2">
+                <Settings className="h-4 w-4" />
+                Configuration
+              </Button>
             )}
             <Button onClick={() => navigate("/tarifs")} variant="outline" className="gap-2">
               <DollarSign className="h-4 w-4" />

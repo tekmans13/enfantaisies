@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Mail, CreditCard, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Mail, CreditCard, Eye, EyeOff, Bug } from "lucide-react";
 
 interface SmtpConfig {
   host: string;
@@ -33,6 +33,7 @@ export default function Configuration() {
   const [showStripeSecret, setShowStripeSecret] = useState(false);
   const [showWebhookSecret, setShowWebhookSecret] = useState(false);
   const [showSmtpPassword, setShowSmtpPassword] = useState(false);
+  const [debugMode, setDebugMode] = useState(false);
   
   const [stripeConfig, setStripeConfig] = useState({
     publishableKey: "",
@@ -80,6 +81,10 @@ export default function Configuration() {
       }
 
       await fetchSmtpConfig();
+      
+      // Charger l'état du mode debug
+      const currentDebugMode = localStorage.getItem('debugMode') === 'true';
+      setDebugMode(currentDebugMode);
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -157,6 +162,19 @@ export default function Configuration() {
     });
   };
 
+  const handleToggleDebug = () => {
+    const newMode = !debugMode;
+    setDebugMode(newMode);
+    localStorage.setItem('debugMode', newMode.toString());
+    
+    toast({
+      title: newMode ? "Mode Debug activé" : "Mode Debug désactivé",
+      description: newMode 
+        ? "La validation des champs est désactivée" 
+        : "La validation des champs est maintenant active",
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -185,7 +203,7 @@ export default function Configuration() {
         </div>
 
         <Tabs defaultValue="stripe" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="stripe">
               <CreditCard className="mr-2 h-4 w-4" />
               Stripe
@@ -193,6 +211,10 @@ export default function Configuration() {
             <TabsTrigger value="smtp">
               <Mail className="mr-2 h-4 w-4" />
               SMTP
+            </TabsTrigger>
+            <TabsTrigger value="debug">
+              <Bug className="mr-2 h-4 w-4" />
+              Debug
             </TabsTrigger>
           </TabsList>
 
@@ -431,6 +453,65 @@ export default function Configuration() {
                     {saving ? "Enregistrement..." : "Enregistrer la configuration"}
                   </Button>
                 </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="debug">
+            <Card>
+              <CardHeader>
+                <CardTitle>Mode Debug</CardTitle>
+                <CardDescription>
+                  Activer le mode debug pour désactiver temporairement la validation des champs dans les formulaires
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                  <div className="flex-1">
+                    <h4 className="font-semibold mb-1">État du mode Debug</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {debugMode 
+                        ? "Le mode debug est actuellement activé. La validation des champs est désactivée." 
+                        : "Le mode debug est actuellement désactivé. La validation des champs est active."}
+                    </p>
+                  </div>
+                  <Button
+                    onClick={handleToggleDebug}
+                    variant={debugMode ? "default" : "outline"}
+                    size="lg"
+                    className="ml-4"
+                  >
+                    {debugMode ? "Debug: ON" : "Debug: OFF"}
+                  </Button>
+                </div>
+
+                <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                  <h4 className="font-semibold text-amber-600 dark:text-amber-400 mb-2 flex items-center gap-2">
+                    <Bug className="h-4 w-4" />
+                    Attention
+                  </h4>
+                  <ul className="text-sm text-amber-600 dark:text-amber-400 space-y-1 list-disc list-inside">
+                    <li>Le mode debug désactive la validation des champs obligatoires</li>
+                    <li>Utilisez uniquement pour les tests et le développement</li>
+                    <li>N'oubliez pas de désactiver le mode debug en production</li>
+                    <li>Ce paramètre est stocké localement dans votre navigateur</li>
+                  </ul>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-semibold">Impact du mode debug</h4>
+                  <div className="grid gap-2">
+                    <div className="p-3 bg-muted rounded text-sm">
+                      <span className="font-medium">Formulaires d'inscription:</span> La validation des champs obligatoires est désactivée
+                    </div>
+                    <div className="p-3 bg-muted rounded text-sm">
+                      <span className="font-medium">Gestion des séjours:</span> Les contraintes de validation sont assouplies
+                    </div>
+                    <div className="p-3 bg-muted rounded text-sm">
+                      <span className="font-medium">Tests rapides:</span> Permet de tester rapidement les fonctionnalités sans remplir tous les champs
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
