@@ -355,7 +355,8 @@ export default function Bureau() {
       }
 
       // Trouver le tarif correspondant au quotient familial
-      const qf = inscription.quotient_familial || 0;
+      // Si pas de QF, utiliser une valeur très élevée pour obtenir le tarif plein
+      const qf = inscription.quotient_familial || 999999;
       const tarif = tarifs.find(t => 
         qf >= t.qf_min && (t.qf_max === null || qf <= t.qf_max)
       ) || tarifs[tarifs.length - 1];
