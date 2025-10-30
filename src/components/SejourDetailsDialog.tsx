@@ -159,14 +159,14 @@ export function SejourDetailsDialog({
                       <TableHead>Enfant</TableHead>
                       <TableHead>Parent</TableHead>
                       <TableHead>Contact</TableHead>
-                      <TableHead>Régime alimentaire</TableHead>
-                      <TableHead>Santé</TableHead>
+                      <TableHead>Allergies alim.</TableHead>
+                      <TableHead>Médicaments</TableHead>
+                      <TableHead>Allergies</TableHead>
                       <TableHead>Statut</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {inscriptions.map((inscription) => {
-                      const dietary = getDietaryInfo(inscription);
                       return (
                         <TableRow key={inscription.id}>
                           <TableCell>
@@ -191,36 +191,35 @@ export function SejourDetailsDialog({
                             </div>
                           </TableCell>
                           <TableCell>
-                            {dietary.length > 0 ? (
-                              <div className="space-y-1">
-                                {dietary.map((item, idx) => (
-                                  <Badge key={idx} variant="outline" className="text-xs">
-                                    {item}
-                                  </Badge>
-                                ))}
+                            {inscription.food_allergies_details ? (
+                              <div className="text-sm max-w-[200px]">
+                                <p className="truncate" title={inscription.food_allergies_details}>
+                                  {inscription.food_allergies_details}
+                                </p>
                               </div>
                             ) : (
-                              <span className="text-muted-foreground text-sm">Aucun</span>
+                              <span className="text-muted-foreground text-sm">-</span>
                             )}
                           </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              {inscription.has_medication && (
-                                <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit">
-                                  <Pill className="w-3 h-3" />
-                                  Médicaments
-                                </Badge>
-                              )}
-                              {inscription.has_allergies && (
-                                <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit">
-                                  <AlertTriangle className="w-3 h-3" />
-                                  Allergies
-                                </Badge>
-                              )}
-                              {!inscription.has_medication && !inscription.has_allergies && (
-                                <span className="text-muted-foreground text-sm">Aucun</span>
-                              )}
-                            </div>
+                          <TableCell className="text-center">
+                            {inscription.has_medication ? (
+                              <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-600 border-orange-500/20">
+                                <Pill className="w-3 h-3 mr-1" />
+                                Oui
+                              </Badge>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {inscription.has_allergies ? (
+                              <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 border-red-500/20">
+                                <AlertTriangle className="w-3 h-3 mr-1" />
+                                Oui
+                              </Badge>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">-</span>
+                            )}
                           </TableCell>
                           <TableCell>
                             <InscriptionStatusBadge status={inscription.status} />
