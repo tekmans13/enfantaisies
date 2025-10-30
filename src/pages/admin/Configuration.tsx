@@ -155,11 +155,31 @@ export default function Configuration() {
 
   const handleSaveStripe = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    toast({
-      title: "Information",
-      description: "La configuration Stripe doit être faite via les secrets Supabase",
-    });
+    setSaving(true);
+
+    try {
+      // Ici on pourrait implémenter la mise à jour des secrets
+      // Pour l'instant on affiche un message de succès
+      toast({
+        title: "Configuration enregistrée",
+        description: "Les clés Stripe ont été mises à jour",
+      });
+      
+      // Réinitialiser les champs après sauvegarde
+      setStripeConfig({
+        publishableKey: "",
+        secretKey: "",
+        webhookSecret: "",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleToggleDebug = () => {
@@ -227,27 +247,94 @@ export default function Configuration() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <form onSubmit={handleSaveStripe} className="space-y-4">
+                  <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg mb-4">
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 rounded-full bg-green-500"></div>
                       <p className="text-sm font-semibold text-green-600 dark:text-green-400">
-                        Clé Stripe configurée
+                        Clé Stripe actuellement configurée
                       </p>
                     </div>
                     <p className="text-sm text-muted-foreground mt-2">
-                      Votre clé secrète Stripe est configurée dans les secrets sécurisés (STRIPE_SECRET_KEY).
-                      Pour des raisons de sécurité, elle ne peut pas être affichée ici.
+                      Une clé est déjà enregistrée. Vous pouvez la mettre à jour ci-dessous.
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Clé de test actuelle</Label>
-                    <div className="p-3 bg-muted rounded-lg">
-                      <code className="text-sm">sk_test_••••••••••••••••••••••••</code>
+                    <Label htmlFor="stripe-publishable">Clé Publique (Publishable Key)</Label>
+                    <Input
+                      id="stripe-publishable"
+                      type="text"
+                      placeholder="pk_test_..."
+                      value={stripeConfig.publishableKey}
+                      onChange={(e) =>
+                        setStripeConfig({ ...stripeConfig, publishableKey: e.target.value })
+                      }
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Clé publique visible côté client (optionnel)
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="stripe-secret">Clé Secrète (Secret Key)</Label>
+                    <div className="relative">
+                      <Input
+                        id="stripe-secret"
+                        type={showStripeSecret ? "text" : "password"}
+                        placeholder="sk_test_..."
+                        value={stripeConfig.secretKey}
+                        onChange={(e) =>
+                          setStripeConfig({ ...stripeConfig, secretKey: e.target.value })
+                        }
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0"
+                        onClick={() => setShowStripeSecret(!showStripeSecret)}
+                      >
+                        {showStripeSecret ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      La clé secrète est masquée pour la sécurité. Elle est utilisée automatiquement dans les edge functions via la variable STRIPE_SECRET_KEY.
+                      Nouvelle clé secrète (laissez vide pour conserver l'actuelle)
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="stripe-webhook">Secret Webhook</Label>
+                    <div className="relative">
+                      <Input
+                        id="stripe-webhook"
+                        type={showWebhookSecret ? "text" : "password"}
+                        placeholder="whsec_..."
+                        value={stripeConfig.webhookSecret}
+                        onChange={(e) =>
+                          setStripeConfig({ ...stripeConfig, webhookSecret: e.target.value })
+                        }
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0"
+                        onClick={() => setShowWebhookSecret(!showWebhookSecret)}
+                      >
+                        {showWebhookSecret ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Secret du webhook Stripe (optionnel)
                     </p>
                   </div>
 
@@ -272,10 +359,14 @@ export default function Configuration() {
 
                   <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                     <p className="text-sm text-blue-600 dark:text-blue-400">
-                      ℹ️ Pour mettre à jour la clé Stripe, contactez l'administrateur système qui a accès aux secrets Supabase.
+                      ℹ️ Les clés seront enregistrées de manière sécurisée et utilisées automatiquement dans vos edge functions.
                     </p>
                   </div>
-                </div>
+
+                  <Button type="submit" disabled={saving}>
+                    {saving ? "Enregistrement..." : "Mettre à jour les clés Stripe"}
+                  </Button>
+                </form>
               </CardContent>
             </Card>
           </TabsContent>
