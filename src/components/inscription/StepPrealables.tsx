@@ -31,6 +31,9 @@ export function StepPrealables({
   isDocModalOpen,
   setIsDocModalOpen 
 }: StepPrealablesProps) {
+  // Année pour l'avis d'imposition (année en cours - 1)
+  const impositionYear = new Date().getFullYear() - 1;
+  
   const checkboxItems = [
     { id: 'isFirstInscription', label: "C'est votre 1ère inscription" },
     { id: 'hasMedication', label: 'Votre enfant prend un traitement médicamenteux' },
@@ -63,7 +66,7 @@ export function StepPrealables({
                 <div className="space-y-2">
                   <div className="flex items-start gap-2">
                     <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-amber-900 dark:text-amber-100">Attestation de la CAF (moins de 3 mois) - OU - Avis d'imposition 2024</p>
+                    <p className="text-amber-900 dark:text-amber-100">Attestation de la CAF (moins de 3 mois) - OU - Avis d'imposition {impositionYear}</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />

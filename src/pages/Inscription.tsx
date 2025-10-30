@@ -353,6 +353,12 @@ export default function Inscription() {
     { number: 5, title: "Documents", icon: FileCheck },
   ];
 
+  // Calcul des années pour les documents fiscaux
+  const currentYear = new Date().getFullYear();
+  const impositionYear = currentYear - 1;
+  const olderImpositionYear = currentYear - 5;
+  const olderRevenueYear = currentYear - 6;
+
   const progressPercentage = (currentStep / TOTAL_INSCRIPTION_STEPS) * 100;
 
   return (
@@ -1586,10 +1592,10 @@ export default function Inscription() {
                   {/* Attestation CAF */}
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <Label className="text-sm font-semibold mb-2 block">
-                      Attestation CAF ou Avis d'imposition 2024 *
+                      Attestation CAF ou Avis d'imposition {impositionYear} *
                     </Label>
                     <p className="text-xs text-muted-foreground mb-3">
-                      Attestation de la CAF (Quotient Familial) de moins de 3 mois. Si pas d'affiliation CAF : dernier avis d'imposition 2020 sur les revenus 2019 du foyer (ou de chacun des deux parents).
+                      Attestation de la CAF (Quotient Familial) de moins de 3 mois. Si pas d'affiliation CAF : dernier avis d'imposition {olderImpositionYear} sur les revenus {olderRevenueYear} du foyer (ou de chacun des deux parents).
                     </p>
                     <p className="text-xs text-muted-foreground mb-3 font-semibold">
                       (En l'absence d'attestation CAF ou de votre avis d'imposition, le tarif 12 sera automatiquement appliqué.)
