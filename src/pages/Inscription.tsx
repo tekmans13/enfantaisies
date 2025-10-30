@@ -356,8 +356,8 @@ export default function Inscription() {
   // Calcul des années pour les documents fiscaux
   const currentYear = new Date().getFullYear();
   const impositionYear = currentYear - 1;
-  const olderImpositionYear = currentYear - 5;
-  const olderRevenueYear = currentYear - 6;
+  const olderImpositionYear = currentYear - 1;
+  const olderRevenueYear = currentYear - 2;
 
   const progressPercentage = (currentStep / TOTAL_INSCRIPTION_STEPS) * 100;
 
