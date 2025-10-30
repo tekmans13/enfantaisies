@@ -159,6 +159,7 @@ export function SejourDetailsDialog({
                       <TableHead>Enfant</TableHead>
                       <TableHead>Parent</TableHead>
                       <TableHead>Contact</TableHead>
+                      <TableHead>Préférences</TableHead>
                       <TableHead>Allergies alim.</TableHead>
                       <TableHead>Médicaments</TableHead>
                       <TableHead>Allergies</TableHead>
@@ -189,6 +190,17 @@ export function SejourDetailsDialog({
                               <p>{inscription.parent_mobile}</p>
                               <p className="text-muted-foreground">{inscription.parent_email}</p>
                             </div>
+                          </TableCell>
+                          <TableCell>
+                            {inscription.demande_specifique ? (
+                              <div className="text-sm max-w-[200px]">
+                                <p className="truncate" title={inscription.demande_specifique}>
+                                  {inscription.demande_specifique}
+                                </p>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">-</span>
+                            )}
                           </TableCell>
                           <TableCell>
                             {inscription.food_allergies_details ? (
