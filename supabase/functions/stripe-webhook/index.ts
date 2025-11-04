@@ -75,13 +75,24 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Gérer les différents événements Stripe
     switch (event.type) {
-      case 'checkout.session.completed':
-      case 'payment_intent.succeeded': {
+      case 'checkout.session.completed': {
         const session = event.data.object as any;
         const inscriptionId = session.metadata?.inscription_id;
 
         if (inscriptionId) {
           console.log('Payment succeeded for inscription:', inscriptionId);
+
+          // Vérifier si l'inscription n'est pas déjà marquée comme payée
+          const { data: existingInscription } = await supabase
+            .from('inscriptions')
+            .select('status')
+            .eq('id', inscriptionId)
+            .single();
+
+          if (existingInscription?.status === 'paye') {
+            console.log('Inscription already marked as paid, skipping');
+            break;
+          }
 
           const { error } = await supabase
             .from('inscriptions')
