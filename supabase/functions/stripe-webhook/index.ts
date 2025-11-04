@@ -131,10 +131,10 @@ const handler = async (req: Request): Promise<Response> => {
                   parentName: inscription.parent_first_name,
                   childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
                   recapUrl,
-                  // Pas de paymentUrl car le paiement est déjà effectué
+                  isPaymentConfirmation: true, // Indiquer qu'il s'agit d'une confirmation de paiement
                 }
               });
-              console.log('Confirmation email sent successfully');
+              console.log('Payment confirmation email sent successfully');
             } catch (emailError) {
               console.error('Error sending confirmation email:', emailError);
             }

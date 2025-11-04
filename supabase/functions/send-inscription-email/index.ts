@@ -27,6 +27,7 @@ interface EmailRequest {
   recapUrl: string;
   paymentUrl?: string;
   montantTotal?: number;
+  isPaymentConfirmation?: boolean;
 }
 
 /** Handler principal de la fonction edge */
@@ -37,7 +38,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { inscriptionId, parentEmail, parentName, childName, recapUrl, paymentUrl, montantTotal }: EmailRequest = await req.json();
+    const { inscriptionId, parentEmail, parentName, childName, recapUrl, paymentUrl, montantTotal, isPaymentConfirmation }: EmailRequest = await req.json();
 
     console.log("Sending email to:", parentEmail);
 
@@ -87,14 +88,21 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Envoi depuis:", smtpConfig.from_email);
     
     // Construire le contenu de l'email selon le contexte
-    const emailSubject = paymentUrl 
-      ? "Lien de paiement - Centre Aéré" 
-      : "Confirmation de votre inscription - Centre Aéré";
-    
+    let emailSubject: string;
     let emailContent = `Bonjour ${parentName},\n\n`;
     
-    if (paymentUrl) {
+    if (isPaymentConfirmation) {
+      // Email après paiement réussi
+      emailSubject = "Inscription validée - Centre Aéré";
+      emailContent += `Nous avons bien reçu votre paiement pour l'inscription de ${childName} au Centre Aéré.\n\n`;
+      emailContent += `Votre inscription est maintenant validée et confirmée.\n\n`;
+      emailContent += `Vous pouvez consulter le récapitulatif complet de votre inscription à tout moment :\n`;
+      emailContent += `${recapUrl}\n\n`;
+      emailContent += `Référence de l'inscription : ${inscriptionId}\n\n`;
+      emailContent += `Nous vous attendons avec plaisir !\n\n`;
+    } else if (paymentUrl) {
       // Email avec lien de paiement
+      emailSubject = "Lien de paiement - Centre Aéré";
       emailContent += `Votre inscription pour ${childName} au Centre Aéré est en attente de paiement.\n\n`;
       emailContent += `Montant à régler : ${montantTotal?.toFixed(2)}€\n\n`;
       emailContent += `Pour finaliser votre inscription, veuillez procéder au paiement en cliquant sur le lien ci-dessous :\n`;
@@ -103,7 +111,8 @@ const handler = async (req: Request): Promise<Response> => {
       emailContent += `${recapUrl}\n\n`;
       emailContent += `Référence de l'inscription : ${inscriptionId}\n\n`;
     } else {
-      // Email de confirmation simple
+      // Email de confirmation simple (première inscription)
+      emailSubject = "Confirmation de votre inscription - Centre Aéré";
       emailContent += `Nous avons bien reçu votre inscription pour ${childName} au Centre Aéré.\n\n`;
       emailContent += `Votre inscription a été enregistrée avec succès et sera traitée par notre équipe dans les plus brefs délais.\n\n`;
       emailContent += `Vous pouvez consulter le récapitulatif de votre inscription à tout moment en cliquant sur le lien ci-dessous :\n`;
