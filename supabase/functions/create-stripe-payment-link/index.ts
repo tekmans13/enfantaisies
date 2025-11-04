@@ -4,6 +4,7 @@ import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 interface PaymentRequest {
@@ -23,21 +24,29 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { inscriptionId, parentEmail, parentName, childName, montantTotal, nombreSemaines }: PaymentRequest = await req.json();
     
-    console.log('Creating payment link for inscription:', inscriptionId);
+    console.log({
+      inscriptionId,
+      parentEmail,
+      montantTotal,
+      nombreSemaines,
+      env: Deno.env.get('STRIPE_SECRET_KEY')?.startsWith('sk_test_') ? 'test' : 'live'
+    });
 
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
     if (!stripeKey) {
       throw new Error('STRIPE_SECRET_KEY not configured');
     }
 
+    console.log('Stripe key prefix:', stripeKey?.slice(0, 8));
+
     const stripe = new Stripe(stripeKey, {
       apiVersion: '2020-08-27',
       httpClient: Stripe.createFetchHttpClient(),
     });
 
-    // Créer une Checkout Session au lieu d'un Payment Link
+    // Créer une Checkout Session
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      automatic_payment_methods: { enabled: true },
       line_items: [
         {
           price_data: {
@@ -46,7 +55,7 @@ const handler = async (req: Request): Promise<Response> => {
               name: `Inscription ${childName} - ${nombreSemaines} semaine(s)`,
               description: `Paiement pour l'inscription au centre aéré`,
             },
-            unit_amount: Math.round(montantTotal * 100), // Stripe utilise les centimes
+            unit_amount: Math.round(montantTotal * 100),
           },
           quantity: 1,
         },
@@ -69,7 +78,8 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
 
-    console.log('Checkout session created:', session.url);
+    console.log('Checkout session id:', session.id);
+    console.log('Checkout URL:', session.url);
 
     return new Response(
       JSON.stringify({ 

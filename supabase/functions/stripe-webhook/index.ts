@@ -5,6 +5,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 const handler = async (req: Request): Promise<Response> => {
@@ -53,6 +54,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log('Webhook event type:', event.type);
+    console.log('Webhook event id:', event.id);
 
     // Le client Supabase est déjà initialisé plus haut
 
