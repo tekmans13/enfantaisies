@@ -825,7 +825,7 @@ export default function Bureau() {
                                  variant="ghost"
                                  className="h-7 w-7 p-0"
                                  onClick={() => handleSendPayment(inscription)}
-                                 disabled={sendingPayment === inscription.id}
+                                 disabled={sendingPayment === inscription.id || inscription.status === 'paye'}
                                >
                                  <Send className="w-3 h-3" />
                                </Button>
@@ -894,6 +894,7 @@ export default function Bureau() {
                                  variant="ghost"
                                  className="h-7 w-7 p-0"
                                  onClick={() => setEditingInscription(inscription)}
+                                 disabled={inscription.status === 'paye'}
                                >
                                  <Edit className="w-3 h-3" />
                                </Button>
