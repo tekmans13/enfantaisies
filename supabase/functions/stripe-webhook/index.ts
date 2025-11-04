@@ -78,6 +78,45 @@ const handler = async (req: Request): Promise<Response> => {
           }
 
           console.log('Inscription updated successfully');
+
+          // Récupérer les infos de l'inscription pour envoyer l'email
+          const { data: inscription } = await supabase
+            .from('inscriptions')
+            .select(`
+              id,
+              child_first_name,
+              child_last_name,
+              parents (
+                first_name,
+                email
+              )
+            `)
+            .eq('id', inscriptionId)
+            .single();
+
+          if (inscription && inscription.parents && Array.isArray(inscription.parents) && inscription.parents.length > 0) {
+            const parent = inscription.parents[0];
+            console.log('Sending confirmation email to:', parent.email);
+
+            // Envoyer l'email de confirmation de paiement
+            const recapUrl = `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovableproject.com')}/recap-inscription/${inscriptionId}`;
+            
+            try {
+              await supabase.functions.invoke('send-inscription-email', {
+                body: {
+                  inscriptionId: inscription.id,
+                  parentEmail: parent.email,
+                  parentName: parent.first_name,
+                  childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
+                  recapUrl,
+                  // Pas de paymentUrl car le paiement est déjà effectué
+                }
+              });
+              console.log('Confirmation email sent successfully');
+            } catch (emailError) {
+              console.error('Error sending confirmation email:', emailError);
+            }
+          }
         }
         break;
       }
