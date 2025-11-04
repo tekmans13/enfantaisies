@@ -32,7 +32,7 @@ export function InscriptionStatusBadge({ status, size = "md" }: InscriptionStatu
   
   if (status === 'attribuee' || status === 'attribuee_alternatif') {
     return (
-      <Badge variant="outline" className={`bg-green-500/10 text-green-500 border-green-500 ${textSize}`}>
+      <Badge variant="outline" className={`bg-cyan-500/10 text-cyan-600 border-cyan-500 ${textSize}`}>
         <CheckCircle className={`${iconSize} mr-1`} />
         Attribuée
       </Badge>
