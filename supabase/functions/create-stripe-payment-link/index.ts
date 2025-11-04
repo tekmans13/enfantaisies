@@ -35,8 +35,9 @@ const handler = async (req: Request): Promise<Response> => {
       httpClient: Stripe.createFetchHttpClient(),
     });
 
-    // Créer le lien de paiement
-    const paymentLink = await stripe.paymentLinks.create({
+    // Créer une Checkout Session au lieu d'un Payment Link
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
@@ -50,19 +51,29 @@ const handler = async (req: Request): Promise<Response> => {
           quantity: 1,
         },
       ],
+      mode: 'payment',
+      success_url: `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovableproject.com')}/recap-inscription/${inscriptionId}?success=true`,
+      cancel_url: `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovableproject.com')}/recap-inscription/${inscriptionId}?canceled=true`,
+      customer_email: parentEmail,
       metadata: {
         inscription_id: inscriptionId,
         parent_email: parentEmail,
         parent_name: parentName,
         child_name: childName,
       },
+      payment_intent_data: {
+        metadata: {
+          inscription_id: inscriptionId,
+          parent_email: parentEmail,
+        },
+      },
     });
 
-    console.log('Payment link created:', paymentLink.url);
+    console.log('Checkout session created:', session.url);
 
     return new Response(
       JSON.stringify({ 
-        paymentUrl: paymentLink.url,
+        paymentUrl: session.url,
         success: true 
       }),
       {
