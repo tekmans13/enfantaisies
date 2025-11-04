@@ -33,14 +33,26 @@ export default function RecapInscription() {
       if (!id) return;
 
       try {
-        const { data: inscriptionData, error: inscriptionError } = await supabase
-          .from('inscriptions')
-          .select('*')
-          .eq('id', id)
-          .maybeSingle();
+        // D'abord essayer de récupérer depuis sessionStorage (pour les utilisateurs anonymes)
+        const cachedData = sessionStorage.getItem(`inscription_${id}`);
+        let inscriptionData;
 
-        if (inscriptionError) throw inscriptionError;
-        setInscription(inscriptionData);
+        if (cachedData) {
+          // Utiliser les données en cache
+          inscriptionData = JSON.parse(cachedData);
+          setInscription(inscriptionData);
+        } else {
+          // Sinon faire une requête normale (pour les utilisateurs authentifiés ou refresh)
+          const { data, error: inscriptionError } = await supabase
+            .from('inscriptions')
+            .select('*')
+            .eq('id', id)
+            .maybeSingle();
+
+          if (inscriptionError) throw inscriptionError;
+          inscriptionData = data;
+          setInscription(inscriptionData);
+        }
 
         // Récupérer les séjours
         const sejourIds = [

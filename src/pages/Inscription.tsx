@@ -297,6 +297,9 @@ export default function Inscription() {
 
       if (error) throw error;
 
+      // Stocker les données de l'inscription dans sessionStorage pour la page recap
+      sessionStorage.setItem(`inscription_${inscriptionId}`, JSON.stringify(inscriptionData));
+
       // Upload des documents avec l'ID déjà connu
       
       const documentsToUpload: DocumentToUpload[] = [
