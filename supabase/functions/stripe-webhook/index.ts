@@ -9,11 +9,18 @@ const corsHeaders = {
 };
 
 const handler = async (req: Request): Promise<Response> => {
+  console.log('===== WEBHOOK CALLED =====');
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  console.log('Headers:', Object.fromEntries(req.headers.entries()));
+  
   if (req.method === 'OPTIONS') {
+    console.log('Returning CORS preflight response');
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    console.log('Processing webhook...');
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
     
