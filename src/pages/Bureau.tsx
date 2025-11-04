@@ -477,6 +477,10 @@ export default function Bureau() {
               <DollarSign className="h-4 w-4" />
               Gérer les tarifs
             </Button>
+            <Button onClick={() => navigate("/admin/users")} variant="outline" className="gap-2">
+              <UsersIcon className="h-4 w-4" />
+              Utilisateurs
+            </Button>
             <Button onClick={() => navigate("/documents")} variant="outline" className="gap-2">
               <FileText className="h-4 w-4" />
               Documents
