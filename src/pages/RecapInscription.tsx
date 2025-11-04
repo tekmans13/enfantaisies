@@ -262,18 +262,32 @@ export default function RecapInscription() {
                   <FileText className="w-5 h-5 text-primary" />
                   <h2 className="text-xl font-semibold">Informations importantes</h2>
                 </div>
-                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-6 space-y-2">
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-6 space-y-3">
                   {inscription.has_medication && (
-                    <p className="text-sm flex items-center gap-2">
-                      <Badge variant="outline" className="bg-amber-100 dark:bg-amber-900">⚠️</Badge>
-                      Traitement médicamenteux
-                    </p>
+                    <div>
+                      <p className="text-sm flex items-center gap-2 font-semibold">
+                        <Badge variant="outline" className="bg-amber-100 dark:bg-amber-900">⚠️</Badge>
+                        Traitement médicamenteux
+                      </p>
+                      {inscription.medication_details && (
+                        <p className="text-sm ml-8 mt-2 p-3 bg-background rounded border border-amber-200 dark:border-amber-800">
+                          {inscription.medication_details}
+                        </p>
+                      )}
+                    </div>
                   )}
                   {inscription.has_allergies && (
-                    <p className="text-sm flex items-center gap-2">
-                      <Badge variant="outline" className="bg-amber-100 dark:bg-amber-900">⚠️</Badge>
-                      Allergies
-                    </p>
+                    <div>
+                      <p className="text-sm flex items-center gap-2 font-semibold">
+                        <Badge variant="outline" className="bg-amber-100 dark:bg-amber-900">⚠️</Badge>
+                        Allergies
+                      </p>
+                      {inscription.allergies_details && (
+                        <p className="text-sm ml-8 mt-2 p-3 bg-background rounded border border-amber-200 dark:border-amber-800">
+                          {inscription.allergies_details}
+                        </p>
+                      )}
+                    </div>
                   )}
                   {inscription.food_allergies_details && (
                     <div>

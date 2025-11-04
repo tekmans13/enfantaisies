@@ -264,12 +264,28 @@ export function InscriptionRecapDialog({
                         {inscription.has_allergies ? 'Oui' : 'Non'}
                       </Badge>
                     </div>
+                    {inscription.has_allergies && inscription.allergies_details && (
+                      <div>
+                        <p className="text-muted-foreground mb-1">Détails des allergies:</p>
+                        <p className="font-medium text-xs bg-background p-2 rounded border">
+                          {inscription.allergies_details}
+                        </p>
+                      </div>
+                    )}
                     <div className="flex items-center gap-2">
                       <p className="text-muted-foreground">Médicaments:</p>
                       <Badge variant={inscription.has_medication ? "destructive" : "secondary"} className="text-xs">
                         {inscription.has_medication ? 'Oui' : 'Non'}
                       </Badge>
                     </div>
+                    {inscription.has_medication && inscription.medication_details && (
+                      <div>
+                        <p className="text-muted-foreground mb-1">Détails du traitement:</p>
+                        <p className="font-medium text-xs bg-background p-2 rounded border">
+                          {inscription.medication_details}
+                        </p>
+                      </div>
+                    )}
                     {inscription.food_allergies_details && (
                       <div>
                         <p className="text-muted-foreground mb-1">Allergies/pratiques alimentaires:</p>
