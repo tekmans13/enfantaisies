@@ -227,7 +227,12 @@ export default function Inscription() {
     }
 
     try {
+      // Générer un UUID côté client pour éviter le besoin de .select() après INSERT
+      // Cela permet de faire un INSERT sans avoir besoin d'une politique SELECT pour anon
+      const inscriptionId = crypto.randomUUID();
+      
       const inscriptionData: any = {
+        id: inscriptionId, // UUID généré côté client
         is_first_inscription: formData.isFirstInscription,
         has_medication: formData.hasMedication,
         has_allergies: formData.hasAllergies,
@@ -285,16 +290,14 @@ export default function Inscription() {
         authorized_person_2_other_phone: formData.authorizedPerson2OtherPhone || null,
       };
 
-      const { data, error } = await supabase
+      // INSERT sans .select() - ne nécessite pas de politique SELECT
+      const { error } = await supabase
         .from('inscriptions')
-        .insert(inscriptionData)
-        .select()
-        .single();
+        .insert(inscriptionData);
 
       if (error) throw error;
 
-      // Upload des documents
-      const inscriptionId = data.id;
+      // Upload des documents avec l'ID déjà connu
       
       const documentsToUpload: DocumentToUpload[] = [
         { file: uploadedFiles.ficheSanitaire1, type: 'fiche_sanitaire_1' },
@@ -315,12 +318,12 @@ export default function Inscription() {
 
 
       // Envoyer l'email de confirmation
-      const recapUrl = `${window.location.origin}/recap-inscription/${data.id}`;
+      const recapUrl = `${window.location.origin}/recap-inscription/${inscriptionId}`;
       
       try {
         await supabase.functions.invoke('send-inscription-email', {
           body: {
-            inscriptionId: data.id.slice(0, 8),
+            inscriptionId: inscriptionId.slice(0, 8),
             parentEmail: formData.parentEmail,
             parentName: `${formData.parentFirstName} ${formData.parentLastName}`,
             childName: `${formData.childFirstName} ${formData.childLastName}`,
@@ -338,7 +341,7 @@ export default function Inscription() {
       });
 
       // Rediriger vers la page de récapitulatif
-      navigate(`/recap-inscription/${data.id}`);
+      navigate(`/recap-inscription/${inscriptionId}`);
     } catch (error) {
       toast({
         title: "Erreur",
