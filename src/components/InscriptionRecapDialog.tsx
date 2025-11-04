@@ -258,29 +258,17 @@ export function InscriptionRecapDialog({
                 <div className="space-y-2">
                   <h4 className="font-semibold text-sm">Informations médicales</h4>
                   <div className="grid gap-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <p className="text-muted-foreground">Allergies:</p>
-                      <Badge variant={inscription.has_allergies ? "destructive" : "secondary"} className="text-xs">
-                        {inscription.has_allergies ? 'Oui' : 'Non'}
-                      </Badge>
-                    </div>
                     {inscription.has_allergies && inscription.allergies_details && (
                       <div>
-                        <p className="text-muted-foreground mb-1">Détails des allergies:</p>
+                        <p className="text-muted-foreground mb-1">Allergies:</p>
                         <p className="font-medium text-xs bg-background p-2 rounded border">
                           {inscription.allergies_details}
                         </p>
                       </div>
                     )}
-                    <div className="flex items-center gap-2">
-                      <p className="text-muted-foreground">Médicaments:</p>
-                      <Badge variant={inscription.has_medication ? "destructive" : "secondary"} className="text-xs">
-                        {inscription.has_medication ? 'Oui' : 'Non'}
-                      </Badge>
-                    </div>
                     {inscription.has_medication && inscription.medication_details && (
                       <div>
-                        <p className="text-muted-foreground mb-1">Détails du traitement:</p>
+                        <p className="text-muted-foreground mb-1">Traitement médicamenteux:</p>
                         <p className="font-medium text-xs bg-background p-2 rounded border">
                           {inscription.medication_details}
                         </p>
@@ -293,6 +281,9 @@ export function InscriptionRecapDialog({
                           {inscription.food_allergies_details}
                         </p>
                       </div>
+                    )}
+                    {!inscription.has_allergies && !inscription.has_medication && !inscription.food_allergies_details && (
+                      <p className="text-muted-foreground text-sm">Aucune information médicale particulière</p>
                     )}
                   </div>
                 </div>
