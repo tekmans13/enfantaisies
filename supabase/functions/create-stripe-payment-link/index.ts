@@ -31,7 +31,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const stripe = new Stripe(stripeKey, {
-      apiVersion: '2023-10-16',
+      apiVersion: '2020-08-27',
       httpClient: Stripe.createFetchHttpClient(),
     });
 
