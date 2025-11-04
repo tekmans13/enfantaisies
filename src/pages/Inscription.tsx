@@ -292,6 +292,22 @@ export default function Inscription() {
         authorized_person_2_other_phone: formData.authorizedPerson2OtherPhone || null,
       };
 
+      // Debug: vérifier les valeurs des champs médicaux
+      console.log('FormData medical details:', {
+        hasMedication: formData.hasMedication,
+        medicationDetails: formData.medicationDetails,
+        hasAllergies: formData.hasAllergies,
+        allergiesDetails: formData.allergiesDetails,
+        foodAllergiesDetails: formData.foodAllergiesDetails
+      });
+      console.log('Inscription data medical details:', {
+        has_medication: inscriptionData.has_medication,
+        medication_details: inscriptionData.medication_details,
+        has_allergies: inscriptionData.has_allergies,
+        allergies_details: inscriptionData.allergies_details,
+        food_allergies_details: inscriptionData.food_allergies_details
+      });
+
       // INSERT sans .select() - ne nécessite pas de politique SELECT
       const { error } = await supabase
         .from('inscriptions')
