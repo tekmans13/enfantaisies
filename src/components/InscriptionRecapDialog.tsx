@@ -179,9 +179,38 @@ export function InscriptionRecapDialog({
               Nous avons bien reçu votre demande d'inscription
             </p>
             {inscription && (
-              <div className="mt-3 text-xs text-muted-foreground">
-                Référence de l'inscription : #{inscription.id.slice(0, 8)}
-              </div>
+              <>
+                <div className="mt-3 text-xs text-muted-foreground">
+                  Référence de l'inscription : #{inscription.id.slice(0, 8)}
+                </div>
+                
+                {/* Statut de paiement */}
+                <div className="mt-4 flex justify-center">
+                  {inscription.status === 'paye' ? (
+                    <Card className="border-green-200 bg-green-50 dark:bg-green-950/20 inline-block">
+                      <div className="py-2 px-4">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <span className="font-semibold text-sm text-green-900 dark:text-green-100">
+                            PAYÉ
+                          </span>
+                        </div>
+                      </div>
+                    </Card>
+                  ) : (
+                    <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950/20 inline-block">
+                      <div className="py-2 px-4">
+                        <div className="flex items-center gap-2">
+                          <Info className="h-4 w-4 text-orange-600" />
+                          <span className="font-semibold text-sm text-orange-900 dark:text-orange-100">
+                            EN ATTENTE DE PAIEMENT
+                          </span>
+                        </div>
+                      </div>
+                    </Card>
+                  )}
+                </div>
+              </>
             )}
           </DialogTitle>
         </DialogHeader>
