@@ -235,7 +235,9 @@ export default function Inscription() {
         id: inscriptionId, // UUID généré côté client
         is_first_inscription: formData.isFirstInscription,
         has_medication: formData.hasMedication,
+        medication_details: formData.medicationDetails || null,
         has_allergies: formData.hasAllergies,
+        allergies_details: formData.allergiesDetails || null,
         food_allergies_details: formData.foodAllergiesDetails || null,
         child_first_name: formData.childFirstName,
         child_last_name: formData.childLastName,
