@@ -177,6 +177,33 @@ export default function RecapInscription() {
             <div className="mt-4 text-xs text-muted-foreground">
               Référence de l'inscription : #{inscription.id.slice(0, 8)}
             </div>
+            
+            {/* Statut de paiement */}
+            <div className="mt-6">
+              {inscription.status === 'paye' ? (
+                <Card className="border-green-200 bg-green-50 dark:bg-green-950/20 inline-block">
+                  <CardContent className="py-3 px-6">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                      <span className="font-semibold text-green-900 dark:text-green-100">
+                        PAYÉ
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950/20 inline-block">
+                  <CardContent className="py-3 px-6">
+                    <div className="flex items-center gap-2">
+                      <Info className="h-5 w-5 text-orange-600" />
+                      <span className="font-semibold text-orange-900 dark:text-orange-100">
+                        EN ATTENTE DE PAIEMENT
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
 
           <Separator className="my-8" />
