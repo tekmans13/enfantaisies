@@ -14,23 +14,16 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
+    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
     
     if (!stripeKey) {
       throw new Error('STRIPE_SECRET_KEY not configured');
     }
 
-    // Initialiser le client Supabase pour charger la config
+    // Initialiser le client Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // Charger le webhook secret depuis la base de données
-    const { data: stripeConfig } = await supabase
-      .from('stripe_config')
-      .select('webhook_secret')
-      .single();
-    
-    const webhookSecret = stripeConfig?.webhook_secret;
 
     const stripe = new Stripe(stripeKey, {
       apiVersion: '2023-10-16',
@@ -92,21 +85,12 @@ const handler = async (req: Request): Promise<Response> => {
           // Récupérer les infos de l'inscription pour envoyer l'email
           const { data: inscription } = await supabase
             .from('inscriptions')
-            .select(`
-              id,
-              child_first_name,
-              child_last_name,
-              parents (
-                first_name,
-                email
-              )
-            `)
+            .select('id, child_first_name, child_last_name, parent_email, parent_first_name')
             .eq('id', inscriptionId)
             .single();
 
-          if (inscription && inscription.parents && Array.isArray(inscription.parents) && inscription.parents.length > 0) {
-            const parent = inscription.parents[0];
-            console.log('Sending confirmation email to:', parent.email);
+          if (inscription) {
+            console.log('Sending confirmation email to:', inscription.parent_email);
 
             // Envoyer l'email de confirmation de paiement
             const recapUrl = `https://enfan-campus-inscriptions.lovable.app/recap-inscription/${inscriptionId}`;
@@ -115,8 +99,8 @@ const handler = async (req: Request): Promise<Response> => {
               await supabase.functions.invoke('send-inscription-email', {
                 body: {
                   inscriptionId: inscription.id,
-                  parentEmail: parent.email,
-                  parentName: parent.first_name,
+                  parentEmail: inscription.parent_email,
+                  parentName: inscription.parent_first_name,
                   childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
                   recapUrl,
                   // Pas de paymentUrl car le paiement est déjà effectué
