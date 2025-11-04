@@ -67,14 +67,7 @@ const App = () => (
               </ProtectedRoute>
             } 
           />
-          <Route 
-            path="/recap-inscription/:id"
-            element={
-              <ProtectedRoute>
-                <RecapInscription />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/recap-inscription/:id" element={<RecapInscription />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
