@@ -4,11 +4,11 @@
  */
 
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { CheckCircle, Home, Info, FileText } from "lucide-react";
+import { CheckCircle, Home, Info, FileText, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useTarifCalculator } from "@/hooks/use-tarif-calculator";
@@ -20,10 +20,15 @@ import { DocumentsList } from "@/components/recap/DocumentsList";
 export default function RecapInscription() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [inscription, setInscription] = useState<any>(null);
   const [sejours, setSejours] = useState<any[]>([]);
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Récupérer les paramètres de paiement
+  const paymentSuccess = searchParams.get('success') === 'true';
+  const paymentCanceled = searchParams.get('canceled') === 'true';
   
   // Utiliser le hook de calcul de tarifs
   const { calculatePrice } = useTarifCalculator(inscription?.quotient_familial);
@@ -119,7 +124,45 @@ export default function RecapInscription() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Message de succès du paiement */}
+        {paymentSuccess && (
+          <Card className="border-green-200 bg-green-50 dark:bg-green-950/20">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-green-900 dark:text-green-100">
+                    Paiement réussi !
+                  </h3>
+                  <p className="text-sm text-green-700 dark:text-green-200">
+                    Votre paiement a été effectué avec succès. Vous allez recevoir un email de confirmation.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Message d'annulation du paiement */}
+        {paymentCanceled && (
+          <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950/20">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <XCircle className="h-6 w-6 text-orange-600 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-orange-900 dark:text-orange-100">
+                    Paiement annulé
+                  </h3>
+                  <p className="text-sm text-orange-700 dark:text-orange-200">
+                    Le paiement a été annulé. Vous pouvez le retenter à tout moment depuis votre espace.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <Card className="p-8 shadow-soft">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
