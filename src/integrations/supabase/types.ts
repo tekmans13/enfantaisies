@@ -416,6 +416,33 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_config: {
+        Row: {
+          created_at: string
+          id: string
+          publishable_key: string | null
+          secret_key: string | null
+          updated_at: string
+          webhook_secret: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          publishable_key?: string | null
+          secret_key?: string | null
+          updated_at?: string
+          webhook_secret?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          publishable_key?: string | null
+          secret_key?: string | null
+          updated_at?: string
+          webhook_secret?: string | null
+        }
+        Relationships: []
+      }
       tarifs: {
         Row: {
           annee: number

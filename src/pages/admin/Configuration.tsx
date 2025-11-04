@@ -82,6 +82,7 @@ export default function Configuration() {
       }
 
       await fetchSmtpConfig();
+      await fetchStripeConfig();
       
       // Charger l'état du mode debug
       const currentDebugMode = localStorage.getItem('debugMode') === 'true';
@@ -109,6 +110,29 @@ export default function Configuration() {
       }
     } catch (error: any) {
       console.error("Error fetching SMTP config:", error);
+    }
+  };
+
+  const fetchStripeConfig = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("stripe_config")
+        .select("*")
+        .single();
+
+      if (error && error.code !== "PGRST116") {
+        throw error;
+      }
+
+      if (data) {
+        setStripeConfig({
+          publishableKey: data.publishable_key || "",
+          secretKey: data.secret_key || "",
+          webhookSecret: data.webhook_secret || "",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error fetching Stripe config:", error);
     }
   };
 
@@ -159,18 +183,38 @@ export default function Configuration() {
     setSaving(true);
 
     try {
-      // Ici on pourrait implémenter la mise à jour des secrets
-      // Pour l'instant on affiche un message de succès
+      // Vérifier si une configuration existe déjà
+      const { data: existingConfig } = await supabase
+        .from("stripe_config")
+        .select("id")
+        .single();
+
+      const configData = {
+        publishable_key: stripeConfig.publishableKey,
+        secret_key: stripeConfig.secretKey,
+        webhook_secret: stripeConfig.webhookSecret,
+      };
+
+      if (existingConfig) {
+        // Mise à jour
+        const { error } = await supabase
+          .from("stripe_config")
+          .update(configData)
+          .eq("id", existingConfig.id);
+
+        if (error) throw error;
+      } else {
+        // Insertion
+        const { error } = await supabase
+          .from("stripe_config")
+          .insert([configData]);
+
+        if (error) throw error;
+      }
+
       toast({
         title: "Configuration enregistrée",
-        description: "Les clés Stripe ont été mises à jour",
-      });
-      
-      // Réinitialiser les champs après sauvegarde
-      setStripeConfig({
-        publishableKey: "",
-        secretKey: "",
-        webhookSecret: "",
+        description: "Les clés Stripe ont été mises à jour avec succès",
       });
     } catch (error: any) {
       toast({

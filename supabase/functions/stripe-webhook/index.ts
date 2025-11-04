@@ -14,11 +14,23 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
-    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
     
     if (!stripeKey) {
       throw new Error('STRIPE_SECRET_KEY not configured');
     }
+
+    // Initialiser le client Supabase pour charger la config
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Charger le webhook secret depuis la base de données
+    const { data: stripeConfig } = await supabase
+      .from('stripe_config')
+      .select('webhook_secret')
+      .single();
+    
+    const webhookSecret = stripeConfig?.webhook_secret;
 
     const stripe = new Stripe(stripeKey, {
       apiVersion: '2023-10-16',
@@ -43,15 +55,13 @@ const handler = async (req: Request): Promise<Response> => {
       }
     } else {
       // En mode test sans webhook secret, parser directement le JSON
+      console.log('Warning: No webhook secret configured, skipping signature verification');
       event = JSON.parse(body);
     }
 
     console.log('Webhook event type:', event.type);
 
-    // Initialiser le client Supabase
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // Le client Supabase est déjà initialisé plus haut
 
     // Gérer les différents événements Stripe
     switch (event.type) {
