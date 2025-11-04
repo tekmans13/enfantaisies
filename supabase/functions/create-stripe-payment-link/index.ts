@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -24,20 +25,32 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { inscriptionId, parentEmail, parentName, childName, montantTotal, nombreSemaines }: PaymentRequest = await req.json();
     
+    // Initialiser le client Supabase
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Récupérer la configuration Stripe depuis la base de données
+    const { data: stripeConfig, error: configError } = await supabase
+      .from('stripe_config')
+      .select('secret_key')
+      .single();
+
+    if (configError || !stripeConfig?.secret_key) {
+      throw new Error('Configuration Stripe non trouvée. Veuillez configurer Stripe dans l\'interface d\'administration.');
+    }
+
+    const stripeKey = stripeConfig.secret_key;
+    
     console.log({
       inscriptionId,
       parentEmail,
       montantTotal,
       nombreSemaines,
-      env: Deno.env.get('STRIPE_SECRET_KEY')?.startsWith('sk_test_') ? 'test' : 'live'
+      env: stripeKey.startsWith('sk_test_') ? 'test' : 'live'
     });
 
-    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
-    if (!stripeKey) {
-      throw new Error('STRIPE_SECRET_KEY not configured');
-    }
-
-    console.log('Stripe key prefix:', stripeKey?.slice(0, 8));
+    console.log('Stripe key prefix:', stripeKey.slice(0, 8));
 
     const stripe = new Stripe(stripeKey, {
       apiVersion: '2020-08-27',

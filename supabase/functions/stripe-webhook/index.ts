@@ -21,17 +21,25 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     console.log('Processing webhook...');
-    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
-    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
     
-    if (!stripeKey) {
-      throw new Error('STRIPE_SECRET_KEY not configured');
-    }
-
     // Initialiser le client Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Récupérer la configuration Stripe depuis la base de données
+    const { data: stripeConfig, error: configError } = await supabase
+      .from('stripe_config')
+      .select('secret_key, webhook_secret')
+      .single();
+
+    if (configError || !stripeConfig?.secret_key) {
+      console.error('Stripe config error:', configError);
+      throw new Error('Configuration Stripe non trouvée. Veuillez configurer Stripe dans l\'interface d\'administration.');
+    }
+
+    const stripeKey = stripeConfig.secret_key;
+    const webhookSecret = stripeConfig.webhook_secret;
 
     const stripe = new Stripe(stripeKey, {
       apiVersion: '2020-08-27',
