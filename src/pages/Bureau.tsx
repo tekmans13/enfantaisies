@@ -417,6 +417,31 @@ export default function Bureau() {
           .update({ status: 'envoye' })
           .eq('id', inscription.id);
         
+        // Construire l'URL de recap
+        const recapUrl = `${window.location.origin}/recap-inscription/${inscription.id}`;
+        
+        // Envoyer l'email avec le lien de paiement
+        const { error: emailError } = await supabase.functions.invoke('send-inscription-email', {
+          body: {
+            inscriptionId: inscription.id,
+            parentEmail: inscription.parent_email,
+            parentName: `${inscription.parent_first_name} ${inscription.parent_last_name}`,
+            childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
+            recapUrl: recapUrl,
+            paymentUrl: data.paymentUrl,
+            montantTotal: montantTotal,
+          },
+        });
+        
+        if (emailError) {
+          console.error("Erreur lors de l'envoi de l'email:", emailError);
+          toast({
+            title: "Attention",
+            description: "Lien créé mais email non envoyé",
+            variant: "destructive",
+          });
+        }
+        
         // Copier le lien dans le presse-papier
         await navigator.clipboard.writeText(data.paymentUrl);
         
@@ -424,8 +449,8 @@ export default function Bureau() {
         window.open(data.paymentUrl, '_blank');
         
         toast({
-          title: "Lien de paiement créé",
-          description: `Lien copié et ouvert. Montant: ${montantTotal.toFixed(2)}€`,
+          title: "Lien de paiement créé et envoyé",
+          description: `Email envoyé à ${inscription.parent_email}. Montant: ${montantTotal.toFixed(2)}€`,
         });
         
         // Rafraîchir les inscriptions

@@ -25,6 +25,8 @@ interface EmailRequest {
   parentName: string;
   childName: string;
   recapUrl: string;
+  paymentUrl?: string;
+  montantTotal?: number;
 }
 
 /** Handler principal de la fonction edge */
@@ -35,7 +37,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { inscriptionId, parentEmail, parentName, childName, recapUrl }: EmailRequest = await req.json();
+    const { inscriptionId, parentEmail, parentName, childName, recapUrl, paymentUrl, montantTotal }: EmailRequest = await req.json();
 
     console.log("Sending email to:", parentEmail);
 
@@ -84,30 +86,41 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Envoi depuis:", smtpConfig.from_email);
     
-    // Envoyer l'email de confirmation
+    // Construire le contenu de l'email selon le contexte
+    const emailSubject = paymentUrl 
+      ? "Lien de paiement - Centre Aéré" 
+      : "Confirmation de votre inscription - Centre Aéré";
+    
+    let emailContent = `Bonjour ${parentName},\n\n`;
+    
+    if (paymentUrl) {
+      // Email avec lien de paiement
+      emailContent += `Votre inscription pour ${childName} au Centre Aéré est en attente de paiement.\n\n`;
+      emailContent += `Montant à régler : ${montantTotal?.toFixed(2)}€\n\n`;
+      emailContent += `Pour finaliser votre inscription, veuillez procéder au paiement en cliquant sur le lien ci-dessous :\n`;
+      emailContent += `${paymentUrl}\n\n`;
+      emailContent += `Vous pouvez consulter le récapitulatif de votre inscription à tout moment :\n`;
+      emailContent += `${recapUrl}\n\n`;
+      emailContent += `Référence de l'inscription : ${inscriptionId}\n\n`;
+    } else {
+      // Email de confirmation simple
+      emailContent += `Nous avons bien reçu votre inscription pour ${childName} au Centre Aéré.\n\n`;
+      emailContent += `Votre inscription a été enregistrée avec succès et sera traitée par notre équipe dans les plus brefs délais.\n\n`;
+      emailContent += `Vous pouvez consulter le récapitulatif de votre inscription à tout moment en cliquant sur le lien ci-dessous :\n`;
+      emailContent += `${recapUrl}\n\n`;
+      emailContent += `Référence de l'inscription : ${inscriptionId}\n\n`;
+      emailContent += `Vous recevrez une notification par email une fois votre inscription validée.\n\n`;
+    }
+    
+    emailContent += `Si vous avez des questions, n'hésitez pas à nous contacter.\n\n`;
+    emailContent += `Cordialement,\nL'équipe du Centre Aéré`;
+    
+    // Envoyer l'email
     await client.send({
       from: smtpConfig.from_email,
       to: parentEmail,
-      subject: "Confirmation de votre inscription - Centre Aéré",
-      content: `
-Bonjour ${parentName},
-
-Nous avons bien reçu votre inscription pour ${childName} au Centre Aéré.
-
-Votre inscription a été enregistrée avec succès et sera traitée par notre équipe dans les plus brefs délais.
-
-Vous pouvez consulter le récapitulatif de votre inscription à tout moment en cliquant sur le lien ci-dessous :
-${recapUrl}
-
-Référence de l'inscription : ${inscriptionId}
-
-Vous recevrez une notification par email une fois votre inscription validée.
-
-Si vous avez des questions, n'hésitez pas à nous contacter.
-
-Cordialement,
-L'équipe du Centre Aéré
-      `,
+      subject: emailSubject,
+      content: emailContent,
     });
 
     await client.close();
