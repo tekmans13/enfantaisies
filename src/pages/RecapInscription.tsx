@@ -256,6 +256,22 @@ export default function RecapInscription() {
             </div>
 
             {/* Informations complémentaires */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Info className="w-5 h-5 text-primary" />
+                <h2 className="text-xl font-semibold">Informations générales</h2>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-6">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm text-muted-foreground">Première inscription:</p>
+                  <Badge variant={inscription.is_first_inscription ? "default" : "secondary"}>
+                    {inscription.is_first_inscription ? 'Oui' : 'Non'}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* Informations médicales */}
             {(inscription.has_medication && inscription.medication_details) || 
              (inscription.has_allergies && inscription.allergies_details) || 
              inscription.food_allergies_details ? (

@@ -163,6 +163,7 @@ export function SejourDetailsDialog({
                       <TableHead>Allergies alim.</TableHead>
                       <TableHead>Médicaments</TableHead>
                       <TableHead>Allergies</TableHead>
+                      <TableHead>1ère inscr.</TableHead>
                       <TableHead>Statut</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -248,6 +249,11 @@ export function SejourDetailsDialog({
                             ) : (
                               <span className="text-muted-foreground text-sm">-</span>
                             )}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Badge variant={inscription.is_first_inscription ? "default" : "secondary"} className="text-xs">
+                              {inscription.is_first_inscription ? 'Oui' : 'Non'}
+                            </Badge>
                           </TableCell>
                           <TableCell>
                             <InscriptionStatusBadge status={inscription.status} />

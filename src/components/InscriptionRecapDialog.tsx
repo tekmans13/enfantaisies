@@ -258,6 +258,12 @@ export function InscriptionRecapDialog({
                 <div className="space-y-2">
                   <h4 className="font-semibold text-sm">Informations médicales</h4>
                   <div className="grid gap-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <p className="text-muted-foreground">Première inscription:</p>
+                      <Badge variant={inscription.is_first_inscription ? "default" : "secondary"} className="text-xs">
+                        {inscription.is_first_inscription ? 'Oui' : 'Non'}
+                      </Badge>
+                    </div>
                     {inscription.has_allergies && inscription.allergies_details && (
                       <div>
                         <p className="text-muted-foreground mb-1">Allergies:</p>
