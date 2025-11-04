@@ -48,11 +48,12 @@ export const exportInscriptionsToExcel = (inscriptions: any[], sejours: any[]) =
     'N° CAF': inscription.caf_number || '',
     'Régime SS': inscription.social_security_regime,
     'Médicaments': inscription.has_medication ? 'Oui' : 'Non',
+    'Médicaments (détails)': inscription.medication_details || '',
     'Allergies': inscription.has_allergies ? 'Oui' : 'Non',
-    'Allergies alimentaires': inscription.has_food_allergies ? 'Oui' : 'Non',
-    'Sans porc': inscription.no_pork ? 'Oui' : 'Non',
-    'Sans viande': inscription.no_meat ? 'Oui' : 'Non',
+    'Allergies (détails)': inscription.allergies_details || '',
+    'Allergies alimentaires (détails)': inscription.food_allergies_details || '',
     'Première inscription': inscription.is_first_inscription ? 'Oui' : 'Non',
+    'Demande spécifique': inscription.demande_specifique || '',
     'Date création': new Date(inscription.created_at).toLocaleDateString('fr-FR'),
   }));
 
