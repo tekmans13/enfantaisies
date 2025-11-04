@@ -52,8 +52,8 @@ const handler = async (req: Request): Promise<Response> => {
         },
       ],
       mode: 'payment',
-      success_url: `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovableproject.com')}/recap-inscription/${inscriptionId}?success=true`,
-      cancel_url: `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovableproject.com')}/recap-inscription/${inscriptionId}?canceled=true`,
+      success_url: `https://enfan-campus-inscriptions.lovable.app/recap-inscription/${inscriptionId}?success=true`,
+      cancel_url: `https://enfan-campus-inscriptions.lovable.app/recap-inscription/${inscriptionId}?canceled=true`,
       customer_email: parentEmail,
       metadata: {
         inscription_id: inscriptionId,
