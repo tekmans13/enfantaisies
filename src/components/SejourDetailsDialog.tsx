@@ -215,20 +215,36 @@ export function SejourDetailsDialog({
                           </TableCell>
                           <TableCell className="text-center">
                             {inscription.has_medication ? (
-                              <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-600 border-orange-500/20">
-                                <Pill className="w-3 h-3 mr-1" />
-                                Oui
-                              </Badge>
+                              inscription.medication_details ? (
+                                <div className="text-sm max-w-[200px]">
+                                  <p className="truncate" title={inscription.medication_details}>
+                                    {inscription.medication_details}
+                                  </p>
+                                </div>
+                              ) : (
+                                <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-600 border-orange-500/20">
+                                  <Pill className="w-3 h-3 mr-1" />
+                                  Oui
+                                </Badge>
+                              )
                             ) : (
                               <span className="text-muted-foreground text-sm">-</span>
                             )}
                           </TableCell>
                           <TableCell className="text-center">
                             {inscription.has_allergies ? (
-                              <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 border-red-500/20">
-                                <AlertTriangle className="w-3 h-3 mr-1" />
-                                Oui
-                              </Badge>
+                              inscription.allergies_details ? (
+                                <div className="text-sm max-w-[200px]">
+                                  <p className="truncate" title={inscription.allergies_details}>
+                                    {inscription.allergies_details}
+                                  </p>
+                                </div>
+                              ) : (
+                                <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 border-red-500/20">
+                                  <AlertTriangle className="w-3 h-3 mr-1" />
+                                  Oui
+                                </Badge>
+                              )
                             ) : (
                               <span className="text-muted-foreground text-sm">-</span>
                             )}
