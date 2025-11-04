@@ -319,13 +319,15 @@ export default function Users() {
           </div>
 
           <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/admin/configuration")}
-            >
-              <Settings className="mr-2 h-4 w-4" />
-              Configuration
-            </Button>
+            {currentUserRole === "admin" && (
+              <Button
+                variant="outline"
+                onClick={() => navigate("/admin/configuration")}
+              >
+                <Settings className="mr-2 h-4 w-4" />
+                Configuration
+              </Button>
+            )}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
@@ -337,7 +339,9 @@ export default function Users() {
               <DialogHeader>
                 <DialogTitle>Créer un nouvel utilisateur</DialogTitle>
                 <DialogDescription>
-                  Ajoutez un nouveau compte utilisateur ou administrateur
+                  {currentUserRole === "admin" 
+                    ? "Ajoutez un nouveau compte utilisateur ou administrateur"
+                    : "Ajoutez un nouveau compte utilisateur"}
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleCreateUser} className="space-y-4">
@@ -364,15 +368,23 @@ export default function Users() {
                     onValueChange={(value: "admin" | "user") =>
                       setNewUser({ ...newUser, role: value })
                     }
+                    disabled={currentUserRole === "user"}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="user">Utilisateur</SelectItem>
-                      <SelectItem value="admin">Administrateur</SelectItem>
+                      {currentUserRole === "admin" && (
+                        <SelectItem value="admin">Administrateur</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
+                  {currentUserRole === "user" && (
+                    <p className="text-sm text-muted-foreground">
+                      Vous pouvez uniquement créer des utilisateurs
+                    </p>
+                  )}
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Création..." : "Créer l'utilisateur"}
@@ -426,25 +438,31 @@ export default function Users() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Select
-                          value={user.role || "none"}
-                          onValueChange={(value) => {
-                            if (value !== "none") {
-                              handleChangeRole(user.id, value as "admin" | "user");
-                            }
-                          }}
-                        >
-                          <SelectTrigger className="w-[140px]">
-                            <SelectValue placeholder="Modifier rôle" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="user">Utilisateur</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="none" disabled>
-                              Aucun rôle
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
+                        {currentUserRole === "admin" ? (
+                          <Select
+                            value={user.role || "none"}
+                            onValueChange={(value) => {
+                              if (value !== "none") {
+                                handleChangeRole(user.id, value as "admin" | "user");
+                              }
+                            }}
+                          >
+                            <SelectTrigger className="w-[140px]">
+                              <SelectValue placeholder="Modifier rôle" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="user">Utilisateur</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                              <SelectItem value="none" disabled>
+                                Aucun rôle
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <div className="w-[140px] text-sm text-muted-foreground">
+                            Non modifiable
+                          </div>
+                        )}
                         
                         <Button
                           variant="ghost"
@@ -462,6 +480,7 @@ export default function Users() {
                               size="icon"
                               className="text-destructive hover:text-destructive"
                               title="Supprimer l'utilisateur"
+                              disabled={currentUserRole === "user" && user.role === "admin"}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
