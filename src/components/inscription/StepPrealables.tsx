@@ -92,10 +92,27 @@ export function StepPrealables({
                 <p className="font-medium mb-3 text-amber-900 dark:text-amber-100">
                   Chers parents, vérifiez que vous êtes bien en possession des documents suivants avant de commencer l'inscription :
                 </p>
-                <div className="space-y-2">
+                <div className="space-y-2 mb-4">
                   <div className="flex items-start gap-2">
                     <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
                     <p className="text-amber-900 dark:text-amber-100">Attestation de la CAF (moins de 3 mois) - OU - Avis d'imposition {impositionYear}</p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-amber-900 dark:text-amber-100">Responsabilité civile (avec le nom de l'enfant)</p>
+                  </div>
+                </div>
+                <p className="font-medium mb-3 text-amber-900 dark:text-amber-100">
+                  Et télécharger les documents, les signer et les avoir scannées les suivants:
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2">
+                    <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-amber-900 dark:text-amber-100">Fiche sanitaire de liaison</p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-amber-900 dark:text-amber-100">Autorisations parentales</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
@@ -103,7 +120,11 @@ export function StepPrealables({
                   </div>
                   <div className="flex items-start gap-2">
                     <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-amber-900 dark:text-amber-100">Responsabilité civile (avec le nom de l'enfant)</p>
+                    <p className="text-amber-900 dark:text-amber-100">Règlement intérieur</p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-amber-900 dark:text-amber-100">Charte des permanences parents</p>
                   </div>
                 </div>
               </AlertDescription>
