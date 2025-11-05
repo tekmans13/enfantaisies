@@ -122,7 +122,9 @@ export function StepPrealables({
               <AlertCircle className="h-5 w-5 text-amber-600" />
               <AlertDescription className="text-sm mt-2">
                 <p className="font-medium mb-3 text-amber-900 dark:text-amber-100">
-                  Chers parents, vérifiez que vous êtes bien en possession des documents suivants avant de commencer l'inscription :
+                  Chers parents,
+                  <br />
+                  Avant de commencer l'inscription, merci de vérifier que vous disposez bien des documents suivants :
                 </p>
                 <div className="space-y-2 mb-4">
                   <div className="flex items-start gap-2">
@@ -135,7 +137,7 @@ export function StepPrealables({
                   </div>
                 </div>
                 <p className="font-medium mb-3 text-amber-900 dark:text-amber-100">
-                  Et télécharger les documents, les signer et les avoir scannées les suivants:
+                  Ensuite, téléchargez les documents suivants, signez-les et scannez-les pour les joindre à votre dossier :
                 </p>
                 <div className="space-y-2">
                   {documentsToDownload.map((doc) => (
