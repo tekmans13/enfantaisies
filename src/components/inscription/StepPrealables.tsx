@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertCircle, FileCheck } from "lucide-react";
+import { AlertCircle, FileCheck, Download } from "lucide-react";
 
 interface StepPrealablesProps {
   formData: {
@@ -36,6 +36,38 @@ export function StepPrealables({
 }: StepPrealablesProps) {
   // Année pour l'avis d'imposition (année en cours - 1)
   const impositionYear = new Date().getFullYear() - 1;
+  
+  const documentsToDownload = [
+    {
+      name: "Fiche sanitaire de liaison",
+      path: "/documents/ENFANTAISIES_fiche_sanitaire.pdf"
+    },
+    {
+      name: "Autorisations parentales",
+      path: "/documents/ENFANTAISIES_autorisations_parentales.pdf"
+    },
+    {
+      name: "Certificat médical",
+      path: "/documents/ENFANTAISIES_certificat_medical.pdf"
+    },
+    {
+      name: "Règlement intérieur",
+      path: "/documents/ENFANTAISIES_reglement.pdf"
+    },
+    {
+      name: "Charte des permanences parents",
+      path: "/documents/ENFANTAISIES_charte_permanences_parents.pdf"
+    }
+  ];
+
+  const handleDownload = (path: string, name: string) => {
+    const link = document.createElement('a');
+    link.href = path;
+    link.download = path.split('/').pop() || 'document.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   
   const checkboxItems = [
     { 
@@ -106,26 +138,18 @@ export function StepPrealables({
                   Et télécharger les documents, les signer et les avoir scannées les suivants:
                 </p>
                 <div className="space-y-2">
-                  <div className="flex items-start gap-2">
-                    <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-amber-900 dark:text-amber-100">Fiche sanitaire de liaison</p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-amber-900 dark:text-amber-100">Autorisations parentales</p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-amber-900 dark:text-amber-100">Certificat médical</p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-amber-900 dark:text-amber-100">Règlement intérieur</p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-amber-900 dark:text-amber-100">Charte des permanences parents</p>
-                  </div>
+                  {documentsToDownload.map((doc) => (
+                    <div key={doc.path} className="flex items-start gap-2">
+                      <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                      <button
+                        onClick={() => handleDownload(doc.path, doc.name)}
+                        className="text-amber-900 dark:text-amber-100 hover:underline text-left flex items-center gap-1"
+                      >
+                        {doc.name}
+                        <Download className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               </AlertDescription>
             </Alert>
