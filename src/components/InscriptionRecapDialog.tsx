@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { downloadDocument, downloadAllDocuments } from "@/lib/downloadDocuments";
 import { useToast } from "@/hooks/use-toast";
+import { AttributionInfo } from "@/components/recap/AttributionInfo";
 
 interface InscriptionRecapDialogProps {
   inscriptionId: string | null;
@@ -328,6 +329,13 @@ export function InscriptionRecapDialog({
                 </div>
               </div>
             </div>
+
+            {/* Attribution finale (si disponible) */}
+            <AttributionInfo 
+              inscription={inscription} 
+              sejours={sejours} 
+              calculatePrice={calculatePrice} 
+            />
 
             {/* Séjours */}
             <div>

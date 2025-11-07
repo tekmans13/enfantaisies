@@ -15,6 +15,7 @@ import { useTarifCalculator } from "@/hooks/use-tarif-calculator";
 import { ChildInfo } from "@/components/recap/ChildInfo";
 import { ParentInfo } from "@/components/recap/ParentInfo";
 import { SejourInfo } from "@/components/recap/SejourInfo";
+import { AttributionInfo } from "@/components/recap/AttributionInfo";
 import { DocumentsList } from "@/components/recap/DocumentsList";
 
 export default function RecapInscription() {
@@ -231,6 +232,13 @@ export default function RecapInscription() {
                 </div>
               </div>
             </div>
+
+            {/* Attribution finale (si disponible) */}
+            <AttributionInfo 
+              inscription={inscription} 
+              sejours={sejours} 
+              calculatePrice={calculateSejourPrice} 
+            />
 
             {/* Séjours choisis */}
             <SejourInfo 

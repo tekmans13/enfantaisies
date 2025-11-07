@@ -154,6 +154,7 @@ export type Database = {
           parent2_mobile: string | null
           parent2_office_phone: string | null
           quotient_familial: number | null
+          sejour_2_non_attribue: boolean | null
           sejour_attribue_1: string | null
           sejour_attribue_2: string | null
           sejour_preference_1: string | null
@@ -222,6 +223,7 @@ export type Database = {
           parent2_mobile?: string | null
           parent2_office_phone?: string | null
           quotient_familial?: number | null
+          sejour_2_non_attribue?: boolean | null
           sejour_attribue_1?: string | null
           sejour_attribue_2?: string | null
           sejour_preference_1?: string | null
@@ -290,6 +292,7 @@ export type Database = {
           parent2_mobile?: string | null
           parent2_office_phone?: string | null
           quotient_familial?: number | null
+          sejour_2_non_attribue?: boolean | null
           sejour_attribue_1?: string | null
           sejour_attribue_2?: string | null
           sejour_preference_1?: string | null

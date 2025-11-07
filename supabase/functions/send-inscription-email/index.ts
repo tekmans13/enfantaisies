@@ -101,14 +101,15 @@ const handler = async (req: Request): Promise<Response> => {
       emailContent += `Référence de l'inscription : ${inscriptionId}\n\n`;
       emailContent += `Nous vous attendons avec plaisir !\n\n`;
     } else if (paymentUrl) {
-      // Email avec lien de paiement
-      emailSubject = "Lien de paiement - Centre Aéré";
-      emailContent += `Votre inscription pour ${childName} au Centre Aéré est en attente de paiement.\n\n`;
-      emailContent += `Montant à régler : ${montantTotal?.toFixed(2)}€\n\n`;
-      emailContent += `Pour finaliser votre inscription, veuillez procéder au paiement en cliquant sur le lien ci-dessous :\n`;
-      emailContent += `${paymentUrl}\n\n`;
-      emailContent += `Vous pouvez consulter le récapitulatif de votre inscription à tout moment :\n`;
+      // Email avec attribution et lien de paiement
+      emailSubject = "Attribution et lien de paiement - Centre Aéré";
+      emailContent += `La commission d'attribution a fait au mieux pour répondre aux souhaits de chaque famille.\n\n`;
+      emailContent += `Vous trouverez ci-dessous le lien pour consulter les séjours attribués à ${childName}, ainsi que le lien de paiement correspondant.\n\n`;
+      emailContent += `🔗 Consulter les séjours attribués :\n`;
       emailContent += `${recapUrl}\n\n`;
+      emailContent += `Montant total à régler : ${montantTotal?.toFixed(2)}€\n\n`;
+      emailContent += `💳 Procéder au paiement :\n`;
+      emailContent += `${paymentUrl}\n\n`;
       emailContent += `Référence de l'inscription : ${inscriptionId}\n\n`;
     } else {
       // Email de confirmation simple (première inscription)
