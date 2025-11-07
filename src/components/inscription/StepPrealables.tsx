@@ -124,11 +124,14 @@ export function StepPrealables({
                 <p className="font-medium mb-3 text-red-900 dark:text-red-100">
                   Chers parents,
                   <br />
-                  Pas la peine de se dépêcher : ce n’est pas “premier arrivé, premier servi” ! Les dossiers seront tous traités avec le même soin.
                   <br />
-                  Merci de valider votre inscription uniquement quand tous les documents sont bien remplis.
+                  Ce n’est pas “premier arrivé, premier servi”.
                   <br />
-                  Pensez que chaque dossier incomplet donne du travail en plus aux parents bénévoles des commissions 😉
+                  <br />
+                  Les dossiers seront tous traités avec le même soin.
+                  <br />
+                  <br />
+                  Validez l’inscription uniquement quand le dossier est complet.
                 </p>
               </AlertDescription>
             </Alert>
@@ -136,8 +139,6 @@ export function StepPrealables({
               <AlertCircle className="h-5 w-5 text-amber-600" />
               <AlertDescription className="text-sm mt-2">
                 <p className="font-medium mb-3 text-amber-900 dark:text-amber-100">
-                  Chers parents,
-                  <br />
                   Avant de commencer l'inscription, merci de vérifier que vous disposez bien des documents suivants :
                 </p>
                 <div className="space-y-2 mb-4">
