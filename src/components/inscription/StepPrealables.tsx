@@ -118,6 +118,20 @@ export function StepPrealables({
             <DialogHeader>
               <DialogTitle>Documents requis</DialogTitle>
             </DialogHeader>
+            <Alert variant="default" className="border-red-500/50 bg-red-500/10">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <AlertDescription className="text-sm mt-2">
+                <p className="font-medium mb-3 text-red-900 dark:text-red-100">
+                  Chers parents,
+                  <br />
+                  Pas la peine de se dépêcher : ce n’est pas “premier arrivé, premier servi” ! Les dossiers seront tous traités avec le même soin.
+                  <br />
+                  Merci de valider votre inscription uniquement quand tous les documents sont bien remplis.
+                  <br />
+                  Pensez que chaque dossier incomplet donne du travail en plus aux parents bénévoles des commissions 😉
+                </p>
+              </AlertDescription>
+            </Alert>
             <Alert variant="default" className="border-amber-500/50 bg-amber-500/10">
               <AlertCircle className="h-5 w-5 text-amber-600" />
               <AlertDescription className="text-sm mt-2">
