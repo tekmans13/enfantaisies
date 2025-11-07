@@ -365,8 +365,8 @@ export default function Bureau() {
         qf >= t.qf_min && (t.qf_max === null || qf <= t.qf_max)
       ) || tarifs[tarifs.length - 1];
 
-      // Récupérer les séjours pour calculer le montant
-      const sejourIds = [inscription.sejour_preference_1, inscription.sejour_preference_2].filter(Boolean);
+      // Récupérer les séjours ATTRIBUÉS pour calculer le montant
+      const sejourIds = [inscription.sejour_attribue_1, inscription.sejour_attribue_2].filter(Boolean);
       const { data: sejoursData } = await supabase
         .from('sejours')
         .select('*')
@@ -375,13 +375,13 @@ export default function Bureau() {
       if (!sejoursData || sejoursData.length === 0) {
         toast({
           title: "Erreur",
-          description: "Aucun séjour trouvé",
+          description: "Aucun séjour attribué trouvé",
           variant: "destructive",
         });
         return;
       }
 
-      // Calculer le montant total
+      // Calculer le montant total en fonction des séjours attribués
       let montantTotal = 0;
       sejoursData.forEach(sejour => {
         const dateDebut = new Date(sejour.date_debut);
@@ -395,6 +395,11 @@ export default function Bureau() {
         
         montantTotal += Number(tarifJournalier) * nbJours;
       });
+      
+      // Si le 2ème séjour n'a pas pu être attribué, ajouter 0 (déjà fait, mais pour clarté)
+      if (inscription.sejour_2_non_attribue) {
+        // Le coût est déjà de 0, donc rien à ajouter
+      }
 
       // Appeler la fonction edge
       const { data, error } = await supabase.functions.invoke('create-stripe-payment-link', {
@@ -442,8 +447,8 @@ export default function Bureau() {
           });
         } else {
           toast({
-            title: "Lien de paiement créé et envoyé",
-            description: `Email envoyé à ${inscription.parent_email}. Montant: ${montantTotal.toFixed(2)}€`,
+            title: "Attribution et lien de paiement envoyés",
+            description: `Email envoyé à ${inscription.parent_email} avec le montant attribué de ${montantTotal.toFixed(2)}€`,
           });
         }
         

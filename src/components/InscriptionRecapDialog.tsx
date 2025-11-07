@@ -397,6 +397,11 @@ export function InscriptionRecapDialog({
                           <p className="text-muted-foreground">Choix secondaire</p>
                           <p className="font-medium">{getSejourTitle(inscription.sejour_preference_1_alternatif)}</p>
                           <p className="text-xs text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_1_alternatif)}</p>
+                          {calculatePrice(inscription.sejour_preference_1_alternatif) !== null && (
+                            <Badge variant="secondary" className="mt-1 text-xs">
+                              Prix: {calculatePrice(inscription.sejour_preference_1_alternatif)?.toFixed(2)} €
+                            </Badge>
+                          )}
                         </div>
                       )}
                     </div>
@@ -420,6 +425,11 @@ export function InscriptionRecapDialog({
                           <p className="text-muted-foreground">Choix secondaire</p>
                           <p className="font-medium">{getSejourTitle(inscription.sejour_preference_2_alternatif)}</p>
                           <p className="text-xs text-muted-foreground mt-1">{getSejourDates(inscription.sejour_preference_2_alternatif)}</p>
+                          {calculatePrice(inscription.sejour_preference_2_alternatif) !== null && (
+                            <Badge variant="secondary" className="mt-1 text-xs">
+                              Prix: {calculatePrice(inscription.sejour_preference_2_alternatif)?.toFixed(2)} €
+                            </Badge>
+                          )}
                         </div>
                       )}
                     </div>
