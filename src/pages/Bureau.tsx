@@ -776,6 +776,20 @@ export default function Bureau() {
                 {inscriptions
                   .filter(inscription => selectedGroupe === "all" || inscription.child_age_group === selectedGroupe)
                   .map((inscription, index) => {
+                    const is2Weeks = inscription.nombre_semaines_demandees === 2;
+                    // For 1 week: pref1 = priority, pref2 = alternative, no S2
+                    // For 2 weeks: pref1 = S1 priority, pref1_alt = S1 alt, pref2 = S2 priority, pref2_alt = S2 alt
+                    const s1Priority = inscription.sejour_preference_1;
+                    const s1Alt = is2Weeks ? inscription.sejour_preference_1_alternatif : inscription.sejour_preference_2;
+                    const s2Priority = is2Weeks ? inscription.sejour_preference_2 : null;
+                    const s2Alt = is2Weeks ? inscription.sejour_preference_2_alternatif : null;
+
+                    const renderSejour = (sejourId: string | null) => {
+                      if (!sejourId) return <span className="text-xs text-muted-foreground">-</span>;
+                      const s = sejours.find(s => s.id === sejourId);
+                      return <span className="text-xs">{s ? formatSejourTitre(s) : 'N/A'}</span>;
+                    };
+
                     return (
                   <TableRow 
                     key={inscription.id}
@@ -810,42 +824,10 @@ export default function Bureau() {
                         {inscription.child_age_group || 'N/A'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="py-2">
-                      {inscription.sejour_preference_1 ? (
-                        <span className="text-xs">
-                          {sejours.find(s => s.id === inscription.sejour_preference_1) ? formatSejourTitre(sejours.find(s => s.id === inscription.sejour_preference_1)!) : 'N/A'}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="py-2">
-                      {inscription.sejour_preference_1_alternatif ? (
-                        <span className="text-xs">
-                          {sejours.find(s => s.id === inscription.sejour_preference_1_alternatif) ? formatSejourTitre(sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)!) : 'N/A'}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="py-2">
-                      {inscription.nombre_semaines_demandees === 2 && inscription.sejour_preference_2 ? (
-                        <span className="text-xs">
-                          {sejours.find(s => s.id === inscription.sejour_preference_2) ? formatSejourTitre(sejours.find(s => s.id === inscription.sejour_preference_2)!) : 'N/A'}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="py-2">
-                      {inscription.nombre_semaines_demandees === 2 && inscription.sejour_preference_2_alternatif ? (
-                        <span className="text-xs">
-                          {sejours.find(s => s.id === inscription.sejour_preference_2_alternatif) ? formatSejourTitre(sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)!) : 'N/A'}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
+                    <TableCell className="py-2">{renderSejour(s1Priority)}</TableCell>
+                    <TableCell className="py-2">{renderSejour(s1Alt)}</TableCell>
+                    <TableCell className="py-2">{renderSejour(s2Priority)}</TableCell>
+                    <TableCell className="py-2">{renderSejour(s2Alt)}</TableCell>
                      <TableCell className="py-2">
                        <InscriptionStatusBadge status={inscription.status} size="sm" />
                      </TableCell>
