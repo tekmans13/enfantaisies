@@ -180,6 +180,8 @@ export function SejourDetailsDialog({
                       <TableHead>Médicaments</TableHead>
                       <TableHead>Allergies</TableHead>
                       <TableHead>1ère inscr.</TableHead>
+                      <TableHead>Prioritaire</TableHead>
+                      <TableHead>Adhésion</TableHead>
                       <TableHead>Statut</TableHead>
                     </TableRow>
                   </TableHeader>
