@@ -313,7 +313,7 @@ export function InscriptionEditDialog({
                   </Label>
                   {inscription?.sejour_preference_1 && sejours.find(s => s.id === inscription.sejour_preference_1) ? (
                     <div className="p-3 border-2 border-blue-600 bg-blue-600/10 rounded-lg">
-                      <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_1)?.titre}</div>
+                      <div className="font-semibold">{formatSejourTitre(sejours.find(s => s.id === inscription.sejour_preference_1)!)}</div>
                       <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
