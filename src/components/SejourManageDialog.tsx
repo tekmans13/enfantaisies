@@ -33,9 +33,14 @@ export function SejourManageDialog({
     date_fin: "",
     groupe_age: "",
     places_disponibles: 0,
-    type: "centre_aere"
+    type: "centre_aere",
+    nombre_jours: null as number | null
   });
   const { toast } = useToast();
+
+  const calculatedDays = formData.date_debut && formData.date_fin
+    ? Math.ceil((new Date(formData.date_fin).getTime() - new Date(formData.date_debut).getTime()) / (1000 * 60 * 60 * 24)) + 1
+    : 0;
 
   useEffect(() => {
     if (sejour) {
@@ -46,7 +51,8 @@ export function SejourManageDialog({
         date_fin: sejour.date_fin || "",
         groupe_age: sejour.groupe_age || "",
         places_disponibles: sejour.places_disponibles || 0,
-        type: sejour.type || "centre_aere"
+        type: sejour.type || "centre_aere",
+        nombre_jours: sejour.nombre_jours ?? null
       });
     } else {
       setFormData({
@@ -56,7 +62,8 @@ export function SejourManageDialog({
         date_fin: "",
         groupe_age: "",
         places_disponibles: 0,
-        type: "centre_aere"
+        type: "centre_aere",
+        nombre_jours: null
       });
     }
   }, [sejour, open]);
@@ -184,7 +191,7 @@ export function SejourManageDialog({
               </Select>
             </div>
 
-            <div className="space-y-2">
+           <div className="space-y-2">
               <Label htmlFor="places_disponibles">Places disponibles *</Label>
               <Input
                 id="places_disponibles"
@@ -195,6 +202,26 @@ export function SejourManageDialog({
                 required
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="nombre_jours">Nombre de jours (optionnel)</Label>
+              <Input
+                id="nombre_jours"
+                type="number"
+                min="1"
+                value={formData.nombre_jours ?? ""}
+                onChange={(e) => setFormData({ ...formData, nombre_jours: e.target.value ? parseInt(e.target.value) : null })}
+                placeholder={calculatedDays > 0 ? `Auto: ${calculatedDays} jours` : "Calculé depuis les dates"}
+              />
+              <p className="text-xs text-muted-foreground">
+                {calculatedDays > 0 && (
+                  <>Durée calculée : {calculatedDays} jours. {formData.nombre_jours ? `Valeur utilisée : ${formData.nombre_jours} jours.` : "Laissez vide pour utiliser le calcul automatique."}</>
+                )}
+              </p>
+            </div>
+            <div />
           </div>
 
           <DialogFooter>

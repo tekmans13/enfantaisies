@@ -355,6 +355,7 @@ export type Database = {
           groupe_age: Database["public"]["Enums"]["age_group"]
           id: string
           lieu: string | null
+          nombre_jours: number | null
           places_disponibles: number
           titre: string
           type: string
@@ -366,6 +367,7 @@ export type Database = {
           groupe_age: Database["public"]["Enums"]["age_group"]
           id?: string
           lieu?: string | null
+          nombre_jours?: number | null
           places_disponibles: number
           titre: string
           type: string
@@ -377,6 +379,7 @@ export type Database = {
           groupe_age?: Database["public"]["Enums"]["age_group"]
           id?: string
           lieu?: string | null
+          nombre_jours?: number | null
           places_disponibles?: number
           titre?: string
           type?: string
