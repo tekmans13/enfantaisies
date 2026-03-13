@@ -98,7 +98,7 @@ export function SejourDetailsDialog({
 
         <div className="space-y-6">
           {/* Info générale */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <Card className="p-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                 <Calendar className="w-4 h-4" />
@@ -106,6 +106,17 @@ export function SejourDetailsDialog({
               </div>
               <p className="font-semibold">
                 {new Date(sejour.date_debut).toLocaleDateString('fr-FR')} - {new Date(sejour.date_fin).toLocaleDateString('fr-FR')}
+              </p>
+            </Card>
+            <Card className="p-4">
+              <div className="text-sm text-muted-foreground mb-1">Durée</div>
+              <p className="font-semibold">
+                {(() => {
+                  const joursCalc = Math.ceil((new Date(sejour.date_fin).getTime() - new Date(sejour.date_debut).getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                  const nbJours = sejour.nombre_jours ?? joursCalc;
+                  return `${nbJours} jour${nbJours > 1 ? 's' : ''}`;
+                })()}
+                {sejour.nombre_jours && <span className="text-xs text-muted-foreground ml-1">(personnalisé)</span>}
               </p>
             </Card>
             <Card className="p-4">
