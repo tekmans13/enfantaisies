@@ -1433,7 +1433,7 @@ export default function Inscription() {
                                  <div className="flex-1">
                                    <Label htmlFor={`week2-${sejour.id}`} className="cursor-pointer">
                                      <div className="flex items-center justify-between">
-                                       <p className="font-semibold">{sejour.titre}</p>
+                                       <p className="font-semibold">{formatSejourTitre(sejour)}</p>
                                        {price !== null && (
                                          <Badge variant="secondary" className="ml-2">
                                            {price.toFixed(2)} €
