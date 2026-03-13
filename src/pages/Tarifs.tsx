@@ -51,6 +51,17 @@ const Tarifs = () => {
     setIsDialogOpen(false);
   };
 
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase.from('tarifs').delete().eq('id', id);
+      if (error) throw error;
+      toast({ title: "Tarif supprimé", description: "Le tarif a été supprimé avec succès" });
+      refetch();
+    } catch (error: any) {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    }
+  };
+
   const formatQF = (min: number, max: number | null) => {
     if (max === null) {
       return `${min} < QF`;
