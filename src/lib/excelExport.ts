@@ -54,6 +54,8 @@ export const exportInscriptionsToExcel = (inscriptions: any[], sejours: any[]) =
     'Allergies (détails)': inscription.allergies_details || '',
     'Allergies alimentaires (détails)': inscription.food_allergies_details || '',
     'Première inscription': inscription.is_first_inscription ? 'Oui' : 'Non',
+    'Prioritaire': inscription.is_prioritaire ? 'Oui' : 'Non',
+    'Adhésion': inscription.has_adhesion ? 'Oui' : 'Non',
     'Demande spécifique': inscription.demande_specifique || '',
     'Date création': new Date(inscription.created_at).toLocaleDateString('fr-FR'),
   }));
