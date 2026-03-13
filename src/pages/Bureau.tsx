@@ -684,12 +684,12 @@ export default function Bureau() {
                             {stats && (
                               <div className="grid grid-cols-3 gap-2 pt-2 border-t">
                                 <div className="text-center">
-                                  <p className="text-2xl font-bold text-primary">{stats.choix1}</p>
-                                  <p className="text-xs text-muted-foreground">1er choix</p>
+                                  <p className="text-2xl font-bold text-primary">{stats.attribue1}</p>
+                                  <p className="text-xs text-muted-foreground">Sem. 1</p>
                                 </div>
                                 <div className="text-center">
-                                  <p className="text-2xl font-bold text-secondary">{stats.choix2}</p>
-                                  <p className="text-xs text-muted-foreground">2ème choix</p>
+                                  <p className="text-2xl font-bold text-secondary">{stats.attribue2}</p>
+                                  <p className="text-xs text-muted-foreground">Sem. 2</p>
                                 </div>
                                 <div className="text-center">
                                   <p className="text-2xl font-bold text-foreground">{stats.total}</p>
@@ -700,12 +700,8 @@ export default function Bureau() {
                             
                             <div className="pt-2 border-t space-y-2">
                               <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Places demandées 1er choix</span>
-                                <span className="font-semibold text-primary">{stats ? stats.choix1 : 0}/{sejour.places_disponibles}</span>
-                              </div>
-                              <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Places demandées total</span>
-                                <span className="font-semibold">{stats ? stats.total : 0}/{sejour.places_disponibles}</span>
+                                <span className="text-muted-foreground">Inscrits attribués</span>
+                                <span className="font-semibold text-primary">{stats ? stats.total : 0}/{sejour.places_disponibles}</span>
                               </div>
                             </div>
                           </div>
