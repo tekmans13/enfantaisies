@@ -406,7 +406,7 @@ export function InscriptionEditDialog({
                     <Label className="text-base mb-3 block font-semibold">2ème semaine (choix alternatif)</Label>
                     {inscription?.sejour_preference_2_alternatif && sejours.find(s => s.id === inscription.sejour_preference_2_alternatif) ? (
                       <div className="p-3 border-2 border-blue-400 bg-blue-400/10 rounded-lg">
-                        <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)?.titre}</div>
+                        <div className="font-semibold">{formatSejourTitre(sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)!)}</div>
                         <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
