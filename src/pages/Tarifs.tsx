@@ -17,8 +17,10 @@ import { TarifManageDialog } from "@/components/TarifManageDialog";
 
 const Tarifs = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [selectedTarif, setSelectedTarif] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const { data: tarifs, isLoading, refetch } = useQuery({
     queryKey: ['tarifs'],
