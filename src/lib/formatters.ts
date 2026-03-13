@@ -99,8 +99,9 @@ export const SEJOUR_TYPE_LABELS: Record<string, string> = {
  * Retourne le titre du séjour préfixé par son type
  * Ex: "Centre Aéré - Été Pitchouns"
  */
-export const formatSejourTitre = (sejour: { titre: string; type?: string }): string => {
-  if (!sejour.type) return sejour.titre;
-  const prefix = SEJOUR_TYPE_LABELS[sejour.type] || sejour.type;
-  return `${prefix} - ${sejour.titre}`;
+export const formatSejourTitre = (sejour: { titre: string; type?: string; lieu?: string | null }): string => {
+  const prefix = sejour.type ? (SEJOUR_TYPE_LABELS[sejour.type] || sejour.type) : null;
+  const base = prefix ? `${prefix} - ${sejour.titre}` : sejour.titre;
+  if (sejour.lieu) return `${base} (${sejour.lieu})`;
+  return base;
 };
