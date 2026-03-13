@@ -296,10 +296,18 @@ export default function Bureau() {
 
   const handleDeleteAllInscriptions = async () => {
     try {
+      // Supprimer d'abord tous les documents associés
+      const { error: docsError } = await supabase
+        .from('inscription_documents')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+
+      if (docsError) throw docsError;
+
       const { error } = await supabase
         .from('inscriptions')
         .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+        .neq('id', '00000000-0000-0000-0000-000000000000');
 
       if (error) throw error;
 
