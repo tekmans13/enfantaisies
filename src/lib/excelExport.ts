@@ -54,6 +54,8 @@ export const exportInscriptionsToExcel = (inscriptions: any[], sejours: any[]) =
     'Allergies (détails)': inscription.allergies_details || '',
     'Allergies alimentaires (détails)': inscription.food_allergies_details || '',
     'Première inscription': inscription.is_first_inscription ? 'Oui' : 'Non',
+    'Prioritaire': inscription.is_prioritaire ? 'Oui' : 'Non',
+    'Adhésion': inscription.has_adhesion ? 'Oui' : 'Non',
     'Demande spécifique': inscription.demande_specifique || '',
     'Date création': new Date(inscription.created_at).toLocaleDateString('fr-FR'),
   }));
@@ -129,6 +131,8 @@ export const exportSejourInscriptionsToExcel = (sejour: any, inscriptions: any[]
     'Traitement médicamenteux (détails)': inscription.medication_details || '',
     'Allergies': inscription.has_allergies ? 'Oui' : 'Non',
     'Allergies (détails)': inscription.allergies_details || '',
+    'Prioritaire': inscription.is_prioritaire ? 'Oui' : 'Non',
+    'Adhésion': inscription.has_adhesion ? 'Oui' : 'Non',
     'Choix': inscription.sejour_preference_1 === sejour.id ? '1er choix' : '2ème choix',
   }));
 

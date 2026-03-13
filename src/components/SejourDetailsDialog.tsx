@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, Users, AlertTriangle, Pill, FileDown } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { InscriptionStatusBadge } from "./InscriptionStatusBadge";
 import { exportSejourInscriptionsToExcel } from "@/lib/excelExport";
 import { formatSejourTitre } from "@/lib/formatters";
@@ -180,6 +181,8 @@ export function SejourDetailsDialog({
                       <TableHead>Médicaments</TableHead>
                       <TableHead>Allergies</TableHead>
                       <TableHead>1ère inscr.</TableHead>
+                      <TableHead>Prioritaire</TableHead>
+                      <TableHead>Adhésion</TableHead>
                       <TableHead>Statut</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -270,6 +273,24 @@ export function SejourDetailsDialog({
                             <Badge variant={inscription.is_first_inscription ? "default" : "secondary"} className="text-xs">
                               {inscription.is_first_inscription ? 'Oui' : 'Non'}
                             </Badge>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Checkbox
+                              checked={inscription.is_prioritaire || false}
+                              onCheckedChange={async (checked) => {
+                                await supabase.from('inscriptions').update({ is_prioritaire: !!checked } as any).eq('id', inscription.id);
+                                fetchInscriptions();
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Checkbox
+                              checked={inscription.has_adhesion || false}
+                              onCheckedChange={async (checked) => {
+                                await supabase.from('inscriptions').update({ has_adhesion: !!checked } as any).eq('id', inscription.id);
+                                fetchInscriptions();
+                              }}
+                            />
                           </TableCell>
                           <TableCell>
                             <InscriptionStatusBadge status={inscription.status} />

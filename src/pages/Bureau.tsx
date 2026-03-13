@@ -46,6 +46,7 @@ import { SejourDetailsDialog } from "@/components/SejourDetailsDialog";
 import { HomeContentManageDialog } from "@/components/HomeContentManageDialog";
 import { exportInscriptionsToExcel } from "@/lib/excelExport";
 import { downloadAllDocuments } from "@/lib/downloadDocuments";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Bureau() {
   const navigate = useNavigate();
@@ -767,6 +768,8 @@ export default function Bureau() {
                   <TableHead>S1 - Choix alternatif</TableHead>
                   <TableHead>S2 - Choix prioritaire</TableHead>
                   <TableHead>S2 - Choix alternatif</TableHead>
+                  <TableHead>Prioritaire</TableHead>
+                  <TableHead>Adhésion</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Actions</TableHead>
@@ -828,6 +831,24 @@ export default function Bureau() {
                     <TableCell className="py-2">{renderSejour(s1Alt)}</TableCell>
                     <TableCell className="py-2">{renderSejour(s2Priority)}</TableCell>
                     <TableCell className="py-2">{renderSejour(s2Alt)}</TableCell>
+                    <TableCell className="py-2 text-center">
+                      <Checkbox
+                        checked={inscription.is_prioritaire || false}
+                        onCheckedChange={async (checked) => {
+                          await supabase.from('inscriptions').update({ is_prioritaire: !!checked } as any).eq('id', inscription.id);
+                          fetchInscriptions();
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell className="py-2 text-center">
+                      <Checkbox
+                        checked={inscription.has_adhesion || false}
+                        onCheckedChange={async (checked) => {
+                          await supabase.from('inscriptions').update({ has_adhesion: !!checked } as any).eq('id', inscription.id);
+                          fetchInscriptions();
+                        }}
+                      />
+                    </TableCell>
                      <TableCell className="py-2">
                        <InscriptionStatusBadge status={inscription.status} size="sm" />
                      </TableCell>

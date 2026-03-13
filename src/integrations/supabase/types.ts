@@ -132,10 +132,12 @@ export type Database = {
           created_at: string | null
           demande_specifique: string | null
           food_allergies_details: string | null
+          has_adhesion: boolean | null
           has_allergies: boolean | null
           has_medication: boolean | null
           id: string
           is_first_inscription: boolean | null
+          is_prioritaire: boolean | null
           medication_details: string | null
           nombre_semaines_demandees: number | null
           paiement_date: string | null
@@ -201,10 +203,12 @@ export type Database = {
           created_at?: string | null
           demande_specifique?: string | null
           food_allergies_details?: string | null
+          has_adhesion?: boolean | null
           has_allergies?: boolean | null
           has_medication?: boolean | null
           id?: string
           is_first_inscription?: boolean | null
+          is_prioritaire?: boolean | null
           medication_details?: string | null
           nombre_semaines_demandees?: number | null
           paiement_date?: string | null
@@ -270,10 +274,12 @@ export type Database = {
           created_at?: string | null
           demande_specifique?: string | null
           food_allergies_details?: string | null
+          has_adhesion?: boolean | null
           has_allergies?: boolean | null
           has_medication?: boolean | null
           id?: string
           is_first_inscription?: boolean | null
+          is_prioritaire?: boolean | null
           medication_details?: string | null
           nombre_semaines_demandees?: number | null
           paiement_date?: string | null
