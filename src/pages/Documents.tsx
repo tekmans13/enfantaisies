@@ -235,8 +235,13 @@ export default function Documents() {
                                 size="sm"
                                 variant="outline"
                                 className="gap-2"
+                                disabled={uploadingDoc === doc.id}
                               >
-                                <Upload className="w-4 h-4" />
+                                {uploadingDoc === doc.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Upload className="w-4 h-4" />
+                                )}
                                 Mettre à jour
                               </Button>
                             </DialogTrigger>
