@@ -4,6 +4,7 @@
  */
 
 import * as XLSX from 'xlsx';
+import { formatSejourTitre } from './formatters';
 
 /**
  * Exporte toutes les inscriptions vers un fichier Excel
