@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -9,15 +10,17 @@ import {
 } from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Pencil, Plus } from "lucide-react";
+import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { TarifManageDialog } from "@/components/TarifManageDialog";
 
 const Tarifs = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [selectedTarif, setSelectedTarif] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const { data: tarifs, isLoading, refetch } = useQuery({
     queryKey: ['tarifs'],
@@ -46,6 +49,17 @@ const Tarifs = () => {
   const handleSuccess = () => {
     refetch();
     setIsDialogOpen(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase.from('tarifs').delete().eq('id', id);
+      if (error) throw error;
+      toast({ title: "Tarif supprimé", description: "Le tarif a été supprimé avec succès" });
+      refetch();
+    } catch (error: any) {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    }
   };
 
   const formatQF = (min: number, max: number | null) => {
@@ -109,13 +123,23 @@ const Tarifs = () => {
                   <TableCell className="text-right">{tarif.tarif_journee_sejour} €</TableCell>
                   <TableCell className="text-right font-semibold">{tarif.tarif_semaine_sejour} €</TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(tarif)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(tarif)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(tarif.id)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
