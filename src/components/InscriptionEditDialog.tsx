@@ -116,7 +116,7 @@ export function InscriptionEditDialog({
                 (attributionMap.get(insc.sejour_attribue_1) || 0) + 1
               );
             }
-            if (insc.sejour_attribue_2) {
+            if (insc.nombre_semaines_demandees === 2 && insc.sejour_attribue_2) {
               attributionMap.set(
                 insc.sejour_attribue_2, 
                 (attributionMap.get(insc.sejour_attribue_2) || 0) + 1
