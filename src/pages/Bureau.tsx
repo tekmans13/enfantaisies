@@ -255,10 +255,25 @@ export default function Bureau() {
 
   const handleDeleteAllSejours = async () => {
     try {
+      // D'abord, retirer les références aux séjours dans les inscriptions
+      const { error: updateError } = await supabase
+        .from('inscriptions')
+        .update({
+          sejour_preference_1: null,
+          sejour_preference_2: null,
+          sejour_preference_1_alternatif: null,
+          sejour_preference_2_alternatif: null,
+          sejour_attribue_1: null,
+          sejour_attribue_2: null,
+        })
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+
+      if (updateError) throw updateError;
+
       const { error } = await supabase
         .from('sejours')
         .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+        .neq('id', '00000000-0000-0000-0000-000000000000');
 
       if (error) throw error;
 
@@ -281,10 +296,18 @@ export default function Bureau() {
 
   const handleDeleteAllInscriptions = async () => {
     try {
+      // Supprimer d'abord tous les documents associés
+      const { error: docsError } = await supabase
+        .from('inscription_documents')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+
+      if (docsError) throw docsError;
+
       const { error } = await supabase
         .from('inscriptions')
         .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+        .neq('id', '00000000-0000-0000-0000-000000000000');
 
       if (error) throw error;
 
