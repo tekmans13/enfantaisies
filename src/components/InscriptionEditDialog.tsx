@@ -181,7 +181,7 @@ export function InscriptionEditDialog({
       .from('inscriptions')
       .update({ 
         sejour_attribue_1: assignedSejour,
-        sejour_attribue_2: assignedSejour2 || null,
+        sejour_attribue_2: wantsTwoWeeks ? (assignedSejour2 || null) : null,
         status: newStatus,
         validated_at: new Date().toISOString()
       })
