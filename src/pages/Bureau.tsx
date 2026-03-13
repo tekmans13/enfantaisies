@@ -973,7 +973,15 @@ export default function Bureau() {
             setEditingSejour(null);
           }
         }}
-        onSuccess={() => {
+        onSuccess={(updatedSejour) => {
+          if (updatedSejour?.id) {
+            setSejours((prev) =>
+              prev.map((item) => (item.id === updatedSejour.id ? { ...item, ...updatedSejour } : item))
+            );
+            setViewingSejour((prev) =>
+              prev?.id === updatedSejour.id ? { ...prev, ...updatedSejour } : prev
+            );
+          }
           fetchSejours();
           fetchInscriptions();
         }}

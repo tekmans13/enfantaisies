@@ -73,14 +73,12 @@ export function SejourManageDialog({
 
     if (sejour) {
       // Modification
-      console.log("Updating sejour:", sejour.id, "with data:", formData);
-      const { data: updatedData, error } = await supabase
+      const { data: updatedSejour, error } = await supabase
         .from('sejours')
         .update(formData as any)
         .eq('id', sejour.id)
-        .select();
-
-      console.log("Update result:", { updatedData, error });
+        .select()
+        .maybeSingle();
 
       if (error) {
         console.error("Erreur update séjour:", error);
@@ -94,7 +92,7 @@ export function SejourManageDialog({
           title: "Succès",
           description: `Séjour modifié: "${formData.titre}"`,
         });
-        onSuccess();
+        onSuccess(updatedSejour ?? { ...sejour, ...formData });
         onOpenChange(false);
       }
     } else {
