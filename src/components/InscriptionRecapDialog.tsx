@@ -117,7 +117,7 @@ export function InscriptionRecapDialog({
     const qf = inscription?.quotient_familial || 999999;
     const tarif = tarifs.find(t => 
       qf >= t.qf_min && (t.qf_max === null || qf <= t.qf_max)
-    );
+    ) || tarifs[tarifs.length - 1];
     
     if (!tarif) return null;
     
