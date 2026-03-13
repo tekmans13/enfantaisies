@@ -85,3 +85,22 @@ export const formatFileName = (
   const docName = documentType.replace(/_/g, '-');
   return `${lastNameClean}_${firstNameClean}_${docName}.${fileExt}`;
 };
+
+/**
+ * Labels pour les types de séjour
+ */
+export const SEJOUR_TYPE_LABELS: Record<string, string> = {
+  centre_aere: 'Centre Aéré',
+  sejour: 'Séjour',
+  animation: 'Animation',
+};
+
+/**
+ * Retourne le titre du séjour préfixé par son type
+ * Ex: "Centre Aéré - Été Pitchouns"
+ */
+export const formatSejourTitre = (sejour: { titre: string; type?: string }): string => {
+  if (!sejour.type) return sejour.titre;
+  const prefix = SEJOUR_TYPE_LABELS[sejour.type] || sejour.type;
+  return `${prefix} - ${sejour.titre}`;
+};
