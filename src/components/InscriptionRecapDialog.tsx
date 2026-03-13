@@ -60,7 +60,9 @@ export function InscriptionRecapDialog({
         inscriptionData.sejour_preference_2,
         inscriptionData.sejour_preference_1_alternatif,
         inscriptionData.sejour_preference_2_alternatif,
-      ].filter(Boolean);
+        inscriptionData.sejour_attribue_1,
+        inscriptionData.sejour_attribue_2,
+      ].filter((id, index, arr) => id && arr.indexOf(id) === index);
 
       if (sejourIds.length > 0) {
         const { data: sejoursData, error: sejoursError } = await supabase
