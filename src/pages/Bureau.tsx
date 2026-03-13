@@ -19,6 +19,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
+import { formatSejourTitre } from "@/lib/formatters";
 import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
@@ -633,7 +634,7 @@ export default function Bureau() {
                           <div className="space-y-2">
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
-                                <h3 className="font-semibold">{sejour.titre}</h3>
+                                <h3 className="font-semibold">{formatSejourTitre(sejour)}</h3>
                                 {sejour.lieu && (
                                   <p className="text-xs text-muted-foreground">{sejour.lieu}</p>
                                 )}

@@ -5,7 +5,7 @@
 
 import { CheckCircle2, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/formatters";
+import { formatDate, formatSejourTitre } from "@/lib/formatters";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Sejour {
@@ -35,7 +35,7 @@ export function AttributionInfo({ inscription, sejours, calculatePrice }: Attrib
 
   const getSejourTitle = (sejourId: string) => {
     const sejour = sejours.find(s => s.id === sejourId);
-    return sejour ? sejour.titre : 'Non spécifié';
+    return sejour ? formatSejourTitre(sejour) : 'Non spécifié';
   };
 
   const getSejourDates = (sejourId: string) => {

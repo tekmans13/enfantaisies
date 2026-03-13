@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Users, Info } from "lucide-react";
+import { formatSejourTitre } from "@/lib/formatters";
 
 interface InscriptionEditDialogProps {
   inscription: any;
@@ -460,7 +461,7 @@ export function InscriptionEditDialog({
                           <div key={sejour.id} className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
                             <RadioGroupItem value={sejour.id} id={`assigned1-${sejour.id}`} />
                             <Label htmlFor={`assigned1-${sejour.id}`} className="flex-1 cursor-pointer">
-                              <div className="font-semibold">{sejour.titre}</div>
+                              <div className="font-semibold">{formatSejourTitre(sejour)}</div>
                               <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-muted-foreground">
                                 <span className="flex items-center gap-1">
                                   <Calendar className="w-3 h-3" />
@@ -520,7 +521,7 @@ export function InscriptionEditDialog({
                             <div key={sejour.id} className="flex items-start space-x-3 p-3 border-2 rounded-lg hover:bg-muted/50 transition-colors">
                               <RadioGroupItem value={sejour.id} id={`assigned2-${sejour.id}`} />
                               <Label htmlFor={`assigned2-${sejour.id}`} className="flex-1 cursor-pointer">
-                                <div className="font-semibold">{sejour.titre}</div>
+                                <div className="font-semibold">{formatSejourTitre(sejour)}</div>
                                 <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-muted-foreground">
                                   <span className="flex items-center gap-1">
                                     <Calendar className="w-3 h-3" />

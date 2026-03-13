@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { downloadDocument, downloadAllDocuments } from "@/lib/downloadDocuments";
 import { useToast } from "@/hooks/use-toast";
+import { formatSejourTitre } from "@/lib/formatters";
 import { AttributionInfo } from "@/components/recap/AttributionInfo";
 
 interface InscriptionRecapDialogProps {
@@ -98,7 +99,7 @@ export function InscriptionRecapDialog({
 
   const getSejourTitle = (sejourId: string) => {
     const sejour = sejours.find(s => s.id === sejourId);
-    return sejour ? sejour.titre : 'Non spécifié';
+    return sejour ? formatSejourTitre(sejour) : 'Non spécifié';
   };
 
   const getSejourDates = (sejourId: string) => {

@@ -21,7 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useSejours } from "@/hooks/use-sejours";
 import { useTarifCalculator } from "@/hooks/use-tarif-calculator";
-import { validateEmail, validatePhone } from "@/lib/formatters";
+import { validateEmail, validatePhone, formatSejourTitre } from "@/lib/formatters";
 import { uploadDocuments, DocumentToUpload } from "@/lib/documentHelpers";
 import { CLASS_TO_AGE_GROUP, TOTAL_INSCRIPTION_STEPS, CLASS_LABELS } from "@/lib/constants";
 import { StepPrealables } from "@/components/inscription/StepPrealables";
@@ -1215,7 +1215,7 @@ export default function Inscription() {
                                <div className="flex-1">
                                  <Label htmlFor={`sejour-${sejour.id}`} className="cursor-pointer">
                                    <div className="flex items-center justify-between">
-                                     <p className="font-semibold">{sejour.titre}</p>
+                                      <p className="font-semibold">{formatSejourTitre(sejour)}</p>
                                      {price !== null && (
                                        <Badge variant="secondary" className="ml-2">
                                          {price.toFixed(2)} €
@@ -1326,7 +1326,7 @@ export default function Inscription() {
                                  <div className="flex-1">
                                    <Label htmlFor={`week1-${sejour.id}`} className="cursor-pointer">
                                      <div className="flex items-center justify-between">
-                                       <p className="font-semibold">{sejour.titre}</p>
+                                        <p className="font-semibold">{formatSejourTitre(sejour)}</p>
                                        {price !== null && (
                                          <Badge variant="secondary" className="ml-2">
                                            {price.toFixed(2)} €
@@ -1433,7 +1433,7 @@ export default function Inscription() {
                                  <div className="flex-1">
                                    <Label htmlFor={`week2-${sejour.id}`} className="cursor-pointer">
                                      <div className="flex items-center justify-between">
-                                       <p className="font-semibold">{sejour.titre}</p>
+                                       <p className="font-semibold">{formatSejourTitre(sejour)}</p>
                                        {price !== null && (
                                          <Badge variant="secondary" className="ml-2">
                                            {price.toFixed(2)} €

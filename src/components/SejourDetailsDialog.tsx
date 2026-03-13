@@ -20,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Calendar, Users, AlertTriangle, Pill, FileDown } from "lucide-react";
 import { InscriptionStatusBadge } from "./InscriptionStatusBadge";
 import { exportSejourInscriptionsToExcel } from "@/lib/excelExport";
+import { formatSejourTitre } from "@/lib/formatters";
 
 interface SejourDetailsDialogProps {
   sejour: any;
@@ -76,7 +77,7 @@ export function SejourDetailsDialog({
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-4">
               <div>
-                <h2 className="text-2xl">{sejour.titre}</h2>
+                <h2 className="text-2xl">{formatSejourTitre(sejour)}</h2>
                 {sejour.lieu && (
                   <p className="text-sm text-muted-foreground font-normal">{sejour.lieu}</p>
                 )}

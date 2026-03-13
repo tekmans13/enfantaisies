@@ -127,16 +127,34 @@ export function SejourManageDialog({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
+              <Label htmlFor="type">Type de séjour *</Label>
+              <Select
+                value={formData.type}
+                onValueChange={(value) => setFormData({ ...formData, type: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="centre_aere">Centre Aéré</SelectItem>
+                  <SelectItem value="sejour">Séjour</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="titre">Titre du séjour *</Label>
               <Input
                 id="titre"
                 value={formData.titre}
                 onChange={(e) => setFormData({ ...formData, titre: e.target.value })}
-                placeholder="Ex: Séjour Été Pitchouns"
+                placeholder="Ex: Été Pitchouns"
                 required
               />
             </div>
+          </div>
 
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="lieu">Lieu</Label>
               <Input

@@ -4,6 +4,7 @@
  */
 
 import * as XLSX from 'xlsx';
+import { formatSejourTitre } from './formatters';
 
 /**
  * Exporte toutes les inscriptions vers un fichier Excel
@@ -13,7 +14,7 @@ import * as XLSX from 'xlsx';
 export const exportInscriptionsToExcel = (inscriptions: any[], sejours: any[]) => {
   const getSejourTitle = (sejourId: string) => {
     const sejour = sejours.find(s => s.id === sejourId);
-    return sejour ? sejour.titre : '';
+    return sejour ? formatSejourTitre(sejour) : '';
   };
 
   const data = inscriptions.map(inscription => ({
@@ -133,8 +134,8 @@ export const exportSejourInscriptionsToExcel = (sejour: any, inscriptions: any[]
 
   const worksheet = XLSX.utils.json_to_sheet(data);
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, sejour.titre);
+  XLSX.utils.book_append_sheet(workbook, worksheet, formatSejourTitre(sejour));
   
-  const fileName = `sejour_${sejour.titre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
+  const fileName = `sejour_${formatSejourTitre(sejour).replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
   XLSX.writeFile(workbook, fileName);
 };
