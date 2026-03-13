@@ -131,7 +131,7 @@ export function InscriptionEditDialog({
               (attributionMap.get(assignedSejour) || 0) + 1
             );
           }
-          if (assignedSejour2) {
+          if (wantsTwoWeeks && assignedSejour2) {
             attributionMap.set(
               assignedSejour2, 
               (attributionMap.get(assignedSejour2) || 0) + 1
