@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileText, Download, Upload, Eye, ArrowLeft } from "lucide-react";
+import { FileText, Download, Upload, Eye, ArrowLeft, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Table,
   TableBody,
@@ -66,10 +67,41 @@ export default function Documents() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
+  const [storageUrls, setStorageUrls] = useState<Record<string, string>>({});
+
+  // Check which documents have been uploaded to storage
+  useEffect(() => {
+    const checkStorageDocuments = async () => {
+      const urls: Record<string, string> = {};
+      for (const doc of DOCUMENTS) {
+        const fileName = doc.path.split('/').pop() || '';
+        const { data } = supabase.storage
+          .from('centre-documents')
+          .getPublicUrl(fileName);
+        
+        // Check if the file exists by trying to fetch it
+        try {
+          const response = await fetch(data.publicUrl, { method: 'HEAD' });
+          if (response.ok) {
+            urls[doc.id] = data.publicUrl;
+          }
+        } catch {
+          // File doesn't exist in storage, will use static file
+        }
+      }
+      setStorageUrls(urls);
+    };
+    checkStorageDocuments();
+  }, []);
+
+  const getDocUrl = (doc: Document) => {
+    return storageUrls[doc.id] || doc.path;
+  };
 
   const handleDownload = (doc: Document) => {
+    const url = getDocUrl(doc);
     const link = document.createElement('a');
-    link.href = doc.path;
+    link.href = url;
     link.download = doc.path.split('/').pop() || 'document.pdf';
     document.body.appendChild(link);
     link.click();
@@ -82,7 +114,7 @@ export default function Documents() {
   };
 
   const handleView = (doc: Document) => {
-    window.open(doc.path, '_blank');
+    window.open(getDocUrl(doc), '_blank');
   };
 
   const handleUpload = async (docId: string, file: File | null) => {
@@ -90,14 +122,40 @@ export default function Documents() {
     
     setUploadingDoc(docId);
     
-    // Simuler un upload (dans une vraie app, uploader vers le serveur)
-    setTimeout(() => {
+    try {
+      const doc = DOCUMENTS.find(d => d.id === docId);
+      if (!doc) return;
+      
+      const fileName = doc.path.split('/').pop() || 'document.pdf';
+      
+      // Upload to storage (upsert to replace existing)
+      const { error } = await supabase.storage
+        .from('centre-documents')
+        .upload(fileName, file, { upsert: true });
+      
+      if (error) throw error;
+      
+      // Update the URL in state
+      const { data } = supabase.storage
+        .from('centre-documents')
+        .getPublicUrl(fileName);
+      
+      setStorageUrls(prev => ({ ...prev, [docId]: data.publicUrl + '?t=' + Date.now() }));
+      
       toast({
         title: "Document mis à jour",
-        description: "Le document a été mis à jour avec succès",
+        description: `${doc.name} a été mis à jour avec succès`,
       });
+    } catch (error: any) {
+      console.error('Erreur upload:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de mettre à jour le document",
+        variant: "destructive",
+      });
+    } finally {
       setUploadingDoc(null);
-    }, 1000);
+    }
   };
 
   return (
@@ -177,8 +235,13 @@ export default function Documents() {
                                 size="sm"
                                 variant="outline"
                                 className="gap-2"
+                                disabled={uploadingDoc === doc.id}
                               >
-                                <Upload className="w-4 h-4" />
+                                {uploadingDoc === doc.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Upload className="w-4 h-4" />
+                                )}
                                 Mettre à jour
                               </Button>
                             </DialogTrigger>
