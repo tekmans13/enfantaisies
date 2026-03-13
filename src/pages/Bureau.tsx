@@ -830,6 +830,24 @@ export default function Bureau() {
                     <TableCell className="py-2">{renderSejour(s1Alt)}</TableCell>
                     <TableCell className="py-2">{renderSejour(s2Priority)}</TableCell>
                     <TableCell className="py-2">{renderSejour(s2Alt)}</TableCell>
+                    <TableCell className="py-2 text-center">
+                      <Checkbox
+                        checked={inscription.is_prioritaire || false}
+                        onCheckedChange={async (checked) => {
+                          await supabase.from('inscriptions').update({ is_prioritaire: !!checked }).eq('id', inscription.id);
+                          fetchInscriptions();
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell className="py-2 text-center">
+                      <Checkbox
+                        checked={inscription.has_adhesion || false}
+                        onCheckedChange={async (checked) => {
+                          await supabase.from('inscriptions').update({ has_adhesion: !!checked }).eq('id', inscription.id);
+                          fetchInscriptions();
+                        }}
+                      />
+                    </TableCell>
                      <TableCell className="py-2">
                        <InscriptionStatusBadge status={inscription.status} size="sm" />
                      </TableCell>
