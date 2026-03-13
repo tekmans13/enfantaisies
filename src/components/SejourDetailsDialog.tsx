@@ -273,6 +273,24 @@ export function SejourDetailsDialog({
                               {inscription.is_first_inscription ? 'Oui' : 'Non'}
                             </Badge>
                           </TableCell>
+                          <TableCell className="text-center">
+                            <Checkbox
+                              checked={inscription.is_prioritaire || false}
+                              onCheckedChange={async (checked) => {
+                                await supabase.from('inscriptions').update({ is_prioritaire: !!checked } as any).eq('id', inscription.id);
+                                fetchInscriptions();
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Checkbox
+                              checked={inscription.has_adhesion || false}
+                              onCheckedChange={async (checked) => {
+                                await supabase.from('inscriptions').update({ has_adhesion: !!checked } as any).eq('id', inscription.id);
+                                fetchInscriptions();
+                              }}
+                            />
+                          </TableCell>
                           <TableCell>
                             <InscriptionStatusBadge status={inscription.status} />
                           </TableCell>

@@ -46,6 +46,7 @@ import { SejourDetailsDialog } from "@/components/SejourDetailsDialog";
 import { HomeContentManageDialog } from "@/components/HomeContentManageDialog";
 import { exportInscriptionsToExcel } from "@/lib/excelExport";
 import { downloadAllDocuments } from "@/lib/downloadDocuments";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Bureau() {
   const navigate = useNavigate();
