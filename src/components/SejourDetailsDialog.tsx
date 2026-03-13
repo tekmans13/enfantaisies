@@ -20,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Calendar, Users, AlertTriangle, Pill, FileDown } from "lucide-react";
 import { InscriptionStatusBadge } from "./InscriptionStatusBadge";
 import { exportSejourInscriptionsToExcel } from "@/lib/excelExport";
+import { formatSejourTitre } from "@/lib/formatters";
 
 interface SejourDetailsDialogProps {
   sejour: any;

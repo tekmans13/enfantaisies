@@ -19,6 +19,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
+import { formatSejourTitre } from "@/lib/formatters";
 import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,

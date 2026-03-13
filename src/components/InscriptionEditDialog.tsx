@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Users, Info } from "lucide-react";
+import { formatSejourTitre } from "@/lib/formatters";
 
 interface InscriptionEditDialogProps {
   inscription: any;
