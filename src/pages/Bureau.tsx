@@ -822,7 +822,7 @@ export default function Bureau() {
                     <TableCell className="py-2">
                       {inscription.sejour_preference_1_alternatif ? (
                         <span className="text-xs">
-                          {sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)?.titre || 'N/A'}
+                          {sejours.find(s => s.id === inscription.sejour_preference_1_alternatif) ? formatSejourTitre(sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)!) : 'N/A'}
                         </span>
                       ) : (
                         <span className="text-xs text-muted-foreground">-</span>
