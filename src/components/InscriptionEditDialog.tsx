@@ -313,7 +313,7 @@ export function InscriptionEditDialog({
                   </Label>
                   {inscription?.sejour_preference_1 && sejours.find(s => s.id === inscription.sejour_preference_1) ? (
                     <div className="p-3 border-2 border-blue-600 bg-blue-600/10 rounded-lg">
-                      <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_1)?.titre}</div>
+                      <div className="font-semibold">{formatSejourTitre(sejours.find(s => s.id === inscription.sejour_preference_1)!)}</div>
                       <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
@@ -336,7 +336,7 @@ export function InscriptionEditDialog({
                     <Label className="text-base mb-3 block font-semibold">1ère semaine (choix alternatif)</Label>
                     {inscription?.sejour_preference_1_alternatif && sejours.find(s => s.id === inscription.sejour_preference_1_alternatif) ? (
                       <div className="p-3 border-2 border-blue-400 bg-blue-400/10 rounded-lg">
-                        <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)?.titre}</div>
+                        <div className="font-semibold">{formatSejourTitre(sejours.find(s => s.id === inscription.sejour_preference_1_alternatif)!)}</div>
                         <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
@@ -359,7 +359,7 @@ export function InscriptionEditDialog({
                     <Label className="text-base mb-3 block font-semibold">2ème semaine (choix prioritaire)</Label>
                     {inscription?.sejour_preference_2 && sejours.find(s => s.id === inscription.sejour_preference_2) ? (
                       <div className="p-3 border-2 border-blue-600 bg-blue-600/10 rounded-lg">
-                        <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_2)?.titre}</div>
+                        <div className="font-semibold">{formatSejourTitre(sejours.find(s => s.id === inscription.sejour_preference_2)!)}</div>
                         <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
@@ -382,7 +382,7 @@ export function InscriptionEditDialog({
                     <Label className="text-base mb-3 block font-semibold">2ème choix (alternatif)</Label>
                     {inscription?.sejour_preference_2 && sejours.find(s => s.id === inscription.sejour_preference_2) ? (
                       <div className="p-3 border-2 border-blue-600 bg-blue-600/10 rounded-lg">
-                        <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_2)?.titre}</div>
+                        <div className="font-semibold">{formatSejourTitre(sejours.find(s => s.id === inscription.sejour_preference_2)!)}</div>
                         <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
@@ -406,7 +406,7 @@ export function InscriptionEditDialog({
                     <Label className="text-base mb-3 block font-semibold">2ème semaine (choix alternatif)</Label>
                     {inscription?.sejour_preference_2_alternatif && sejours.find(s => s.id === inscription.sejour_preference_2_alternatif) ? (
                       <div className="p-3 border-2 border-blue-400 bg-blue-400/10 rounded-lg">
-                        <div className="font-semibold">{sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)?.titre}</div>
+                        <div className="font-semibold">{formatSejourTitre(sejours.find(s => s.id === inscription.sejour_preference_2_alternatif)!)}</div>
                         <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
