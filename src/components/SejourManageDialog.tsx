@@ -33,7 +33,8 @@ export function SejourManageDialog({
     date_fin: "",
     groupe_age: "",
     places_disponibles: 0,
-    type: "centre_aere"
+    type: "centre_aere",
+    nombre_jours: null as number | null
   });
   const { toast } = useToast();
 
