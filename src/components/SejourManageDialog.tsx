@@ -17,7 +17,7 @@ interface SejourManageDialogProps {
   sejour?: any;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onSuccess: (updatedSejour?: any) => void;
 }
 
 export function SejourManageDialog({
