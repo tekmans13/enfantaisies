@@ -767,6 +767,8 @@ export default function Bureau() {
                   <TableHead>S1 - Choix alternatif</TableHead>
                   <TableHead>S2 - Choix prioritaire</TableHead>
                   <TableHead>S2 - Choix alternatif</TableHead>
+                  <TableHead>Prioritaire</TableHead>
+                  <TableHead>Adhésion</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Actions</TableHead>
