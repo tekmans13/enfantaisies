@@ -835,7 +835,7 @@ export default function Bureau() {
                       <Checkbox
                         checked={inscription.is_prioritaire || false}
                         onCheckedChange={async (checked) => {
-                          await supabase.from('inscriptions').update({ is_prioritaire: !!checked }).eq('id', inscription.id);
+                          await supabase.from('inscriptions').update({ is_prioritaire: !!checked } as any).eq('id', inscription.id);
                           fetchInscriptions();
                         }}
                       />
