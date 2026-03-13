@@ -5,7 +5,7 @@
 
 import { Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/formatters";
+import { formatDate, formatSejourTitre } from "@/lib/formatters";
 
 interface Sejour {
   id: string;
