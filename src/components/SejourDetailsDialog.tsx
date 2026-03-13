@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, Users, AlertTriangle, Pill, FileDown } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { InscriptionStatusBadge } from "./InscriptionStatusBadge";
 import { exportSejourInscriptionsToExcel } from "@/lib/excelExport";
 import { formatSejourTitre } from "@/lib/formatters";

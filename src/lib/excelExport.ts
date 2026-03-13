@@ -131,6 +131,8 @@ export const exportSejourInscriptionsToExcel = (sejour: any, inscriptions: any[]
     'Traitement médicamenteux (détails)': inscription.medication_details || '',
     'Allergies': inscription.has_allergies ? 'Oui' : 'Non',
     'Allergies (détails)': inscription.allergies_details || '',
+    'Prioritaire': inscription.is_prioritaire ? 'Oui' : 'Non',
+    'Adhésion': inscription.has_adhesion ? 'Oui' : 'Non',
     'Choix': inscription.sejour_preference_1 === sejour.id ? '1er choix' : '2ème choix',
   }));
 
