@@ -1,0 +1,1 @@
+ALTER TABLE public.sejours ADD COLUMN nombre_jours integer DEFAULT NULL;
