@@ -38,6 +38,10 @@ export function SejourManageDialog({
   });
   const { toast } = useToast();
 
+  const calculatedDays = formData.date_debut && formData.date_fin
+    ? Math.ceil((new Date(formData.date_fin).getTime() - new Date(formData.date_debut).getTime()) / (1000 * 60 * 60 * 24)) + 1
+    : 0;
+
   useEffect(() => {
     if (sejour) {
       setFormData({
