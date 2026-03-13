@@ -101,7 +101,7 @@ export function InscriptionEditDialog({
     // Compter les attributions pour chaque séjour
     supabase
       .from('inscriptions')
-      .select('sejour_attribue_1, sejour_attribue_2, id')
+      .select('sejour_attribue_1, sejour_attribue_2, nombre_semaines_demandees, id')
       .then(({ data: inscriptions }) => {
         if (inscriptions) {
           const attributionMap = new Map<string, number>();
