@@ -844,7 +844,7 @@ export default function Bureau() {
                       <Checkbox
                         checked={inscription.has_adhesion || false}
                         onCheckedChange={async (checked) => {
-                          await supabase.from('inscriptions').update({ has_adhesion: !!checked }).eq('id', inscription.id);
+                          await supabase.from('inscriptions').update({ has_adhesion: !!checked } as any).eq('id', inscription.id);
                           fetchInscriptions();
                         }}
                       />
