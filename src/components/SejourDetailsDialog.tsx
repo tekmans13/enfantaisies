@@ -45,7 +45,7 @@ export function SejourDetailsDialog({
     const { data } = await supabase
       .from('inscriptions')
       .select('*')
-      .or(`sejour_preference_1.eq.${sejour.id},sejour_preference_2.eq.${sejour.id}`)
+      .or(`sejour_attribue_1.eq.${sejour.id},sejour_attribue_2.eq.${sejour.id}`)
       .order('child_last_name', { ascending: true });
     
     if (data) {
