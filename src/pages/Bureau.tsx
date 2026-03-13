@@ -172,29 +172,42 @@ export default function Bureau() {
       setStats({ total, garcons, filles, enAttente });
 
       // Calculer les statistiques par séjour
-      const sejourMap = new Map();
+      const sejourMap = new Map<string, { id: string; choix1: number; choix2: number; total: number }>();
+
+      const incrementSejourStat = (sejourId: string, choix: 'choix1' | 'choix2') => {
+        if (!sejourMap.has(sejourId)) {
+          sejourMap.set(sejourId, { id: sejourId, choix1: 0, choix2: 0, total: 0 });
+        }
+
+        const stat = sejourMap.get(sejourId)!;
+        stat[choix] += 1;
+        stat.total += 1;
+      };
       
       data.forEach(inscription => {
-        // Premier choix
-        if (inscription.sejour_preference_1) {
-          const key = inscription.sejour_preference_1;
-          if (!sejourMap.has(key)) {
-            sejourMap.set(key, { id: key, choix1: 0, choix2: 0, total: 0 });
+        const hasAttribution = Boolean(
+          inscription.sejour_attribue_1 ||
+          (inscription.nombre_semaines_demandees === 2 && inscription.sejour_attribue_2)
+        );
+
+        if (hasAttribution) {
+          if (inscription.sejour_attribue_1) {
+            incrementSejourStat(inscription.sejour_attribue_1, 'choix1');
           }
-          const stat = sejourMap.get(key);
-          stat.choix1++;
-          stat.total++;
+
+          if (inscription.nombre_semaines_demandees === 2 && inscription.sejour_attribue_2) {
+            incrementSejourStat(inscription.sejour_attribue_2, 'choix2');
+          }
+
+          return;
         }
-        
-        // Second choix
+
+        if (inscription.sejour_preference_1) {
+          incrementSejourStat(inscription.sejour_preference_1, 'choix1');
+        }
+
         if (inscription.sejour_preference_2) {
-          const key = inscription.sejour_preference_2;
-          if (!sejourMap.has(key)) {
-            sejourMap.set(key, { id: key, choix1: 0, choix2: 0, total: 0 });
-          }
-          const stat = sejourMap.get(key);
-          stat.choix2++;
-          stat.total++;
+          incrementSejourStat(inscription.sejour_preference_2, 'choix2');
         }
       });
 

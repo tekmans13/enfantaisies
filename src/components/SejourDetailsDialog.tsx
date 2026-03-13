@@ -49,7 +49,11 @@ export function SejourDetailsDialog({
       .order('child_last_name', { ascending: true });
     
     if (data) {
-      setInscriptions(data);
+      const filteredInscriptions = data.filter((inscription: any) =>
+        inscription.sejour_attribue_1 === sejour.id ||
+        (inscription.nombre_semaines_demandees === 2 && inscription.sejour_attribue_2 === sejour.id)
+      );
+      setInscriptions(filteredInscriptions);
     }
   };
 

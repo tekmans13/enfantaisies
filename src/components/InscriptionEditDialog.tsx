@@ -45,7 +45,11 @@ export function InscriptionEditDialog({
       fetchSejours();
       // Initialiser avec le séjour actuellement attribué (ou le choix du parent si pas encore attribué)
       setAssignedSejour(inscription.sejour_attribue_1 || inscription.sejour_preference_1 || "");
-      setAssignedSejour2(inscription.sejour_attribue_2 || inscription.sejour_preference_2 || "");
+      setAssignedSejour2(
+        wantsTwoWeeks
+          ? (inscription.sejour_attribue_2 || inscription.sejour_preference_2 || "")
+          : ""
+      );
       
       // Écouter les changements en temps réel sur la table sejours
       const channel = supabase
@@ -97,7 +101,7 @@ export function InscriptionEditDialog({
     // Compter les attributions pour chaque séjour
     supabase
       .from('inscriptions')
-      .select('sejour_attribue_1, sejour_attribue_2, id')
+      .select('sejour_attribue_1, sejour_attribue_2, nombre_semaines_demandees, id')
       .then(({ data: inscriptions }) => {
         if (inscriptions) {
           const attributionMap = new Map<string, number>();
@@ -112,7 +116,7 @@ export function InscriptionEditDialog({
                 (attributionMap.get(insc.sejour_attribue_1) || 0) + 1
               );
             }
-            if (insc.sejour_attribue_2) {
+            if (insc.nombre_semaines_demandees === 2 && insc.sejour_attribue_2) {
               attributionMap.set(
                 insc.sejour_attribue_2, 
                 (attributionMap.get(insc.sejour_attribue_2) || 0) + 1
@@ -127,7 +131,7 @@ export function InscriptionEditDialog({
               (attributionMap.get(assignedSejour) || 0) + 1
             );
           }
-          if (assignedSejour2) {
+          if (wantsTwoWeeks && assignedSejour2) {
             attributionMap.set(
               assignedSejour2, 
               (attributionMap.get(assignedSejour2) || 0) + 1
@@ -177,7 +181,7 @@ export function InscriptionEditDialog({
       .from('inscriptions')
       .update({ 
         sejour_attribue_1: assignedSejour,
-        sejour_attribue_2: assignedSejour2 || null,
+        sejour_attribue_2: wantsTwoWeeks ? (assignedSejour2 || null) : null,
         status: newStatus,
         validated_at: new Date().toISOString()
       })
