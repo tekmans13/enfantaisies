@@ -139,11 +139,16 @@ export default function Bureau() {
   };
 
   const fetchSejours = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('sejours')
       .select('*')
       .order('date_debut', { ascending: true });
-    
+
+    if (error) {
+      console.error("Erreur chargement séjours:", error);
+      return;
+    }
+
     if (data) {
       setSejours(data);
     }
@@ -968,7 +973,15 @@ export default function Bureau() {
             setEditingSejour(null);
           }
         }}
-        onSuccess={() => {
+        onSuccess={(updatedSejour) => {
+          if (updatedSejour?.id) {
+            setSejours((prev) =>
+              prev.map((item) => (item.id === updatedSejour.id ? { ...item, ...updatedSejour } : item))
+            );
+            setViewingSejour((prev) =>
+              prev?.id === updatedSejour.id ? { ...prev, ...updatedSejour } : prev
+            );
+          }
           fetchSejours();
           fetchInscriptions();
         }}
