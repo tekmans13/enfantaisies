@@ -171,29 +171,29 @@ export default function Bureau() {
       
       setStats({ total, garcons, filles, enAttente });
 
-      // Calculer les statistiques par séjour
+      // Calculer les statistiques par séjour (basé sur les attributions, pas les préférences)
       const sejourMap = new Map();
       
       data.forEach(inscription => {
-        // Premier choix
-        if (inscription.sejour_preference_1) {
-          const key = inscription.sejour_preference_1;
+        // Premier séjour attribué
+        if (inscription.sejour_attribue_1) {
+          const key = inscription.sejour_attribue_1;
           if (!sejourMap.has(key)) {
-            sejourMap.set(key, { id: key, choix1: 0, choix2: 0, total: 0 });
+            sejourMap.set(key, { id: key, attribue1: 0, attribue2: 0, total: 0 });
           }
           const stat = sejourMap.get(key);
-          stat.choix1++;
+          stat.attribue1++;
           stat.total++;
         }
         
-        // Second choix
-        if (inscription.sejour_preference_2) {
-          const key = inscription.sejour_preference_2;
+        // Second séjour attribué
+        if (inscription.sejour_attribue_2) {
+          const key = inscription.sejour_attribue_2;
           if (!sejourMap.has(key)) {
-            sejourMap.set(key, { id: key, choix1: 0, choix2: 0, total: 0 });
+            sejourMap.set(key, { id: key, attribue1: 0, attribue2: 0, total: 0 });
           }
           const stat = sejourMap.get(key);
-          stat.choix2++;
+          stat.attribue2++;
           stat.total++;
         }
       });
