@@ -503,7 +503,8 @@ export function InscriptionEditDialog({
                           // Calculer le prix pour ce séjour
                           const dateDebut = new Date(sejour.date_debut);
                           const dateFin = new Date(sejour.date_fin);
-                          const nbJours = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                          const joursCalc = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                          const nbJours = sejour.nombre_jours ?? joursCalc;
                           const qf = inscription?.quotient_familial || 999999;
                           
                           // Récupération du tarif

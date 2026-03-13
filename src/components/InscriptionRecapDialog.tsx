@@ -120,7 +120,8 @@ export function InscriptionRecapDialog({
     
     const dateDebut = new Date(sejour.date_debut);
     const dateFin = new Date(sejour.date_fin);
-    const nbJours = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const joursCalc = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const nbJours = sejour.nombre_jours ?? joursCalc;
     
     const isCentreAere = sejour.type === 'centre_aere' || sejour.type === 'animation';
     const tarifJournalier = isCentreAere

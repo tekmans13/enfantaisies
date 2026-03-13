@@ -66,8 +66,8 @@ export const calculateSejourPrice = (
 ): number | null => {
   if (!sejour || !tarif) return null;
   
-  // Calculer le nombre de jours
-  const nbJours = calculateDaysBetween(sejour.date_debut, sejour.date_fin);
+  // Utiliser nombre_jours personnalisé si défini, sinon calculer depuis les dates
+  const nbJours = sejour.nombre_jours ?? calculateDaysBetween(sejour.date_debut, sejour.date_fin);
   
   // Déterminer le type de tarif (animation/centre_aere vs séjour)
   const isCentreAere = sejour.type === 'centre_aere' || sejour.type === 'animation';
