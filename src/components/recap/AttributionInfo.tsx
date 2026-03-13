@@ -5,7 +5,7 @@
 
 import { CheckCircle2, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/formatters";
+import { formatDate, formatSejourTitre } from "@/lib/formatters";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Sejour {
