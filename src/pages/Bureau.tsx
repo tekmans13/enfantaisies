@@ -139,11 +139,16 @@ export default function Bureau() {
   };
 
   const fetchSejours = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('sejours')
       .select('*')
       .order('date_debut', { ascending: true });
-    
+
+    if (error) {
+      console.error("Erreur chargement séjours:", error);
+      return;
+    }
+
     if (data) {
       setSejours(data);
     }
