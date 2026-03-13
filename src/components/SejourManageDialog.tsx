@@ -79,9 +79,10 @@ export function SejourManageDialog({
         .eq('id', sejour.id);
 
       if (error) {
+        console.error("Erreur update séjour:", error);
         toast({
           title: "Erreur",
-          description: "Impossible de modifier le séjour",
+          description: `Impossible de modifier le séjour: ${error.message}`,
           variant: "destructive",
         });
       } else {
@@ -89,8 +90,8 @@ export function SejourManageDialog({
           title: "Succès",
           description: "Séjour modifié avec succès",
         });
-        onSuccess();
         onOpenChange(false);
+        onSuccess();
       }
     } else {
       // Création
