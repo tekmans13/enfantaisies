@@ -45,7 +45,11 @@ export function InscriptionEditDialog({
       fetchSejours();
       // Initialiser avec le séjour actuellement attribué (ou le choix du parent si pas encore attribué)
       setAssignedSejour(inscription.sejour_attribue_1 || inscription.sejour_preference_1 || "");
-      setAssignedSejour2(inscription.sejour_attribue_2 || inscription.sejour_preference_2 || "");
+      setAssignedSejour2(
+        wantsTwoWeeks
+          ? (inscription.sejour_attribue_2 || inscription.sejour_preference_2 || "")
+          : ""
+      );
       
       // Écouter les changements en temps réel sur la table sejours
       const channel = supabase
