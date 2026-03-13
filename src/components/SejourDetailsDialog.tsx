@@ -76,7 +76,7 @@ export function SejourDetailsDialog({
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-4">
               <div>
-                <h2 className="text-2xl">{sejour.titre}</h2>
+                <h2 className="text-2xl">{formatSejourTitre(sejour)}</h2>
                 {sejour.lieu && (
                   <p className="text-sm text-muted-foreground font-normal">{sejour.lieu}</p>
                 )}

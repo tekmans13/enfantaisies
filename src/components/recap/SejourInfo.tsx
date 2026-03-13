@@ -30,7 +30,7 @@ interface SejourInfoProps {
 export function SejourInfo({ inscription, sejours, calculatePrice }: SejourInfoProps) {
   const getSejourTitle = (sejourId: string) => {
     const sejour = sejours.find(s => s.id === sejourId);
-    return sejour ? sejour.titre : 'Non spécifié';
+    return sejour ? formatSejourTitre(sejour) : 'Non spécifié';
   };
 
   const getSejourDates = (sejourId: string) => {

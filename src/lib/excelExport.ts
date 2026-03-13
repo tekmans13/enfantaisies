@@ -14,7 +14,7 @@ import { formatSejourTitre } from './formatters';
 export const exportInscriptionsToExcel = (inscriptions: any[], sejours: any[]) => {
   const getSejourTitle = (sejourId: string) => {
     const sejour = sejours.find(s => s.id === sejourId);
-    return sejour ? sejour.titre : '';
+    return sejour ? formatSejourTitre(sejour) : '';
   };
 
   const data = inscriptions.map(inscription => ({
