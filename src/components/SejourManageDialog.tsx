@@ -47,7 +47,8 @@ export function SejourManageDialog({
         date_fin: sejour.date_fin || "",
         groupe_age: sejour.groupe_age || "",
         places_disponibles: sejour.places_disponibles || 0,
-        type: sejour.type || "centre_aere"
+        type: sejour.type || "centre_aere",
+        nombre_jours: sejour.nombre_jours ?? null
       });
     } else {
       setFormData({
@@ -57,7 +58,8 @@ export function SejourManageDialog({
         date_fin: "",
         groupe_age: "",
         places_disponibles: 0,
-        type: "centre_aere"
+        type: "centre_aere",
+        nombre_jours: null
       });
     }
   }, [sejour, open]);
