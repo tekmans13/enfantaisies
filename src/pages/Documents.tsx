@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,152 +7,38 @@ import { FileText, Download, Upload, Eye, ArrowLeft, Loader2 } from "lucide-reac
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useCentreDocuments, type CentreDocument } from "@/hooks/use-centre-documents";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
-
-interface Document {
-  id: string;
-  name: string;
-  path: string;
-  description: string;
-}
-
-const DOCUMENTS: Document[] = [
-  {
-    id: "fiche_sanitaire",
-    name: "Fiche sanitaire de liaison",
-    path: "/documents/ENFANTAISIES_fiche_sanitaire.pdf",
-    description: "Document à remplir pour la fiche sanitaire de l'enfant"
-  },
-  {
-    id: "autorisations_parentales",
-    name: "Autorisations parentales",
-    path: "/documents/ENFANTAISIES_autorisations_parentales.pdf",
-    description: "Autorisations nécessaires des parents"
-  },
-  {
-    id: "certificat_medical",
-    name: "Certificat médical",
-    path: "/documents/ENFANTAISIES_certificat_medical.pdf",
-    description: "Certificat médical à faire remplir par le médecin"
-  },
-  {
-    id: "reglement",
-    name: "Règlement intérieur",
-    path: "/documents/ENFANTAISIES_reglement.pdf",
-    description: "Règlement intérieur du centre aéré"
-  },
-  {
-    id: "charte_permanences",
-    name: "Charte des permanences parents",
-    path: "/documents/ENFANTAISIES_charte_permanences_parents.pdf",
-    description: "Charte définissant les permanences des parents"
-  }
-];
 
 export default function Documents() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
-  const [storageUrls, setStorageUrls] = useState<Record<string, string>>({});
+  const { documents, viewDoc, downloadDoc, refreshDocUrl } = useCentreDocuments();
 
-  // Check which documents have been uploaded to storage
-  useEffect(() => {
-    const checkStorageDocuments = async () => {
-      const urls: Record<string, string> = {};
-      for (const doc of DOCUMENTS) {
-        const fileName = doc.path.split('/').pop() || '';
-        const { data } = supabase.storage
-          .from('centre-documents')
-          .getPublicUrl(fileName);
-        
-        // Check if the file exists by trying to fetch it
-        try {
-          const response = await fetch(data.publicUrl, { method: 'HEAD' });
-          if (response.ok) {
-            urls[doc.id] = data.publicUrl;
-          }
-        } catch {
-          // File doesn't exist in storage, will use static file
-        }
-      }
-      setStorageUrls(urls);
-    };
-    checkStorageDocuments();
-  }, []);
-
-  const getDocUrl = (doc: Document) => {
-    return storageUrls[doc.id] || doc.path;
-  };
-
-  const handleDownload = (doc: Document) => {
-    const url = getDocUrl(doc);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = doc.path.split('/').pop() || 'document.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast({
-      title: "Téléchargement",
-      description: `${doc.name} téléchargé avec succès`,
-    });
-  };
-
-  const handleView = (doc: Document) => {
-    window.open(getDocUrl(doc), '_blank');
-  };
-
-  const handleUpload = async (docId: string, file: File | null) => {
+  const handleUpload = async (doc: CentreDocument, file: File | null) => {
     if (!file) return;
-    
-    setUploadingDoc(docId);
-    
+    setUploadingDoc(doc.id);
     try {
-      const doc = DOCUMENTS.find(d => d.id === docId);
-      if (!doc) return;
-      
-      const fileName = doc.path.split('/').pop() || 'document.pdf';
-      
-      // Upload to storage (upsert to replace existing)
       const { error } = await supabase.storage
-        .from('centre-documents')
-        .upload(fileName, file, { upsert: true });
-      
+        .from("centre-documents")
+        .upload(doc.fileName, file, { upsert: true });
       if (error) throw error;
-      
-      // Update the URL in state
+
       const { data } = supabase.storage
-        .from('centre-documents')
-        .getPublicUrl(fileName);
-      
-      setStorageUrls(prev => ({ ...prev, [docId]: data.publicUrl + '?t=' + Date.now() }));
-      
-      toast({
-        title: "Document mis à jour",
-        description: `${doc.name} a été mis à jour avec succès`,
-      });
+        .from("centre-documents")
+        .getPublicUrl(doc.fileName);
+      refreshDocUrl(doc.id, data.publicUrl);
+
+      toast({ title: "Document mis à jour", description: `${doc.name} a été mis à jour avec succès` });
     } catch (error: any) {
-      console.error('Erreur upload:', error);
-      toast({
-        title: "Erreur",
-        description: error.message || "Impossible de mettre à jour le document",
-        variant: "destructive",
-      });
+      console.error("Erreur upload:", error);
+      toast({ title: "Erreur", description: error.message || "Impossible de mettre à jour le document", variant: "destructive" });
     } finally {
       setUploadingDoc(null);
     }
@@ -163,12 +49,8 @@ export default function Documents() {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">
-              Documents
-            </h1>
-            <p className="text-muted-foreground">
-              Consultez et mettez à jour les documents officiels
-            </p>
+            <h1 className="text-4xl font-bold text-foreground mb-2">Documents</h1>
+            <p className="text-muted-foreground">Consultez et mettez à jour les documents officiels</p>
           </div>
           <Button onClick={() => navigate("/bureau")} variant="outline" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
@@ -198,7 +80,7 @@ export default function Documents() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {DOCUMENTS.map((doc) => (
+                  {documents.map((doc) => (
                     <TableRow key={doc.id}>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -206,42 +88,19 @@ export default function Documents() {
                           <span className="font-medium">{doc.name}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {doc.description}
-                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{doc.description}</TableCell>
                       <TableCell>
                         <div className="flex items-center justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleView(doc)}
-                            className="gap-2"
-                          >
-                            <Eye className="w-4 h-4" />
-                            Voir
+                          <Button size="sm" variant="outline" onClick={() => viewDoc(doc)} className="gap-2">
+                            <Eye className="w-4 h-4" /> Voir
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDownload(doc)}
-                            className="gap-2"
-                          >
-                            <Download className="w-4 h-4" />
-                            Télécharger
+                          <Button size="sm" variant="outline" onClick={() => downloadDoc(doc)} className="gap-2">
+                            <Download className="w-4 h-4" /> Télécharger
                           </Button>
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="gap-2"
-                                disabled={uploadingDoc === doc.id}
-                              >
-                                {uploadingDoc === doc.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <Upload className="w-4 h-4" />
-                                )}
+                              <Button size="sm" variant="outline" className="gap-2" disabled={uploadingDoc === doc.id}>
+                                {uploadingDoc === doc.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                                 Mettre à jour
                               </Button>
                             </DialogTrigger>
@@ -251,14 +110,12 @@ export default function Documents() {
                               </DialogHeader>
                               <div className="space-y-4 pt-4">
                                 <div>
-                                  <Label htmlFor={`upload-${doc.id}`}>
-                                    Nouveau fichier PDF
-                                  </Label>
+                                  <Label htmlFor={`upload-${doc.id}`}>Nouveau fichier PDF</Label>
                                   <Input
                                     id={`upload-${doc.id}`}
                                     type="file"
                                     accept=".pdf"
-                                    onChange={(e) => handleUpload(doc.id, e.target.files?.[0] || null)}
+                                    onChange={(e) => handleUpload(doc, e.target.files?.[0] || null)}
                                     disabled={uploadingDoc === doc.id}
                                     className="mt-2"
                                   />
