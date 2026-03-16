@@ -192,11 +192,11 @@ export function StepPrealables({
                   Ensuite, téléchargez les documents suivants, signez-les et scannez-les pour les joindre à votre dossier :
                 </p>
                 <div className="space-y-2">
-                  {documentsToDownload.map((doc) => (
-                    <div key={doc.path} className="flex items-start gap-2">
+                  {DOCUMENTS_LIST.map((doc) => (
+                    <div key={doc.fileName} className="flex items-start gap-2">
                       <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
                       <button
-                        onClick={() => handleDownload(doc.path, doc.name)}
+                        onClick={() => handleDownload(doc)}
                         className="text-amber-900 dark:text-amber-100 hover:underline text-left flex items-center gap-1"
                       >
                         {doc.name}
