@@ -3,7 +3,6 @@
  * Collecte les informations générales avant l'inscription
  */
 
-import { useState, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -11,7 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertCircle, FileCheck, Download } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { useCentreDocuments } from "@/hooks/use-centre-documents";
 
 interface StepPrealablesProps {
   formData: {
@@ -29,40 +28,6 @@ interface StepPrealablesProps {
   setIsDocModalOpen: (open: boolean) => void;
 }
 
-interface DocumentItem {
-  name: string;
-  fileName: string;
-  staticPath: string;
-}
-
-const DOCUMENTS_LIST: DocumentItem[] = [
-  {
-    name: "Fiche sanitaire de liaison",
-    fileName: "ENFANTAISIES_fiche_sanitaire.pdf",
-    staticPath: "/documents/ENFANTAISIES_fiche_sanitaire.pdf"
-  },
-  {
-    name: "Autorisations parentales",
-    fileName: "ENFANTAISIES_autorisations_parentales.pdf",
-    staticPath: "/documents/ENFANTAISIES_autorisations_parentales.pdf"
-  },
-  {
-    name: "Certificat médical",
-    fileName: "ENFANTAISIES_certificat_medical.pdf",
-    staticPath: "/documents/ENFANTAISIES_certificat_medical.pdf"
-  },
-  {
-    name: "Règlement intérieur",
-    fileName: "ENFANTAISIES_reglement.pdf",
-    staticPath: "/documents/ENFANTAISIES_reglement.pdf"
-  },
-  {
-    name: "Charte des permanences parents",
-    fileName: "ENFANTAISIES_charte_permanences_parents.pdf",
-    staticPath: "/documents/ENFANTAISIES_charte_permanences_parents.pdf"
-  }
-];
-
 export function StepPrealables({ 
   formData, 
   onCheckboxChange, 
@@ -71,41 +36,8 @@ export function StepPrealables({
   setIsDocModalOpen 
 }: StepPrealablesProps) {
   const impositionYear = new Date().getFullYear() - 1;
-  const [resolvedUrls, setResolvedUrls] = useState<Record<string, string>>({});
+  const { documents, downloadDoc } = useCentreDocuments();
 
-  // Résoudre les URLs : si le document existe dans le storage, utiliser cette version, sinon le fichier statique
-  useEffect(() => {
-    const resolveUrls = async () => {
-      const urls: Record<string, string> = {};
-      for (const doc of DOCUMENTS_LIST) {
-        const { data } = supabase.storage.from('centre-documents').getPublicUrl(doc.fileName);
-        try {
-          const res = await fetch(data.publicUrl, { method: 'HEAD' });
-          if (res.ok) {
-            urls[doc.fileName] = data.publicUrl;
-          } else {
-            urls[doc.fileName] = doc.staticPath;
-          }
-        } catch {
-          urls[doc.fileName] = doc.staticPath;
-        }
-      }
-      setResolvedUrls(urls);
-    };
-    resolveUrls();
-  }, []);
-
-  const getDocUrl = (doc: DocumentItem) => resolvedUrls[doc.fileName] || doc.staticPath;
-
-  const handleDownload = (doc: DocumentItem) => {
-    const link = document.createElement('a');
-    link.href = getDocUrl(doc);
-    link.download = doc.fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-  
   const checkboxItems = [
     { 
       id: 'isFirstInscription', 
@@ -160,15 +92,12 @@ export function StepPrealables({
               <AlertDescription className="text-sm mt-2">
                 <p className="font-medium mb-3 text-red-900 dark:text-red-100">
                   Chers parents,
-                  <br />
-                  <br />
-                  Ce n’est pas “premier arrivé, premier servi”.
-                  <br />
-                  <br />
+                  <br /><br />
+                  Ce n'est pas "premier arrivé, premier servi".
+                  <br /><br />
                   Les dossiers seront tous traités avec le même soin.
-                  <br />
-                  <br />
-                  Validez l’inscription uniquement quand le dossier est complet.
+                  <br /><br />
+                  Validez l'inscription uniquement quand le dossier est complet.
                 </p>
               </AlertDescription>
             </Alert>
@@ -192,11 +121,11 @@ export function StepPrealables({
                   Ensuite, téléchargez les documents suivants, signez-les et scannez-les pour les joindre à votre dossier :
                 </p>
                 <div className="space-y-2">
-                  {DOCUMENTS_LIST.map((doc) => (
-                    <div key={doc.fileName} className="flex items-start gap-2">
+                  {documents.map((doc) => (
+                    <div key={doc.id} className="flex items-start gap-2">
                       <FileCheck className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
                       <button
-                        onClick={() => handleDownload(doc)}
+                        onClick={() => downloadDoc(doc)}
                         className="text-amber-900 dark:text-amber-100 hover:underline text-left flex items-center gap-1"
                       >
                         {doc.name}
