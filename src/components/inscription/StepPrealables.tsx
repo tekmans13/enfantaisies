@@ -3,6 +3,7 @@
  * Collecte les informations générales avant l'inscription
  */
 
+import { useState, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -10,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertCircle, FileCheck, Download } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface StepPrealablesProps {
   formData: {
@@ -27,6 +29,40 @@ interface StepPrealablesProps {
   setIsDocModalOpen: (open: boolean) => void;
 }
 
+interface DocumentItem {
+  name: string;
+  fileName: string;
+  staticPath: string;
+}
+
+const DOCUMENTS_LIST: DocumentItem[] = [
+  {
+    name: "Fiche sanitaire de liaison",
+    fileName: "ENFANTAISIES_fiche_sanitaire.pdf",
+    staticPath: "/documents/ENFANTAISIES_fiche_sanitaire.pdf"
+  },
+  {
+    name: "Autorisations parentales",
+    fileName: "ENFANTAISIES_autorisations_parentales.pdf",
+    staticPath: "/documents/ENFANTAISIES_autorisations_parentales.pdf"
+  },
+  {
+    name: "Certificat médical",
+    fileName: "ENFANTAISIES_certificat_medical.pdf",
+    staticPath: "/documents/ENFANTAISIES_certificat_medical.pdf"
+  },
+  {
+    name: "Règlement intérieur",
+    fileName: "ENFANTAISIES_reglement.pdf",
+    staticPath: "/documents/ENFANTAISIES_reglement.pdf"
+  },
+  {
+    name: "Charte des permanences parents",
+    fileName: "ENFANTAISIES_charte_permanences_parents.pdf",
+    staticPath: "/documents/ENFANTAISIES_charte_permanences_parents.pdf"
+  }
+];
+
 export function StepPrealables({ 
   formData, 
   onCheckboxChange, 
@@ -34,36 +70,37 @@ export function StepPrealables({
   isDocModalOpen,
   setIsDocModalOpen 
 }: StepPrealablesProps) {
-  // Année pour l'avis d'imposition (année en cours - 1)
   const impositionYear = new Date().getFullYear() - 1;
-  
-  const documentsToDownload = [
-    {
-      name: "Fiche sanitaire de liaison",
-      path: "/documents/ENFANTAISIES_fiche_sanitaire.pdf"
-    },
-    {
-      name: "Autorisations parentales",
-      path: "/documents/ENFANTAISIES_autorisations_parentales.pdf"
-    },
-    {
-      name: "Certificat médical",
-      path: "/documents/ENFANTAISIES_certificat_medical.pdf"
-    },
-    {
-      name: "Règlement intérieur",
-      path: "/documents/ENFANTAISIES_reglement.pdf"
-    },
-    {
-      name: "Charte des permanences parents",
-      path: "/documents/ENFANTAISIES_charte_permanences_parents.pdf"
-    }
-  ];
+  const [resolvedUrls, setResolvedUrls] = useState<Record<string, string>>({});
 
-  const handleDownload = (path: string, name: string) => {
+  // Résoudre les URLs : si le document existe dans le storage, utiliser cette version, sinon le fichier statique
+  useEffect(() => {
+    const resolveUrls = async () => {
+      const urls: Record<string, string> = {};
+      for (const doc of DOCUMENTS_LIST) {
+        const { data } = supabase.storage.from('centre-documents').getPublicUrl(doc.fileName);
+        try {
+          const res = await fetch(data.publicUrl, { method: 'HEAD' });
+          if (res.ok) {
+            urls[doc.fileName] = data.publicUrl;
+          } else {
+            urls[doc.fileName] = doc.staticPath;
+          }
+        } catch {
+          urls[doc.fileName] = doc.staticPath;
+        }
+      }
+      setResolvedUrls(urls);
+    };
+    resolveUrls();
+  }, []);
+
+  const getDocUrl = (doc: DocumentItem) => resolvedUrls[doc.fileName] || doc.staticPath;
+
+  const handleDownload = (doc: DocumentItem) => {
     const link = document.createElement('a');
-    link.href = path;
-    link.download = path.split('/').pop() || 'document.pdf';
+    link.href = getDocUrl(doc);
+    link.download = doc.fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
