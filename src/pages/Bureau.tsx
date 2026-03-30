@@ -485,10 +485,20 @@ export default function Bureau() {
         });
         
         if (emailError) {
-          console.error("Erreur lors de l'envoi de l'email:", emailError);
+          let errorDetail = emailError.message || "Erreur inconnue";
+          if (emailError instanceof FunctionsHttpError) {
+            try {
+              const body = await emailError.context.json();
+              errorDetail = body?.error || body?.details || JSON.stringify(body);
+              console.error("Edge function email error body:", body);
+            } catch (_) {
+              try { errorDetail = await emailError.context.text(); } catch (_2) {}
+            }
+          }
+          console.error("Erreur lors de l'envoi de l'email:", errorDetail);
           toast({
             title: "Attention",
-            description: "Lien créé mais email non envoyé",
+            description: `Lien créé mais email non envoyé: ${errorDetail}`,
             variant: "destructive",
           });
         } else {
