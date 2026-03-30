@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { SmtpConfigDialog } from "@/components/SmtpConfigDialog";
 import { Button } from "@/components/ui/button";
