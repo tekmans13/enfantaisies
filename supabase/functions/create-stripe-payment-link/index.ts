@@ -15,6 +15,7 @@ interface PaymentRequest {
   childName: string;
   montantTotal: number;
   nombreSemaines: number;
+  origin?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
