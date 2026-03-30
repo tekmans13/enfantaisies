@@ -121,7 +121,7 @@ const handler = async (req: Request): Promise<Response> => {
             console.log('Sending confirmation email to:', inscription.parent_email);
 
             // Envoyer l'email de confirmation de paiement
-            const recapUrl = `https://enfan-campus-inscriptions.lovable.app/recap-inscription/${inscriptionId}`;
+            const recapUrl = `${Deno.env.get('PUBLIC_APP_URL') || 'https://enfantaisies.lovable.app'}/recap-inscription/${inscriptionId}`;
             
             try {
               await supabase.functions.invoke('send-inscription-email', {
