@@ -186,6 +186,12 @@ export default function Inscription() {
         if (!formData.parentAddress.trim()) return { isValid: false, message: "L'adresse du domicile est requise" };
         if (!formData.socialSecurityRegime) return { isValid: false, message: "Le régime de sécurité sociale est requis" };
         break;
+      case 3: // Étape Urgence
+        if (!formData.urgencyContact1FirstName.trim()) return { isValid: false, message: "Le prénom de la personne à prévenir en cas d'urgence est requis" };
+        if (!formData.urgencyContact1LastName.trim()) return { isValid: false, message: "Le nom de la personne à prévenir en cas d'urgence est requis" };
+        if (!formData.urgencyContact1Relation.trim()) return { isValid: false, message: "Le lien de parenté de la personne à prévenir en cas d'urgence est requis" };
+        if (!formData.urgencyContact1Mobile.trim()) return { isValid: false, message: "Le téléphone de la personne à prévenir en cas d'urgence est requis" };
+        break;
       case 4: // Étape Séjours
         if (!numberOfWeeks) return { isValid: false, message: "Le nombre de semaines est requis" };
         if (numberOfWeeks === "1") {
