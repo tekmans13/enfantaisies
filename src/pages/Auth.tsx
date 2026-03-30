@@ -92,7 +92,15 @@ export default function Auth() {
             </Button>
           </form>
 
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center space-y-2">
+            <Button
+              variant="link"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm"
+            >
+              {isSignUp ? "Déjà un compte ? Se connecter" : "Créer un compte"}
+            </Button>
+            <br />
             <Button
               variant="ghost"
               onClick={() => navigate("/")}
