@@ -116,14 +116,14 @@ serve(async (req) => {
     } catch (sendError: any) {
       log(`Erreur d'envoi: ${sendError.message}`);
       log(`Stack: ${sendError.stack || 'N/A'}`);
-      await client.close().catch(() => {});
+      try { await client.close(); } catch (_) {}
       return new Response(
         JSON.stringify({ error: 'Erreur d\'envoi de l\'email', details: sendError.message, logs }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    await client.close();
+    try { await client.close(); } catch (_) {}
     log("Connexion SMTP fermée");
 
     return new Response(
