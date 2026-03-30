@@ -88,7 +88,7 @@ export default function Auth() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Connexion..." : "Se connecter"}
+              {loading ? (isSignUp ? "Création..." : "Connexion...") : (isSignUp ? "Créer le compte" : "Se connecter")}
             </Button>
           </form>
 
