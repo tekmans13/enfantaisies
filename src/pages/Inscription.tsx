@@ -186,6 +186,12 @@ export default function Inscription() {
         if (!formData.parentAddress.trim()) return { isValid: false, message: "L'adresse du domicile est requise" };
         if (!formData.socialSecurityRegime) return { isValid: false, message: "Le régime de sécurité sociale est requis" };
         break;
+      case 3: // Étape Urgence
+        if (!formData.urgencyContact1FirstName.trim()) return { isValid: false, message: "Le prénom de la personne à prévenir en cas d'urgence est requis" };
+        if (!formData.urgencyContact1LastName.trim()) return { isValid: false, message: "Le nom de la personne à prévenir en cas d'urgence est requis" };
+        if (!formData.urgencyContact1Relation.trim()) return { isValid: false, message: "Le lien de parenté de la personne à prévenir en cas d'urgence est requis" };
+        if (!formData.urgencyContact1Mobile.trim()) return { isValid: false, message: "Le téléphone de la personne à prévenir en cas d'urgence est requis" };
+        break;
       case 4: // Étape Séjours
         if (!numberOfWeeks) return { isValid: false, message: "Le nombre de semaines est requis" };
         if (numberOfWeeks === "1") {
@@ -821,40 +827,44 @@ export default function Inscription() {
                       <h4 className="text-md font-medium text-foreground mb-3">Personne 1</h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="urgencyContact1FirstName">Prénom</Label>
+                          <Label htmlFor="urgencyContact1FirstName">Prénom <span className="text-destructive">*</span></Label>
                           <Input
                             id="urgencyContact1FirstName"
                             value={formData.urgencyContact1FirstName}
                             onChange={(e) => handleInputChange('urgencyContact1FirstName', e.target.value)}
                             className="mt-1"
+                            required
                           />
                         </div>
                         <div>
-                          <Label htmlFor="urgencyContact1LastName">Nom</Label>
+                          <Label htmlFor="urgencyContact1LastName">Nom <span className="text-destructive">*</span></Label>
                           <Input
                             id="urgencyContact1LastName"
                             value={formData.urgencyContact1LastName}
                             onChange={(e) => handleInputChange('urgencyContact1LastName', e.target.value)}
                             className="mt-1"
+                            required
                           />
                         </div>
                         <div>
-                          <Label htmlFor="urgencyContact1Relation">Lien de parenté (ou ami)</Label>
+                          <Label htmlFor="urgencyContact1Relation">Lien de parenté (ou ami) <span className="text-destructive">*</span></Label>
                           <Input
                             id="urgencyContact1Relation"
                             value={formData.urgencyContact1Relation}
                             onChange={(e) => handleInputChange('urgencyContact1Relation', e.target.value)}
                             className="mt-1"
+                            required
                           />
                         </div>
                         <div>
-                          <Label htmlFor="urgencyContact1Mobile">Téléphone Portable</Label>
+                          <Label htmlFor="urgencyContact1Mobile">Téléphone Portable <span className="text-destructive">*</span></Label>
                           <Input
                             id="urgencyContact1Mobile"
                             type="tel"
                             value={formData.urgencyContact1Mobile}
                             onChange={(e) => handleInputChange('urgencyContact1Mobile', e.target.value)}
                             className="mt-1"
+                            required
                           />
                         </div>
                         <div>
