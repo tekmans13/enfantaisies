@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { SmtpConfigDialog } from "@/components/SmtpConfigDialog";
 import { Button } from "@/components/ui/button";
@@ -132,10 +133,18 @@ export default function Users() {
       });
 
       if (error) {
+        let errorMsg = "Impossible de charger les utilisateurs";
+        if (error instanceof FunctionsHttpError) {
+          try {
+            const errBody = await error.context.json();
+            errorMsg = errBody?.error || errorMsg;
+            console.error("Edge function error body:", errBody);
+          } catch (_) {}
+        }
         console.error("Error fetching users:", error);
         toast({
           title: "Erreur",
-          description: "Impossible de charger les utilisateurs",
+          description: errorMsg,
           variant: "destructive",
         });
         return;
@@ -170,7 +179,17 @@ export default function Users() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        let errorMsg = error.message || "Impossible de créer l'utilisateur";
+        if (error instanceof FunctionsHttpError) {
+          try {
+            const errBody = await error.context.json();
+            errorMsg = errBody?.error || errorMsg;
+            console.error("Edge function create-user error body:", errBody);
+          } catch (_) {}
+        }
+        throw new Error(errorMsg);
+      }
 
       toast({
         title: "Utilisateur créé",
