@@ -226,14 +226,36 @@ export const SmtpConfigDialog = () => {
             </Label>
           </div>
 
-          <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Annuler
+          <div className="flex justify-between gap-3">
+            <Button 
+              type="button" 
+              variant="secondary" 
+              onClick={handleTestSmtp} 
+              disabled={testing || !config.host}
+            >
+              {testing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FlaskConical className="mr-2 h-4 w-4" />}
+              {testing ? "Test en cours..." : "Tester SMTP"}
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Enregistrement..." : "Enregistrer"}
-            </Button>
+            <div className="flex gap-3">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Annuler
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Enregistrement..." : "Enregistrer"}
+              </Button>
+            </div>
           </div>
+
+          {testLogs && (
+            <div className="mt-2">
+              <Label className="text-xs font-semibold">Logs du test :</Label>
+              <ScrollArea className="h-40 mt-1 rounded border bg-muted p-2">
+                <pre className="text-xs whitespace-pre-wrap font-mono">
+                  {testLogs.join("\n")}
+                </pre>
+              </ScrollArea>
+            </div>
+          )}
         </form>
       </DialogContent>
     </Dialog>
