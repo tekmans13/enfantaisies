@@ -446,6 +446,27 @@ export default function Bureau() {
         // Le coût est déjà de 0, donc rien à ajouter
       }
 
+      const getEdgeErrorDetail = async (err: unknown) => {
+        if (err instanceof FunctionsHttpError) {
+          try {
+            const body = await err.context.json();
+            console.error("Edge function error body:", body);
+            return body?.error || body?.details || JSON.stringify(body);
+          } catch (_) {
+            try {
+              const textBody = await err.context.text();
+              console.error("Edge function error text:", textBody);
+              return textBody || err.message;
+            } catch (_2) {
+              return err.message;
+            }
+          }
+        }
+
+        if (err instanceof Error) return err.message;
+        return String(err ?? "Erreur inconnue");
+      };
+
       // Appeler la fonction edge
       const { data, error } = await supabase.functions.invoke('create-stripe-payment-link', {
         body: {
@@ -459,7 +480,10 @@ export default function Bureau() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        const detail = await getEdgeErrorDetail(error);
+        throw new Error(`create-stripe-payment-link: ${detail}`);
+      }
 
       if (data.success) {
         // Mettre à jour le statut à "envoyé"
@@ -485,20 +509,10 @@ export default function Bureau() {
         });
         
         if (emailError) {
-          let errorDetail = emailError.message || "Erreur inconnue";
-          if (emailError instanceof FunctionsHttpError) {
-            try {
-              const body = await emailError.context.json();
-              errorDetail = body?.error || body?.details || JSON.stringify(body);
-              console.error("Edge function email error body:", body);
-            } catch (_) {
-              try { errorDetail = await emailError.context.text(); } catch (_2) {}
-            }
-          }
-          console.error("Erreur lors de l'envoi de l'email:", errorDetail);
+          const detail = await getEdgeErrorDetail(emailError);
           toast({
             title: "Attention",
-            description: `Lien créé mais email non envoyé: ${errorDetail}`,
+            description: `Lien créé mais email non envoyé: ${detail}`,
             variant: "destructive",
           });
         } else {
@@ -514,10 +528,11 @@ export default function Bureau() {
         throw new Error(data.error || 'Erreur inconnue');
       }
     } catch (error: any) {
-      console.error('Error sending payment:', error);
+      const detail = await getEdgeErrorDetail(error);
+      console.error('Error sending payment:', detail, error);
       toast({
-        title: "Erreur",
-        description: error.message || "Impossible de créer le lien de paiement",
+        title: "Erreur envoi lien de paiement",
+        description: detail,
         variant: "destructive",
       });
     } finally {
