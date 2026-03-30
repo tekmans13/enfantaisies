@@ -11,6 +11,7 @@ export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
 
   const handleLogin = async (e: React.FormEvent) => {
