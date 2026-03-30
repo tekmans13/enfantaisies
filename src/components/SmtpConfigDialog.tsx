@@ -113,6 +113,37 @@ export const SmtpConfigDialog = () => {
     }
   };
 
+  const handleTestSmtp = async () => {
+    setTesting(true);
+    setTestLogs(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('test-smtp');
+      
+      if (error) {
+        let errorMsg = error.message;
+        let logs: string[] = [];
+        if (error instanceof FunctionsHttpError) {
+          try {
+            const body = await error.context.json();
+            errorMsg = body?.error || body?.details || errorMsg;
+            logs = body?.logs || [];
+          } catch (_) {}
+        }
+        setTestLogs(logs.length > 0 ? [...logs, `❌ ERREUR: ${errorMsg}`] : [`❌ ERREUR: ${errorMsg}`]);
+        toast({ title: "Échec du test SMTP", description: errorMsg, variant: "destructive" });
+        return;
+      }
+
+      setTestLogs([...(data?.logs || []), `✅ ${data?.message || 'Succès'}`]);
+      toast({ title: "Test SMTP réussi", description: data?.message });
+    } catch (err: any) {
+      setTestLogs([`❌ Erreur inattendue: ${err.message}`]);
+      toast({ title: "Erreur", description: err.message, variant: "destructive" });
+    } finally {
+      setTesting(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
