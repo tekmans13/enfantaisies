@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Settings } from "lucide-react";
+import { Settings, FlaskConical, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 
 interface EmailConfig {
   id?: string;
@@ -21,6 +23,8 @@ interface EmailConfig {
 export const SmtpConfigDialog = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testLogs, setTestLogs] = useState<string[] | null>(null);
   const { toast } = useToast();
   const [config, setConfig] = useState<EmailConfig>({
     host: "",
@@ -109,6 +113,37 @@ export const SmtpConfigDialog = () => {
     }
   };
 
+  const handleTestSmtp = async () => {
+    setTesting(true);
+    setTestLogs(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('test-smtp');
+      
+      if (error) {
+        let errorMsg = error.message;
+        let logs: string[] = [];
+        if (error instanceof FunctionsHttpError) {
+          try {
+            const body = await error.context.json();
+            errorMsg = body?.error || body?.details || errorMsg;
+            logs = body?.logs || [];
+          } catch (_) {}
+        }
+        setTestLogs(logs.length > 0 ? [...logs, `❌ ERREUR: ${errorMsg}`] : [`❌ ERREUR: ${errorMsg}`]);
+        toast({ title: "Échec du test SMTP", description: errorMsg, variant: "destructive" });
+        return;
+      }
+
+      setTestLogs([...(data?.logs || []), `✅ ${data?.message || 'Succès'}`]);
+      toast({ title: "Test SMTP réussi", description: data?.message });
+    } catch (err: any) {
+      setTestLogs([`❌ Erreur inattendue: ${err.message}`]);
+      toast({ title: "Erreur", description: err.message, variant: "destructive" });
+    } finally {
+      setTesting(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -191,14 +226,36 @@ export const SmtpConfigDialog = () => {
             </Label>
           </div>
 
-          <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Annuler
+          <div className="flex justify-between gap-3">
+            <Button 
+              type="button" 
+              variant="secondary" 
+              onClick={handleTestSmtp} 
+              disabled={testing || !config.host}
+            >
+              {testing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FlaskConical className="mr-2 h-4 w-4" />}
+              {testing ? "Test en cours..." : "Tester SMTP"}
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Enregistrement..." : "Enregistrer"}
-            </Button>
+            <div className="flex gap-3">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Annuler
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Enregistrement..." : "Enregistrer"}
+              </Button>
+            </div>
           </div>
+
+          {testLogs && (
+            <div className="mt-2">
+              <Label className="text-xs font-semibold">Logs du test :</Label>
+              <ScrollArea className="h-40 mt-1 rounded border bg-muted p-2">
+                <pre className="text-xs whitespace-pre-wrap font-mono">
+                  {testLogs.join("\n")}
+                </pre>
+              </ScrollArea>
+            </div>
+          )}
         </form>
       </DialogContent>
     </Dialog>
