@@ -1735,9 +1735,9 @@ export default function Inscription() {
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
-              <Button onClick={handleSubmit}>
+              <Button onClick={handleSubmit} disabled={isSubmitting}>
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Terminer
+                {isSubmitting ? "Envoi en cours..." : "Terminer"}
               </Button>
             )}
           </div>
