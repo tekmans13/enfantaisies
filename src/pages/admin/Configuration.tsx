@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +15,8 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Mail, CreditCard, Eye, EyeOff, Bug, Database } from "lucide-react";
+import { ArrowLeft, Mail, CreditCard, Eye, EyeOff, Bug, Database, FlaskConical, Loader2 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SmtpConfig {
   host: string;
@@ -35,6 +37,8 @@ export default function Configuration() {
   const [showSmtpPassword, setShowSmtpPassword] = useState(false);
   const [debugMode, setDebugMode] = useState(false);
   const [showSupabaseKeys, setShowSupabaseKeys] = useState(false);
+  const [testingSmtp, setTestingSmtp] = useState(false);
+  const [smtpTestLogs, setSmtpTestLogs] = useState<string[] | null>(null);
   
   const [stripeConfig, setStripeConfig] = useState({
     publishableKey: "",
@@ -532,9 +536,58 @@ export default function Configuration() {
                     <Label htmlFor="tls">Activer TLS</Label>
                   </div>
 
-                  <Button type="submit" disabled={saving}>
-                    {saving ? "Enregistrement..." : "Enregistrer la configuration"}
-                  </Button>
+                  <div className="flex justify-between items-center gap-3">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={testingSmtp || !smtpConfig.host}
+                      onClick={async () => {
+                        setTestingSmtp(true);
+                        setSmtpTestLogs(null);
+                        try {
+                          const { data, error } = await supabase.functions.invoke('test-smtp');
+                          if (error) {
+                            let errorMsg = error.message;
+                            let logs: string[] = [];
+                            if (error instanceof FunctionsHttpError) {
+                              try {
+                                const body = await error.context.json();
+                                errorMsg = body?.error || body?.details || errorMsg;
+                                logs = body?.logs || [];
+                              } catch (_) {}
+                            }
+                            setSmtpTestLogs(logs.length > 0 ? [...logs, `❌ ERREUR: ${errorMsg}`] : [`❌ ERREUR: ${errorMsg}`]);
+                            toast({ title: "Échec du test SMTP", description: errorMsg, variant: "destructive" });
+                            return;
+                          }
+                          setSmtpTestLogs([...(data?.logs || []), `✅ ${data?.message || 'Succès'}`]);
+                          toast({ title: "Test SMTP réussi", description: data?.message });
+                        } catch (err: any) {
+                          setSmtpTestLogs([`❌ Erreur: ${err.message}`]);
+                          toast({ title: "Erreur", description: err.message, variant: "destructive" });
+                        } finally {
+                          setTestingSmtp(false);
+                        }
+                      }}
+                    >
+                      {testingSmtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FlaskConical className="mr-2 h-4 w-4" />}
+                      {testingSmtp ? "Test en cours..." : "Tester SMTP"}
+                    </Button>
+                    <Button type="submit" disabled={saving}>
+                      {saving ? "Enregistrement..." : "Enregistrer la configuration"}
+                    </Button>
+                  </div>
+
+                  {smtpTestLogs && (
+                    <div className="mt-2">
+                      <Label className="text-xs font-semibold">Logs du test :</Label>
+                      <ScrollArea className="h-48 mt-1 rounded border bg-muted p-3">
+                        <pre className="text-xs whitespace-pre-wrap font-mono">
+                          {smtpTestLogs.join("\n")}
+                        </pre>
+                      </ScrollArea>
+                    </div>
+                  )}
                 </form>
               </CardContent>
             </Card>
