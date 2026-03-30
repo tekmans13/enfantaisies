@@ -827,12 +827,13 @@ export default function Inscription() {
                       <h4 className="text-md font-medium text-foreground mb-3">Personne 1</h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="urgencyContact1FirstName">Prénom</Label>
+                          <Label htmlFor="urgencyContact1FirstName">Prénom <span className="text-destructive">*</span></Label>
                           <Input
                             id="urgencyContact1FirstName"
                             value={formData.urgencyContact1FirstName}
                             onChange={(e) => handleInputChange('urgencyContact1FirstName', e.target.value)}
                             className="mt-1"
+                            required
                           />
                         </div>
                         <div>
