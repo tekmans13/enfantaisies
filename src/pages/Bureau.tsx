@@ -384,7 +384,28 @@ export default function Bureau() {
 
   const handleSendPayment = async (inscription: any) => {
     setSendingPayment(inscription.id);
-    
+
+    const getEdgeErrorDetail = async (err: unknown): Promise<string> => {
+      if (err instanceof FunctionsHttpError) {
+        try {
+          const body = await err.context.json();
+          console.error("Edge function error body:", body);
+          return body?.error || body?.details || JSON.stringify(body);
+        } catch (_) {
+          try {
+            const textBody = await err.context.text();
+            console.error("Edge function error text:", textBody);
+            return textBody || err.message;
+          } catch (_2) {
+            return err.message;
+          }
+        }
+      }
+
+      if (err instanceof Error) return err.message;
+      return String(err ?? "Erreur inconnue");
+    };
+
     try {
       // Récupérer les tarifs
       const { data: tarifs } = await supabase
@@ -402,14 +423,11 @@ export default function Bureau() {
         return;
       }
 
-      // Trouver le tarif correspondant au quotient familial
-      // Si pas de QF, utiliser une valeur très élevée pour obtenir le tarif plein
       const qf = inscription.quotient_familial || 999999;
-      const tarif = tarifs.find(t => 
+      const tarif = tarifs.find(t =>
         qf >= t.qf_min && (t.qf_max === null || qf <= t.qf_max)
       ) || tarifs[tarifs.length - 1];
 
-      // Récupérer les séjours ATTRIBUÉS pour calculer le montant
       const sejourIds = [inscription.sejour_attribue_1, inscription.sejour_attribue_2].filter(Boolean);
       const { data: sejoursData } = await supabase
         .from('sejours')
@@ -425,56 +443,28 @@ export default function Bureau() {
         return;
       }
 
-      // Calculer le montant total en fonction des séjours attribués
       let montantTotal = 0;
       sejoursData.forEach(sejour => {
         const dateDebut = new Date(sejour.date_debut);
         const dateFin = new Date(sejour.date_fin);
         const joursCalc = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         const nbJours = (sejour as any).nombre_jours ?? joursCalc;
-        
+
         const isCentreAere = sejour.type === 'centre_aere' || sejour.type === 'animation';
         const tarifJournalier = isCentreAere
-          ? tarif.tarif_journee_centre_aere 
+          ? tarif.tarif_journee_centre_aere
           : tarif.tarif_journee_sejour;
-        
+
         montantTotal += Number(tarifJournalier) * nbJours;
       });
-      
-      // Si le 2ème séjour n'a pas pu être attribué, ajouter 0 (déjà fait, mais pour clarté)
-      if (inscription.sejour_2_non_attribue) {
-        // Le coût est déjà de 0, donc rien à ajouter
-      }
 
-      const getEdgeErrorDetail = async (err: unknown) => {
-        if (err instanceof FunctionsHttpError) {
-          try {
-            const body = await err.context.json();
-            console.error("Edge function error body:", body);
-            return body?.error || body?.details || JSON.stringify(body);
-          } catch (_) {
-            try {
-              const textBody = await err.context.text();
-              console.error("Edge function error text:", textBody);
-              return textBody || err.message;
-            } catch (_2) {
-              return err.message;
-            }
-          }
-        }
-
-        if (err instanceof Error) return err.message;
-        return String(err ?? "Erreur inconnue");
-      };
-
-      // Appeler la fonction edge
       const { data, error } = await supabase.functions.invoke('create-stripe-payment-link', {
         body: {
           inscriptionId: inscription.id,
           parentEmail: inscription.parent_email,
           parentName: `${inscription.parent_first_name} ${inscription.parent_last_name}`,
           childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
-          montantTotal: montantTotal,
+          montantTotal,
           nombreSemaines: sejoursData.length,
           origin: window.location.origin,
         },
@@ -485,49 +475,45 @@ export default function Bureau() {
         throw new Error(`create-stripe-payment-link: ${detail}`);
       }
 
-      if (data.success) {
-        // Mettre à jour le statut à "envoyé"
-        await supabase
-          .from('inscriptions')
-          .update({ status: 'envoye' })
-          .eq('id', inscription.id);
-        
-        // Construire l'URL de recap
-        const recapUrl = `${window.location.origin}/recap-inscription/${inscription.id}`;
-        
-        // Envoyer l'email avec le lien de paiement
-        const { error: emailError } = await supabase.functions.invoke('send-inscription-email', {
-          body: {
-            inscriptionId: inscription.id,
-            parentEmail: inscription.parent_email,
-            parentName: `${inscription.parent_first_name} ${inscription.parent_last_name}`,
-            childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
-            recapUrl: recapUrl,
-            paymentUrl: data.paymentUrl,
-            montantTotal: montantTotal,
-          },
-        });
-        
-        if (emailError) {
-          const detail = await getEdgeErrorDetail(emailError);
-          toast({
-            title: "Attention",
-            description: `Lien créé mais email non envoyé: ${detail}`,
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Attribution et lien de paiement envoyés",
-            description: `Email envoyé à ${inscription.parent_email} avec le montant attribué de ${montantTotal.toFixed(2)}€`,
-          });
-        }
-        
-        // Rafraîchir les inscriptions
-        fetchInscriptions();
-      } else {
-        throw new Error(data.error || 'Erreur inconnue');
+      if (!data?.success) {
+        throw new Error(data?.error || 'Erreur inconnue');
       }
-    } catch (error: any) {
+
+      await supabase
+        .from('inscriptions')
+        .update({ status: 'envoye' })
+        .eq('id', inscription.id);
+
+      const recapUrl = `${window.location.origin}/recap-inscription/${inscription.id}`;
+
+      const { error: emailError } = await supabase.functions.invoke('send-inscription-email', {
+        body: {
+          inscriptionId: inscription.id,
+          parentEmail: inscription.parent_email,
+          parentName: `${inscription.parent_first_name} ${inscription.parent_last_name}`,
+          childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
+          recapUrl,
+          paymentUrl: data.paymentUrl,
+          montantTotal,
+        },
+      });
+
+      if (emailError) {
+        const detail = await getEdgeErrorDetail(emailError);
+        toast({
+          title: "Attention",
+          description: `Lien créé mais email non envoyé: ${detail}`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Attribution et lien de paiement envoyés",
+          description: `Email envoyé à ${inscription.parent_email} avec le montant attribué de ${montantTotal.toFixed(2)}€`,
+        });
+      }
+
+      fetchInscriptions();
+    } catch (error: unknown) {
       const detail = await getEdgeErrorDetail(error);
       console.error('Error sending payment:', detail, error);
       toast({
