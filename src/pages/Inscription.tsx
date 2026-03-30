@@ -847,12 +847,13 @@ export default function Inscription() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="urgencyContact1Relation">Lien de parenté (ou ami)</Label>
+                          <Label htmlFor="urgencyContact1Relation">Lien de parenté (ou ami) <span className="text-destructive">*</span></Label>
                           <Input
                             id="urgencyContact1Relation"
                             value={formData.urgencyContact1Relation}
                             onChange={(e) => handleInputChange('urgencyContact1Relation', e.target.value)}
                             className="mt-1"
+                            required
                           />
                         </div>
                         <div>
