@@ -373,6 +373,8 @@ export default function Inscription() {
         description: "Une erreur est survenue lors de l'enregistrement.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
