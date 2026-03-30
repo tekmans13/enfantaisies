@@ -37,6 +37,8 @@ export default function Configuration() {
   const [showSmtpPassword, setShowSmtpPassword] = useState(false);
   const [debugMode, setDebugMode] = useState(false);
   const [showSupabaseKeys, setShowSupabaseKeys] = useState(false);
+  const [testingSmtp, setTestingSmtp] = useState(false);
+  const [smtpTestLogs, setSmtpTestLogs] = useState<string[] | null>(null);
   
   const [stripeConfig, setStripeConfig] = useState({
     publishableKey: "",
