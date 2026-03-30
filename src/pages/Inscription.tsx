@@ -231,8 +231,28 @@ export default function Inscription() {
 
     setIsSubmitting(true);
     try {
-      // Générer un UUID côté client pour éviter le besoin de .select() après INSERT
-      // Cela permet de faire un INSERT sans avoir besoin d'une politique SELECT pour anon
+      // Vérification doublon côté client
+      const { data: existing, error: checkError } = await supabase
+        .from('inscriptions')
+        .select('id')
+        .eq('child_first_name', formData.childFirstName.trim())
+        .eq('child_last_name', formData.childLastName.trim())
+        .eq('child_birth_date', formData.childBirthDate)
+        .eq('parent_email', formData.parentEmail.trim().toLowerCase())
+        .limit(1);
+
+      if (checkError) {
+        console.error('Erreur vérification doublon:', checkError);
+      } else if (existing && existing.length > 0) {
+        toast({
+          title: "Inscription déjà existante",
+          description: `${formData.childFirstName} ${formData.childLastName} est déjà inscrit(e) avec cette adresse email.`,
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const inscriptionId = crypto.randomUUID();
       
       const inscriptionData: any = {
