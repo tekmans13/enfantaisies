@@ -15,6 +15,7 @@ interface PaymentRequest {
   childName: string;
   montantTotal: number;
   nombreSemaines: number;
+  origin?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -23,7 +24,8 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { inscriptionId, parentEmail, parentName, childName, montantTotal, nombreSemaines }: PaymentRequest = await req.json();
+    const { inscriptionId, parentEmail, parentName, childName, montantTotal, nombreSemaines, origin }: PaymentRequest = await req.json();
+    const baseUrl = origin?.replace(/\/$/, '') || 'https://enfantaisies.lovable.app';
     
     // Initialiser le client Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -74,8 +76,8 @@ const handler = async (req: Request): Promise<Response> => {
         },
       ],
       mode: 'payment',
-      success_url: `https://enfan-campus-inscriptions.lovable.app/recap-inscription/${inscriptionId}?success=true`,
-      cancel_url: `https://enfan-campus-inscriptions.lovable.app/recap-inscription/${inscriptionId}?canceled=true`,
+      success_url: `${baseUrl}/recap-inscription/${inscriptionId}?success=true`,
+      cancel_url: `${baseUrl}/recap-inscription/${inscriptionId}?canceled=true`,
       customer_email: parentEmail,
       metadata: {
         inscription_id: inscriptionId,

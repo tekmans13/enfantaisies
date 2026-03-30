@@ -454,6 +454,7 @@ export default function Bureau() {
           childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
           montantTotal: montantTotal,
           nombreSemaines: sejoursData.length,
+          origin: window.location.origin,
         },
       });
 
