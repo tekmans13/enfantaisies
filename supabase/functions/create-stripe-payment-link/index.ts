@@ -76,8 +76,8 @@ const handler = async (req: Request): Promise<Response> => {
         },
       ],
       mode: 'payment',
-      success_url: `https://enfan-campus-inscriptions.lovable.app/recap-inscription/${inscriptionId}?success=true`,
-      cancel_url: `https://enfan-campus-inscriptions.lovable.app/recap-inscription/${inscriptionId}?canceled=true`,
+      success_url: `${baseUrl}/recap-inscription/${inscriptionId}?success=true`,
+      cancel_url: `${baseUrl}/recap-inscription/${inscriptionId}?canceled=true`,
       customer_email: parentEmail,
       metadata: {
         inscription_id: inscriptionId,
