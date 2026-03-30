@@ -115,6 +115,7 @@ export default function Inscription() {
     testAisanceAquatique: null,
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [numberOfWeeks, setNumberOfWeeks] = useState<"1" | "2">("1");
   const [selectedSejours, setSelectedSejours] = useState<string[]>([]);
   const [prioritySejour, setPrioritySejour] = useState<string>("");
@@ -212,6 +213,8 @@ export default function Inscription() {
    * Soumet le formulaire d'inscription complet
    */
   const handleSubmit = async () => {
+    if (isSubmitting) return; // Protection double-clic
+    
     // Validation complète de toutes les étapes avant soumission
     for (let step = 1; step <= TOTAL_INSCRIPTION_STEPS; step++) {
       const validation = validateStep(step);
@@ -226,6 +229,7 @@ export default function Inscription() {
       }
     }
 
+    setIsSubmitting(true);
     try {
       // Générer un UUID côté client pour éviter le besoin de .select() après INSERT
       // Cela permet de faire un INSERT sans avoir besoin d'une politique SELECT pour anon
@@ -369,6 +373,8 @@ export default function Inscription() {
         description: "Une erreur est survenue lors de l'enregistrement.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -1729,9 +1735,9 @@ export default function Inscription() {
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
-              <Button onClick={handleSubmit}>
+              <Button onClick={handleSubmit} disabled={isSubmitting}>
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Terminer
+                {isSubmitting ? "Envoi en cours..." : "Terminer"}
               </Button>
             )}
           </div>
