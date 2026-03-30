@@ -213,6 +213,8 @@ export default function Inscription() {
    * Soumet le formulaire d'inscription complet
    */
   const handleSubmit = async () => {
+    if (isSubmitting) return; // Protection double-clic
+    
     // Validation complète de toutes les étapes avant soumission
     for (let step = 1; step <= TOTAL_INSCRIPTION_STEPS; step++) {
       const validation = validateStep(step);
