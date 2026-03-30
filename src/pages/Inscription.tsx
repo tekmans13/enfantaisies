@@ -115,6 +115,7 @@ export default function Inscription() {
     testAisanceAquatique: null,
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [numberOfWeeks, setNumberOfWeeks] = useState<"1" | "2">("1");
   const [selectedSejours, setSelectedSejours] = useState<string[]>([]);
   const [prioritySejour, setPrioritySejour] = useState<string>("");
