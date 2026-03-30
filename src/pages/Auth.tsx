@@ -19,19 +19,31 @@ export default function Auth() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginData.email,
-        password: loginData.password,
-      });
+      const { data, error } = isSignUp
+        ? await supabase.auth.signUp({
+            email: loginData.email,
+            password: loginData.password,
+          })
+        : await supabase.auth.signInWithPassword({
+            email: loginData.email,
+            password: loginData.password,
+          });
 
       if (error) throw error;
 
-      toast({
-        title: "Connexion réussie",
-        description: "Vous êtes maintenant connecté",
-      });
-
-      navigate("/bureau");
+      if (isSignUp) {
+        toast({
+          title: "Compte créé",
+          description: "Votre compte a été créé. Vous pouvez maintenant vous connecter.",
+        });
+        setIsSignUp(false);
+      } else {
+        toast({
+          title: "Connexion réussie",
+          description: "Vous êtes maintenant connecté",
+        });
+        navigate("/bureau");
+      }
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",
