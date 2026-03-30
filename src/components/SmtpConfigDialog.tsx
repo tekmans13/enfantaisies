@@ -23,6 +23,8 @@ interface EmailConfig {
 export const SmtpConfigDialog = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testLogs, setTestLogs] = useState<string[] | null>(null);
   const { toast } = useToast();
   const [config, setConfig] = useState<EmailConfig>({
     host: "",
