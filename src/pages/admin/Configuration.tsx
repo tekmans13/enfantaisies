@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Mail, CreditCard, Eye, EyeOff, Bug, Database } from "lucide-react";
+import { ArrowLeft, Mail, CreditCard, Eye, EyeOff, Bug, Database, FlaskConical, Loader2 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SmtpConfig {
   host: string;
