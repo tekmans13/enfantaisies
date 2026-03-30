@@ -229,6 +229,7 @@ export default function Inscription() {
       }
     }
 
+    setIsSubmitting(true);
     try {
       // Générer un UUID côté client pour éviter le besoin de .select() après INSERT
       // Cela permet de faire un INSERT sans avoir besoin d'une politique SELECT pour anon
