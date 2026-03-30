@@ -24,7 +24,8 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { inscriptionId, parentEmail, parentName, childName, montantTotal, nombreSemaines }: PaymentRequest = await req.json();
+    const { inscriptionId, parentEmail, parentName, childName, montantTotal, nombreSemaines, origin }: PaymentRequest = await req.json();
+    const baseUrl = origin?.replace(/\/$/, '') || 'https://enfantaisies.lovable.app';
     
     // Initialiser le client Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
