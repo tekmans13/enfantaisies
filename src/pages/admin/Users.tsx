@@ -292,7 +292,17 @@ export default function Users() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        let errorMsg = error.message || "Impossible de réinitialiser le mot de passe";
+        if (error instanceof FunctionsHttpError) {
+          try {
+            const errBody = await error.context.json();
+            errorMsg = errBody?.error || errBody?.details || errorMsg;
+            console.error("Edge function reset-password error body:", errBody);
+          } catch (_) {}
+        }
+        throw new Error(errorMsg);
+      }
 
       toast({
         title: "Mot de passe réinitialisé",
