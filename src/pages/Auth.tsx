@@ -61,7 +61,7 @@ export default function Auth() {
         <CardHeader>
           <CardTitle className="text-2xl text-center">Centre Aéré ENFANTAISIES</CardTitle>
           <CardDescription className="text-center">
-            Connexion à votre espace
+            {isSignUp ? "Créer un compte" : "Connexion à votre espace"}
           </CardDescription>
         </CardHeader>
         <CardContent>
