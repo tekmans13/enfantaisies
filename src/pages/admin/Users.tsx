@@ -133,10 +133,18 @@ export default function Users() {
       });
 
       if (error) {
+        let errorMsg = "Impossible de charger les utilisateurs";
+        if (error instanceof FunctionsHttpError) {
+          try {
+            const errBody = await error.context.json();
+            errorMsg = errBody?.error || errorMsg;
+            console.error("Edge function error body:", errBody);
+          } catch (_) {}
+        }
         console.error("Error fetching users:", error);
         toast({
           title: "Erreur",
-          description: "Impossible de charger les utilisateurs",
+          description: errorMsg,
           variant: "destructive",
         });
         return;
