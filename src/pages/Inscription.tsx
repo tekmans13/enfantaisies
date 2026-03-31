@@ -1002,12 +1002,13 @@ export default function Inscription() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="authorizedPerson1Relation">Lien de parenté (ou ami)</Label>
+                          <Label htmlFor="authorizedPerson1Relation">Lien de parenté (ou ami) <span className="text-destructive">*</span></Label>
                           <Input
                             id="authorizedPerson1Relation"
                             value={formData.authorizedPerson1Relation}
                             onChange={(e) => handleInputChange('authorizedPerson1Relation', e.target.value)}
                             className="mt-1"
+                            required
                           />
                         </div>
                         <div>
