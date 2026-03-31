@@ -100,7 +100,6 @@ const handler = async (req: Request): Promise<Response> => {
               status: 'paye',
               stripe_payment_id: pi.id,
               paiement_date: new Date().toISOString(),
-              montant_paye: amount,
             })
             .eq('id', inscriptionId);
 
