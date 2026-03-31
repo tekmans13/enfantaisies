@@ -75,6 +75,71 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Gérer les différents événements Stripe
     switch (event.type) {
+      case 'payment_intent.succeeded': {
+        const pi = event.data.object as any;
+        const inscriptionId = pi.metadata?.inscription_id;
+
+        if (inscriptionId) {
+          console.log('Payment intent succeeded for inscription:', inscriptionId);
+          const amount = ((pi.amount_received ?? pi.amount ?? 0) / 100);
+
+          const { data: existingInscription } = await supabase
+            .from('inscriptions')
+            .select('status')
+            .eq('id', inscriptionId)
+            .single();
+
+          if (existingInscription?.status === 'paye') {
+            console.log('Inscription already marked as paid, skipping');
+            break;
+          }
+
+          const { error } = await supabase
+            .from('inscriptions')
+            .update({
+              status: 'paye',
+              stripe_payment_id: pi.id,
+              paiement_date: new Date().toISOString(),
+            })
+            .eq('id', inscriptionId);
+
+          if (error) {
+            console.error('Error updating inscription:', error);
+            throw error;
+          }
+
+          console.log('Inscription updated successfully, amount:', amount);
+
+          // Envoyer l'email de confirmation
+          const { data: inscription } = await supabase
+            .from('inscriptions')
+            .select('id, child_first_name, child_last_name, parent_email, parent_first_name')
+            .eq('id', inscriptionId)
+            .single();
+
+          if (inscription) {
+            console.log('Sending confirmation email to:', inscription.parent_email);
+            const recapUrl = `${Deno.env.get('PUBLIC_APP_URL') || 'https://enfantaisies.lovable.app'}/recap-inscription/${inscriptionId}`;
+            try {
+              await supabase.functions.invoke('send-inscription-email', {
+                body: {
+                  inscriptionId: inscription.id,
+                  parentEmail: inscription.parent_email,
+                  parentName: inscription.parent_first_name,
+                  childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
+                  recapUrl,
+                  isPaymentConfirmation: true,
+                }
+              });
+              console.log('Payment confirmation email sent successfully');
+            } catch (emailError) {
+              console.error('Error sending confirmation email:', emailError);
+            }
+          }
+        }
+        break;
+      }
+
       case 'checkout.session.completed': {
         const session = event.data.object as any;
         const inscriptionId = session.metadata?.inscription_id;
@@ -82,7 +147,6 @@ const handler = async (req: Request): Promise<Response> => {
         if (inscriptionId) {
           console.log('Payment succeeded for inscription:', inscriptionId);
 
-          // Vérifier si l'inscription n'est pas déjà marquée comme payée
           const { data: existingInscription } = await supabase
             .from('inscriptions')
             .select('status')
@@ -110,7 +174,6 @@ const handler = async (req: Request): Promise<Response> => {
 
           console.log('Inscription updated successfully');
 
-          // Récupérer les infos de l'inscription pour envoyer l'email
           const { data: inscription } = await supabase
             .from('inscriptions')
             .select('id, child_first_name, child_last_name, parent_email, parent_first_name')
@@ -119,10 +182,7 @@ const handler = async (req: Request): Promise<Response> => {
 
           if (inscription) {
             console.log('Sending confirmation email to:', inscription.parent_email);
-
-            // Envoyer l'email de confirmation de paiement
             const recapUrl = `${Deno.env.get('PUBLIC_APP_URL') || 'https://enfantaisies.lovable.app'}/recap-inscription/${inscriptionId}`;
-            
             try {
               await supabase.functions.invoke('send-inscription-email', {
                 body: {
@@ -131,7 +191,7 @@ const handler = async (req: Request): Promise<Response> => {
                   parentName: inscription.parent_first_name,
                   childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
                   recapUrl,
-                  isPaymentConfirmation: true, // Indiquer qu'il s'agit d'une confirmation de paiement
+                  isPaymentConfirmation: true,
                 }
               });
               console.log('Payment confirmation email sent successfully');
