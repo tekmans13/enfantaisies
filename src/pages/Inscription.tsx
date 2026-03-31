@@ -191,6 +191,10 @@ export default function Inscription() {
         if (!formData.urgencyContact1LastName.trim()) return { isValid: false, message: "Le nom de la personne à prévenir en cas d'urgence est requis" };
         if (!formData.urgencyContact1Relation.trim()) return { isValid: false, message: "Le lien de parenté de la personne à prévenir en cas d'urgence est requis" };
         if (!formData.urgencyContact1Mobile.trim()) return { isValid: false, message: "Le téléphone de la personne à prévenir en cas d'urgence est requis" };
+        if (!formData.authorizedPerson1FirstName.trim()) return { isValid: false, message: "Le prénom de la personne autorisée à récupérer l'enfant est requis" };
+        if (!formData.authorizedPerson1LastName.trim()) return { isValid: false, message: "Le nom de la personne autorisée à récupérer l'enfant est requis" };
+        if (!formData.authorizedPerson1Relation.trim()) return { isValid: false, message: "Le lien de parenté de la personne autorisée à récupérer l'enfant est requis" };
+        if (!formData.authorizedPerson1Mobile.trim()) return { isValid: false, message: "Le téléphone de la personne autorisée à récupérer l'enfant est requis" };
         break;
       case 4: // Étape Séjours
         if (!numberOfWeeks) return { isValid: false, message: "Le nombre de semaines est requis" };
@@ -978,40 +982,44 @@ export default function Inscription() {
                       <h4 className="text-md font-medium text-foreground mb-3">Personne 1</h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="authorizedPerson1FirstName">Prénom</Label>
+                          <Label htmlFor="authorizedPerson1FirstName">Prénom <span className="text-destructive">*</span></Label>
                           <Input
                             id="authorizedPerson1FirstName"
                             value={formData.authorizedPerson1FirstName}
                             onChange={(e) => handleInputChange('authorizedPerson1FirstName', e.target.value)}
                             className="mt-1"
+                            required
                           />
                         </div>
                         <div>
-                          <Label htmlFor="authorizedPerson1LastName">Nom</Label>
+                          <Label htmlFor="authorizedPerson1LastName">Nom <span className="text-destructive">*</span></Label>
                           <Input
                             id="authorizedPerson1LastName"
                             value={formData.authorizedPerson1LastName}
                             onChange={(e) => handleInputChange('authorizedPerson1LastName', e.target.value)}
                             className="mt-1"
+                            required
                           />
                         </div>
                         <div>
-                          <Label htmlFor="authorizedPerson1Relation">Lien de parenté (ou ami)</Label>
+                          <Label htmlFor="authorizedPerson1Relation">Lien de parenté (ou ami) <span className="text-destructive">*</span></Label>
                           <Input
                             id="authorizedPerson1Relation"
                             value={formData.authorizedPerson1Relation}
                             onChange={(e) => handleInputChange('authorizedPerson1Relation', e.target.value)}
                             className="mt-1"
+                            required
                           />
                         </div>
                         <div>
-                          <Label htmlFor="authorizedPerson1Mobile">Téléphone Portable</Label>
+                          <Label htmlFor="authorizedPerson1Mobile">Téléphone Portable <span className="text-destructive">*</span></Label>
                           <Input
                             id="authorizedPerson1Mobile"
                             type="tel"
                             value={formData.authorizedPerson1Mobile}
                             onChange={(e) => handleInputChange('authorizedPerson1Mobile', e.target.value)}
                             className="mt-1"
+                            required
                           />
                         </div>
                         <div>
