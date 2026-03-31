@@ -15,8 +15,9 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Mail, CreditCard, Eye, EyeOff, Bug, Database, FlaskConical, Loader2 } from "lucide-react";
+import { ArrowLeft, Mail, CreditCard, Eye, EyeOff, Bug, Database, FlaskConical, Loader2, Info } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SmtpConfig {
   host: string;
@@ -395,7 +396,24 @@ export default function Configuration() {
                   </div>
 
                   <div className="p-4 bg-muted rounded-lg space-y-2">
-                    <h4 className="font-semibold text-sm">Configuration du Webhook Stripe</h4>
+                    <h4 className="font-semibold text-sm flex items-center gap-1">
+                      Configuration du Webhook Stripe
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs text-xs">
+                            <p>Défini dans le fichier <strong>.env</strong> à la racine du projet :</p>
+                            <ul className="mt-1 space-y-0.5 list-disc list-inside">
+                              <li>VITE_SUPABASE_PROJECT_ID</li>
+                              <li>VITE_SUPABASE_PUBLISHABLE_KEY</li>
+                              <li>VITE_SUPABASE_URL</li>
+                            </ul>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </h4>
                     <p className="text-sm text-muted-foreground">
                       URL du webhook à configurer dans Stripe:
                     </p>
