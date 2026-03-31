@@ -191,6 +191,10 @@ export default function Inscription() {
         if (!formData.urgencyContact1LastName.trim()) return { isValid: false, message: "Le nom de la personne à prévenir en cas d'urgence est requis" };
         if (!formData.urgencyContact1Relation.trim()) return { isValid: false, message: "Le lien de parenté de la personne à prévenir en cas d'urgence est requis" };
         if (!formData.urgencyContact1Mobile.trim()) return { isValid: false, message: "Le téléphone de la personne à prévenir en cas d'urgence est requis" };
+        if (!formData.authorizedPerson1FirstName.trim()) return { isValid: false, message: "Le prénom de la personne autorisée à récupérer l'enfant est requis" };
+        if (!formData.authorizedPerson1LastName.trim()) return { isValid: false, message: "Le nom de la personne autorisée à récupérer l'enfant est requis" };
+        if (!formData.authorizedPerson1Relation.trim()) return { isValid: false, message: "Le lien de parenté de la personne autorisée à récupérer l'enfant est requis" };
+        if (!formData.authorizedPerson1Mobile.trim()) return { isValid: false, message: "Le téléphone de la personne autorisée à récupérer l'enfant est requis" };
         break;
       case 4: // Étape Séjours
         if (!numberOfWeeks) return { isValid: false, message: "Le nombre de semaines est requis" };
