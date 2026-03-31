@@ -25,9 +25,10 @@ serve(async (req) => {
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
-    // Verify caller is admin
+    // Verify caller is authenticated
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      log("Aucun header Authorization trouvé");
       return new Response(
         JSON.stringify({ error: 'Non autorisé', logs }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -35,17 +36,31 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
-    if (userError || !user) {
+    log(`Token reçu (longueur: ${token.length})`);
+
+    // Use anon key client to validate user token
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getUser();
+    if (claimsError || !claimsData?.user) {
+      log(`Erreur validation token: ${claimsError?.message || 'utilisateur non trouvé'}`);
       return new Response(
-        JSON.stringify({ error: 'Token invalide', logs }),
+        JSON.stringify({ error: 'Token invalide', details: claimsError?.message, logs }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    const user = claimsData.user;
+    log(`Utilisateur authentifié: ${user.email}`);
+
     const { data: isAdmin } = await supabaseAdmin.rpc('has_role', { _user_id: user.id, _role: 'admin' });
     const { data: isUser } = await supabaseAdmin.rpc('has_role', { _user_id: user.id, _role: 'user' });
     if (!isAdmin && !isUser) {
+      log(`Accès refusé pour ${user.email} - ni admin ni user`);
       return new Response(
         JSON.stringify({ error: 'Accès refusé', logs }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
