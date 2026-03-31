@@ -39,55 +39,62 @@ export default function RecapInscription() {
       if (!id) return;
 
       try {
-        // D'abord essayer de récupérer depuis sessionStorage (pour les utilisateurs anonymes)
+        // D'abord essayer de récupérer depuis sessionStorage (cache local)
         const cachedData = sessionStorage.getItem(`inscription_${id}`);
         let inscriptionData;
+        let sejoursData: any[] = [];
+        let documentsData: any[] = [];
 
         if (cachedData) {
-          // Utiliser les données en cache
           inscriptionData = JSON.parse(cachedData);
-          setInscription(inscriptionData);
-        } else {
-          // Sinon faire une requête normale (pour les utilisateurs authentifiés ou refresh)
-          const { data, error: inscriptionError } = await supabase
-            .from('inscriptions')
-            .select('*')
-            .eq('id', id)
-            .maybeSingle();
-
-          if (inscriptionError) throw inscriptionError;
-          inscriptionData = data;
-          setInscription(inscriptionData);
         }
 
-        // Récupérer les séjours
-        const sejourIds = [
-          inscriptionData.sejour_preference_1,
-          inscriptionData.sejour_preference_2,
-          inscriptionData.sejour_preference_1_alternatif,
-          inscriptionData.sejour_preference_2_alternatif,
-          inscriptionData.sejour_attribue_1,
-          inscriptionData.sejour_attribue_2,
-        ].filter((v, i, a) => v && a.indexOf(v) === i);
+        // Si pas de cache, utiliser l'edge function (fonctionne pour tous, connectés ou non)
+        if (!inscriptionData) {
+          const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID || 'uaoueggrpbiovtpbxaas';
+          const response = await fetch(
+            `https://${projectId}.supabase.co/functions/v1/get-inscription-recap`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ inscriptionId: id }),
+            }
+          );
 
-        if (sejourIds.length > 0) {
-          const { data: sejoursData, error: sejoursError } = await supabase
-            .from('sejours')
-            .select('*')
-            .in('id', sejourIds);
+          if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error || 'Erreur lors du chargement');
+          }
 
-          if (sejoursError) throw sejoursError;
-          setSejours(sejoursData || []);
+          const result = await response.json();
+          inscriptionData = result.inscription;
+          sejoursData = result.sejours || [];
+          documentsData = result.documents || [];
         }
 
-        // Récupérer les documents
-        const { data: documentsData, error: documentsError } = await supabase
-          .from('inscription_documents')
-          .select('*')
-          .eq('inscription_id', id);
+        setInscription(inscriptionData);
 
-        if (documentsError) throw documentsError;
-        setDocuments(documentsData || []);
+        // Si on avait le cache, récupérer séjours et documents via l'edge function aussi
+        if (cachedData && inscriptionData) {
+          const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID || 'uaoueggrpbiovtpbxaas';
+          const response = await fetch(
+            `https://${projectId}.supabase.co/functions/v1/get-inscription-recap`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ inscriptionId: id }),
+            }
+          );
+
+          if (response.ok) {
+            const result = await response.json();
+            sejoursData = result.sejours || [];
+            documentsData = result.documents || [];
+          }
+        }
+
+        setSejours(sejoursData);
+        setDocuments(documentsData);
       } catch (error) {
         console.error('Erreur lors du chargement:', error);
       } finally {
