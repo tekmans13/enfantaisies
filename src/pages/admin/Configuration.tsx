@@ -400,7 +400,7 @@ export default function Configuration() {
                       URL du webhook à configurer dans Stripe:
                     </p>
                     <code className="block p-2 bg-background rounded text-sm">
-                      https://seuqrfwzpeegfxcegthf.supabase.co/functions/v1/stripe-webhook
+                      https://uaoueggrpbiovtpbxaas.supabase.co/functions/v1/stripe-webhook
                     </code>
                     <p className="text-sm text-muted-foreground mt-2">
                       Événements à écouter:
