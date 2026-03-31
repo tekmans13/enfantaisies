@@ -41,8 +41,9 @@ export function InscriptionStatusBadge({ status, size = "md" }: InscriptionStatu
   
   if (status === 'envoye') {
     return (
-      <Badge variant="outline" className={`bg-blue-500/10 text-blue-500 border-blue-500 ${textSize}`}>
-        📧 Envoyé
+      <Badge variant="outline" className={`bg-blue-500/10 text-blue-500 border-blue-500 ${textSize} inline-flex items-center whitespace-nowrap`}>
+        <Mail className={`${iconSize} mr-1 shrink-0`} />
+        Envoyé
       </Badge>
     );
   }
