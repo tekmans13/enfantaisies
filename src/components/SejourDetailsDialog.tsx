@@ -224,7 +224,7 @@ export function SejourDetailsDialog({
                           </TableCell>
                           <TableCell>
                             {inscription.food_allergies_details ? (
-                              <div className="text-sm max-w-[200px]">
+                              <div className="text-xs max-w-[150px]">
                                 <p className="truncate" title={inscription.food_allergies_details}>
                                   {inscription.food_allergies_details}
                                 </p>
