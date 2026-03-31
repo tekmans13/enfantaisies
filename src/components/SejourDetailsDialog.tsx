@@ -213,7 +213,7 @@ export function SejourDetailsDialog({
                           </TableCell>
                           <TableCell>
                             {inscription.demande_specifique ? (
-                              <div className="text-sm max-w-[200px]">
+                              <div className="text-xs max-w-[150px]">
                                 <p className="truncate" title={inscription.demande_specifique}>
                                   {inscription.demande_specifique}
                                 </p>
