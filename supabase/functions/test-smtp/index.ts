@@ -38,14 +38,14 @@ serve(async (req) => {
     const token = authHeader.replace('Bearer ', '');
     log(`Token reçu (longueur: ${token.length})`);
 
-    // Use anon key client to validate user token
+    // Validate JWT using getClaims (more reliable in Deno edge functions)
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getUser();
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getUser(token);
     if (claimsError || !claimsData?.user) {
       log(`Erreur validation token: ${claimsError?.message || 'utilisateur non trouvé'}`);
       return new Response(
