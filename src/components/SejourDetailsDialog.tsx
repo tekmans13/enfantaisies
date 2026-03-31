@@ -254,7 +254,7 @@ export function SejourDetailsDialog({
                           <TableCell className="text-center">
                             {inscription.has_allergies ? (
                               inscription.allergies_details ? (
-                                <div className="text-sm max-w-[200px]">
+                                <div className="text-xs max-w-[150px]">
                                   <p className="truncate" title={inscription.allergies_details}>
                                     {inscription.allergies_details}
                                   </p>
