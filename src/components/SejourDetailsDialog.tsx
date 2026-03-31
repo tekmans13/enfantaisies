@@ -236,7 +236,7 @@ export function SejourDetailsDialog({
                           <TableCell className="text-center">
                             {inscription.has_medication ? (
                               inscription.medication_details ? (
-                                <div className="text-sm max-w-[200px]">
+                                <div className="text-xs max-w-[150px]">
                                   <p className="truncate" title={inscription.medication_details}>
                                     {inscription.medication_details}
                                   </p>
