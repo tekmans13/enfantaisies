@@ -77,7 +77,7 @@ export function SejourDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-4">
@@ -170,20 +170,20 @@ export function SejourDetailsDialog({
               <p className="text-muted-foreground text-center py-8">Aucun inscrit</p>
             ) : (
               <div className="border rounded-lg overflow-hidden">
-                <Table>
+                <Table className="text-xs">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Enfant</TableHead>
-                      <TableHead>Parent</TableHead>
-                      <TableHead>Contact</TableHead>
-                      <TableHead>Préférences</TableHead>
-                      <TableHead>Allergies alim.</TableHead>
-                      <TableHead>Médicaments</TableHead>
-                      <TableHead>Allergies</TableHead>
-                      <TableHead>1ère inscr.</TableHead>
-                      <TableHead>Prioritaire</TableHead>
-                      <TableHead>Adhésion</TableHead>
-                      <TableHead>Statut</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Enfant</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Parent</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Contact</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Préférences</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Allergies alim.</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Médicaments</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Allergies</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">1ère inscr.</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Prioritaire</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Adhésion</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Statut</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -213,7 +213,7 @@ export function SejourDetailsDialog({
                           </TableCell>
                           <TableCell>
                             {inscription.demande_specifique ? (
-                              <div className="text-sm max-w-[200px]">
+                              <div className="text-xs max-w-[150px]">
                                 <p className="truncate" title={inscription.demande_specifique}>
                                   {inscription.demande_specifique}
                                 </p>
@@ -224,7 +224,7 @@ export function SejourDetailsDialog({
                           </TableCell>
                           <TableCell>
                             {inscription.food_allergies_details ? (
-                              <div className="text-sm max-w-[200px]">
+                              <div className="text-xs max-w-[150px]">
                                 <p className="truncate" title={inscription.food_allergies_details}>
                                   {inscription.food_allergies_details}
                                 </p>
@@ -236,7 +236,7 @@ export function SejourDetailsDialog({
                           <TableCell className="text-center">
                             {inscription.has_medication ? (
                               inscription.medication_details ? (
-                                <div className="text-sm max-w-[200px]">
+                                <div className="text-xs max-w-[150px]">
                                   <p className="truncate" title={inscription.medication_details}>
                                     {inscription.medication_details}
                                   </p>
@@ -254,7 +254,7 @@ export function SejourDetailsDialog({
                           <TableCell className="text-center">
                             {inscription.has_allergies ? (
                               inscription.allergies_details ? (
-                                <div className="text-sm max-w-[200px]">
+                                <div className="text-xs max-w-[150px]">
                                   <p className="truncate" title={inscription.allergies_details}>
                                     {inscription.allergies_details}
                                   </p>
