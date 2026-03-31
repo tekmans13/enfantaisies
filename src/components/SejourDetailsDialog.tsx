@@ -170,20 +170,20 @@ export function SejourDetailsDialog({
               <p className="text-muted-foreground text-center py-8">Aucun inscrit</p>
             ) : (
               <div className="border rounded-lg overflow-hidden">
-                <Table>
+                <Table className="text-xs">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Enfant</TableHead>
-                      <TableHead>Parent</TableHead>
-                      <TableHead>Contact</TableHead>
-                      <TableHead>Préférences</TableHead>
-                      <TableHead>Allergies alim.</TableHead>
-                      <TableHead>Médicaments</TableHead>
-                      <TableHead>Allergies</TableHead>
-                      <TableHead>1ère inscr.</TableHead>
-                      <TableHead>Prioritaire</TableHead>
-                      <TableHead>Adhésion</TableHead>
-                      <TableHead>Statut</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Enfant</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Parent</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Contact</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Préférences</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Allergies alim.</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Médicaments</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Allergies</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">1ère inscr.</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Prioritaire</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Adhésion</TableHead>
+                      <TableHead className="text-xs whitespace-nowrap">Statut</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
