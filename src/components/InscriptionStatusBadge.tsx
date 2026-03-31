@@ -4,7 +4,7 @@
  */
 
 import { Badge } from "@/components/ui/badge";
-import { Clock, CheckCircle, XCircle } from "lucide-react";
+import { Clock, CheckCircle, XCircle, Mail } from "lucide-react";
 
 interface InscriptionStatusBadgeProps {
   /** Statut de l'inscription */
