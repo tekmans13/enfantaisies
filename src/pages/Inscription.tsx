@@ -1012,13 +1012,14 @@ export default function Inscription() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="authorizedPerson1Mobile">Téléphone Portable</Label>
+                          <Label htmlFor="authorizedPerson1Mobile">Téléphone Portable <span className="text-destructive">*</span></Label>
                           <Input
                             id="authorizedPerson1Mobile"
                             type="tel"
                             value={formData.authorizedPerson1Mobile}
                             onChange={(e) => handleInputChange('authorizedPerson1Mobile', e.target.value)}
                             className="mt-1"
+                            required
                           />
                         </div>
                         <div>
