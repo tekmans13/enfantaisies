@@ -37,7 +37,7 @@ export function ChildInfo({ inscription }: ChildInfoProps) {
             <p className="font-medium">{formatDate(inscription.child_birth_date)}</p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Classe (septembre 2025)</p>
+            <p className="text-sm text-muted-foreground">Classe (septembre {new Date().getFullYear()})</p>
             <p className="font-medium">{getClassLabel(inscription.child_class)}</p>
           </div>
           <div>

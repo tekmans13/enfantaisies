@@ -548,7 +548,7 @@ export default function Inscription() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="childClass">Classe (septembre 2025) *</Label>
+                        <Label htmlFor="childClass">Classe (septembre {new Date().getFullYear()}) *</Label>
                         <Select value={formData.childClass} onValueChange={(value) => handleInputChange('childClass', value)}>
                           <SelectTrigger className="mt-1">
                             <SelectValue placeholder="Sélectionner une classe" />
