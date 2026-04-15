@@ -118,10 +118,10 @@ const Tarifs = () => {
                 <TableRow key={tarif.id}>
                   <TableCell className="font-medium">{tarif.tarif_numero}</TableCell>
                   <TableCell>{formatQF(tarif.qf_min, tarif.qf_max)}</TableCell>
-                  <TableCell className="text-right">{tarif.tarif_journee_centre_aere} €</TableCell>
-                  <TableCell className="text-right font-semibold">{tarif.tarif_semaine_centre_aere} €</TableCell>
-                  <TableCell className="text-right">{tarif.tarif_journee_sejour} €</TableCell>
-                  <TableCell className="text-right font-semibold">{tarif.tarif_semaine_sejour} €</TableCell>
+                  <TableCell className="text-right">{Number(tarif.tarif_journee_centre_aere).toFixed(2)} €</TableCell>
+                  <TableCell className="text-right font-semibold">{Number(tarif.tarif_semaine_centre_aere).toFixed(2)} €</TableCell>
+                  <TableCell className="text-right">{Number(tarif.tarif_journee_sejour).toFixed(2)} €</TableCell>
+                  <TableCell className="text-right font-semibold">{Number(tarif.tarif_semaine_sejour).toFixed(2)} €</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       <Button

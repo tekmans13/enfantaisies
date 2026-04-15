@@ -71,8 +71,8 @@ export const TarifManageDialog = ({
       qf_max: formData.qf_max ? parseInt(formData.qf_max) : null,
       tarif_journee_centre_aere: tarifJourCentreAere,
       tarif_journee_sejour: tarifJourSejour,
-      tarif_semaine_centre_aere: tarifJourCentreAere * 5,
-      tarif_semaine_sejour: tarifJourSejour * 6,
+      tarif_semaine_centre_aere: Math.round(tarifJourCentreAere * 5 * 100) / 100,
+      tarif_semaine_sejour: Math.round(tarifJourSejour * 6 * 100) / 100,
     };
 
     try {
