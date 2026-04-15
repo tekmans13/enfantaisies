@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,7 @@ export default function Inscription() {
   const [showUrgencyContact2, setShowUrgencyContact2] = useState(false);
   const [showAuthorizedPerson2, setShowAuthorizedPerson2] = useState(false);
   const [isDocModalOpen, setIsDocModalOpen] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -397,12 +399,10 @@ export default function Inscription() {
 
       // Rediriger vers la page de récapitulatif
       navigate(`/recap-inscription/${inscriptionId}`);
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de l'enregistrement.",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      console.error("Erreur soumission inscription:", error);
+      const errorMessage = error?.message || error?.error_description || JSON.stringify(error);
+      setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -1781,6 +1781,31 @@ export default function Inscription() {
           </div>
         </Card>
       </div>
+
+      {/* Modale d'erreur de soumission */}
+      <Dialog open={!!submitError} onOpenChange={(open) => !open && setSubmitError(null)}>
+        <DialogContent className="max-w-[95vw] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-destructive">Erreur lors de l'enregistrement</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Une erreur est survenue lors de la soumission du formulaire. Voici le détail :
+            </p>
+            <Alert variant="destructive">
+              <AlertDescription className="text-sm break-words whitespace-pre-wrap font-mono">
+                {submitError}
+              </AlertDescription>
+            </Alert>
+            <p className="text-sm text-muted-foreground">
+              Si le problème persiste, contactez l'administrateur du centre.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSubmitError(null)}>Fermer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
