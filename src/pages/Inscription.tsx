@@ -26,6 +26,7 @@ import { validateEmail, validatePhone, formatSejourTitreAvecLieu } from "@/lib/f
 import { uploadDocuments, DocumentToUpload } from "@/lib/documentHelpers";
 import { CLASS_TO_AGE_GROUP, TOTAL_INSCRIPTION_STEPS, CLASS_LABELS } from "@/lib/constants";
 import { StepPrealables } from "@/components/inscription/StepPrealables";
+import { useCentreDocuments, CENTRE_DOCUMENTS } from "@/hooks/use-centre-documents";
 
 const getDebugMode = () => localStorage.getItem('debugMode') === 'true';
 
