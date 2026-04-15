@@ -1781,7 +1781,6 @@ export default function Inscription() {
           </div>
         </Card>
       </div>
-    </div>
 
       {/* Modale d'erreur de soumission */}
       <Dialog open={!!submitError} onOpenChange={(open) => !open && setSubmitError(null)}>
