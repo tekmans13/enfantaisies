@@ -1782,5 +1782,31 @@ export default function Inscription() {
         </Card>
       </div>
     </div>
+
+      {/* Modale d'erreur de soumission */}
+      <Dialog open={!!submitError} onOpenChange={(open) => !open && setSubmitError(null)}>
+        <DialogContent className="max-w-[95vw] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-destructive">Erreur lors de l'enregistrement</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Une erreur est survenue lors de la soumission du formulaire. Voici le détail :
+            </p>
+            <Alert variant="destructive">
+              <AlertDescription className="text-sm break-words whitespace-pre-wrap font-mono">
+                {submitError}
+              </AlertDescription>
+            </Alert>
+            <p className="text-sm text-muted-foreground">
+              Si le problème persiste, contactez l'administrateur du centre.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSubmitError(null)}>Fermer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
