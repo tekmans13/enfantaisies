@@ -26,6 +26,7 @@ import { validateEmail, validatePhone, formatSejourTitreAvecLieu } from "@/lib/f
 import { uploadDocuments, DocumentToUpload } from "@/lib/documentHelpers";
 import { CLASS_TO_AGE_GROUP, TOTAL_INSCRIPTION_STEPS, CLASS_LABELS } from "@/lib/constants";
 import { StepPrealables } from "@/components/inscription/StepPrealables";
+import { useCentreDocuments, CENTRE_DOCUMENTS } from "@/hooks/use-centre-documents";
 
 const getDebugMode = () => localStorage.getItem('debugMode') === 'true';
 
@@ -38,6 +39,7 @@ export default function Inscription() {
   const [isDocModalOpen, setIsDocModalOpen] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { getDocUrl } = useCentreDocuments();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -1559,7 +1561,7 @@ export default function Inscription() {
                         <Label className="text-sm font-semibold">
                           Fiche sanitaire de liaison *
                         </Label>
-                        <a href="/documents/ENFANTAISIES_fiche_sanitaire.pdf" download className="text-xs text-primary hover:underline">
+                        <a href={getDocUrl(CENTRE_DOCUMENTS.find(d => d.id === 'fiche_sanitaire')!)} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
                           Télécharger le document à remplir
                         </a>
                       </div>
@@ -1606,7 +1608,7 @@ export default function Inscription() {
                       <Label className="text-sm font-semibold">
                         Autorisation parentale *
                       </Label>
-                      <a href="/documents/ENFANTAISIES_autorisations_parentales.pdf" download className="text-xs text-primary hover:underline">
+                      <a href={getDocUrl(CENTRE_DOCUMENTS.find(d => d.id === 'autorisations_parentales')!)} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
                         Télécharger le document à remplir
                       </a>
                     </div>
@@ -1651,7 +1653,7 @@ export default function Inscription() {
                       <Label className="text-sm font-semibold">
                         Certificat médical *
                       </Label>
-                      <a href="/documents/ENFANTAISIES_certificat_medical.pdf" download className="text-xs text-primary hover:underline">
+                      <a href={getDocUrl(CENTRE_DOCUMENTS.find(d => d.id === 'certificat_medical')!)} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
                         Télécharger le document à remplir
                       </a>
                     </div>
