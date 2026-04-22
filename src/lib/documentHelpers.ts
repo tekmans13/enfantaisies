@@ -37,16 +37,21 @@ export const uploadDocument = async (
 
   if (uploadError) {
     console.error('Erreur upload:', uploadError);
-    throw uploadError;
+    throw new Error(`Upload ${document.type}: ${uploadError.message}`);
   }
 
   // Enregistrer le document dans la table
-  await supabase.from('inscription_documents').insert({
+  const { error: insertError } = await supabase.from('inscription_documents').insert({
     inscription_id: inscriptionId,
     document_type: document.type,
     file_path: filePath,
     file_name: formattedFileName,
   });
+
+  if (insertError) {
+    console.error('Erreur enregistrement document:', insertError);
+    throw new Error(`Enregistrement document ${document.type}: ${insertError.message}`);
+  }
 
   return filePath;
 };
