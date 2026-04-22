@@ -37,16 +37,21 @@ export const uploadDocument = async (
 
   if (uploadError) {
     console.error('Erreur upload:', uploadError);
-    throw uploadError;
+    throw new Error(`Upload ${document.type}: ${uploadError.message}`);
   }
 
   // Enregistrer le document dans la table
-  await supabase.from('inscription_documents').insert({
+  const { error: insertError } = await supabase.from('inscription_documents').insert({
     inscription_id: inscriptionId,
     document_type: document.type,
     file_path: filePath,
     file_name: formattedFileName,
   });
+
+  if (insertError) {
+    console.error('Erreur enregistrement document:', insertError);
+    throw new Error(`Enregistrement document ${document.type}: ${insertError.message}`);
+  }
 
   return filePath;
 };
@@ -59,12 +64,15 @@ export const uploadDocuments = async (
   documents: DocumentToUpload[],
   childLastName: string,
   childFirstName: string
-): Promise<void> => {
-  const uploadPromises = documents
-    .filter(doc => doc.file !== null)
-    .map(doc => uploadDocument(inscriptionId, doc, childLastName, childFirstName));
-  
-  await Promise.all(uploadPromises);
+): Promise<string[]> => {
+  const uploadedPaths: string[] = [];
+
+  for (const doc of documents.filter((item) => item.file !== null)) {
+    const path = await uploadDocument(inscriptionId, doc, childLastName, childFirstName);
+    if (path) uploadedPaths.push(path);
+  }
+
+  return uploadedPaths;
 };
 
 /**
