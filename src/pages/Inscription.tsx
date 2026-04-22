@@ -22,7 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useSejours } from "@/hooks/use-sejours";
 import { useTarifCalculator } from "@/hooks/use-tarif-calculator";
-import { validateEmail, validatePhone, formatSejourTitreAvecLieu, normalizeText, normalizeForComparison } from "@/lib/formatters";
+import { validateEmail, validatePhone, formatSejourTitreAvecLieu, normalizeText } from "@/lib/formatters";
 import { uploadDocuments, DocumentToUpload } from "@/lib/documentHelpers";
 import { CLASS_TO_AGE_GROUP, TOTAL_INSCRIPTION_STEPS, CLASS_LABELS } from "@/lib/constants";
 import { StepPrealables } from "@/components/inscription/StepPrealables";
