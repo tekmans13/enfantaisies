@@ -5,6 +5,32 @@
 import { AGE_GROUP_LABELS, CLASS_LABELS, STATUS_LABELS } from './constants';
 
 /**
+ * Normalise une chaîne Unicode et nettoie les espaces parasites
+ */
+export const normalizeText = (value: string): string =>
+  value.normalize('NFC').replace(/\s+/g, ' ').trim();
+
+/**
+ * Normalise une valeur pour les comparaisons tolérantes aux accents et à la casse
+ */
+export const normalizeForComparison = (value: string): string =>
+  normalizeText(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+/**
+ * Génère une version sûre pour les noms de fichiers et chemins de storage
+ */
+export const slugifyFilePart = (value: string): string => {
+  const slug = normalizeForComparison(value)
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return slug || 'document';
+};
+
+/**
  * Formate une date au format français (ex: "12 janvier 2025")
  */
 export const formatDate = (dateString: string): string => {
@@ -79,10 +105,11 @@ export const formatFileName = (
   documentType: string,
   originalFile: File
 ): string => {
-  const lastNameClean = lastName.toLowerCase().replace(/\s+/g, '-');
-  const firstNameClean = firstName.toLowerCase().replace(/\s+/g, '-');
-  const fileExt = originalFile.name.split('.').pop();
-  const docName = documentType.replace(/_/g, '-');
+  const lastNameClean = slugifyFilePart(lastName);
+  const firstNameClean = slugifyFilePart(firstName);
+  const rawExt = originalFile.name.split('.').pop() || 'bin';
+  const fileExt = slugifyFilePart(rawExt).replace(/-/g, '') || 'bin';
+  const docName = slugifyFilePart(documentType.replace(/_/g, '-'));
   return `${lastNameClean}_${firstNameClean}_${docName}.${fileExt}`;
 };
 
