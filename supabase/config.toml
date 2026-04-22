@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.get-inscription-recap]
 verify_jwt = false
+
+[functions.submit-inscription]
+verify_jwt = false
