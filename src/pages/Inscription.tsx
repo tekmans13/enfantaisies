@@ -289,6 +289,7 @@ export default function Inscription() {
     }
 
     setIsSubmitting(true);
+    let createdInscriptionId: string | null = null;
     try {
       // Vérification doublon côté client
       const { data: existing, error: checkError } = await supabase
@@ -315,6 +316,7 @@ export default function Inscription() {
       }
 
       const inscriptionId = crypto.randomUUID();
+      createdInscriptionId = inscriptionId;
       
       const inscriptionData: any = {
         id: inscriptionId, // UUID généré côté client
@@ -436,12 +438,22 @@ export default function Inscription() {
       console.error("Erreur soumission inscription:", error);
       const errorMessage = error?.message || error?.error_description || JSON.stringify(error);
 
+      if (createdInscriptionId && (errorMessage?.toLowerCase().includes('upload') || errorMessage?.toLowerCase().includes('networkerror'))) {
+        const { error: rollbackError } = await supabase
+          .from('inscriptions')
+          .delete()
+          .eq('id', createdInscriptionId);
+
+        if (rollbackError) {
+          console.error('Erreur rollback inscription:', rollbackError);
+        }
+      }
+
       if (errorMessage?.toLowerCase().includes('upload') || errorMessage?.toLowerCase().includes('networkerror')) {
         setSubmitError(`L'inscription a rencontré un problème lors de l'envoi des documents. ${errorMessage}`);
       } else {
         setSubmitError(errorMessage);
       }
-      setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
