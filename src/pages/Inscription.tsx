@@ -22,7 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useSejours } from "@/hooks/use-sejours";
 import { useTarifCalculator } from "@/hooks/use-tarif-calculator";
-import { validateEmail, validatePhone, formatSejourTitreAvecLieu } from "@/lib/formatters";
+import { validateEmail, validatePhone, formatSejourTitreAvecLieu, normalizeText, normalizeForComparison } from "@/lib/formatters";
 import { uploadDocuments, DocumentToUpload } from "@/lib/documentHelpers";
 import { CLASS_TO_AGE_GROUP, TOTAL_INSCRIPTION_STEPS, CLASS_LABELS } from "@/lib/constants";
 import { StepPrealables } from "@/components/inscription/StepPrealables";
@@ -166,6 +166,50 @@ export default function Inscription() {
     }));
   };
 
+  const getSanitizedFormData = () => ({
+    ...formData,
+    childFirstName: normalizeText(formData.childFirstName),
+    childLastName: normalizeText(formData.childLastName),
+    childSchool: normalizeText(formData.childSchool),
+    quotientFamilial: normalizeText(formData.quotientFamilial),
+    cafNumber: normalizeText(formData.cafNumber),
+    parentFirstName: normalizeText(formData.parentFirstName),
+    parentLastName: normalizeText(formData.parentLastName),
+    parentEmail: normalizeText(formData.parentEmail).toLowerCase(),
+    parentMobile: normalizeText(formData.parentMobile),
+    parentOfficePhone: normalizeText(formData.parentOfficePhone),
+    parentAddress: normalizeText(formData.parentAddress),
+    parent2FirstName: normalizeText(formData.parent2FirstName),
+    parent2LastName: normalizeText(formData.parent2LastName),
+    parent2Email: normalizeText(formData.parent2Email).toLowerCase(),
+    parent2Mobile: normalizeText(formData.parent2Mobile),
+    parent2OfficePhone: normalizeText(formData.parent2OfficePhone),
+    medicationDetails: normalizeText(formData.medicationDetails),
+    allergiesDetails: normalizeText(formData.allergiesDetails),
+    foodAllergiesDetails: normalizeText(formData.foodAllergiesDetails),
+    demandeSpecifique: normalizeText(formData.demandeSpecifique),
+    urgencyContact1FirstName: normalizeText(formData.urgencyContact1FirstName),
+    urgencyContact1LastName: normalizeText(formData.urgencyContact1LastName),
+    urgencyContact1Relation: normalizeText(formData.urgencyContact1Relation),
+    urgencyContact1Mobile: normalizeText(formData.urgencyContact1Mobile),
+    urgencyContact1OtherPhone: normalizeText(formData.urgencyContact1OtherPhone),
+    urgencyContact2FirstName: normalizeText(formData.urgencyContact2FirstName),
+    urgencyContact2LastName: normalizeText(formData.urgencyContact2LastName),
+    urgencyContact2Relation: normalizeText(formData.urgencyContact2Relation),
+    urgencyContact2Mobile: normalizeText(formData.urgencyContact2Mobile),
+    urgencyContact2OtherPhone: normalizeText(formData.urgencyContact2OtherPhone),
+    authorizedPerson1FirstName: normalizeText(formData.authorizedPerson1FirstName),
+    authorizedPerson1LastName: normalizeText(formData.authorizedPerson1LastName),
+    authorizedPerson1Relation: normalizeText(formData.authorizedPerson1Relation),
+    authorizedPerson1Mobile: normalizeText(formData.authorizedPerson1Mobile),
+    authorizedPerson1OtherPhone: normalizeText(formData.authorizedPerson1OtherPhone),
+    authorizedPerson2FirstName: normalizeText(formData.authorizedPerson2FirstName),
+    authorizedPerson2LastName: normalizeText(formData.authorizedPerson2LastName),
+    authorizedPerson2Relation: normalizeText(formData.authorizedPerson2Relation),
+    authorizedPerson2Mobile: normalizeText(formData.authorizedPerson2Mobile),
+    authorizedPerson2OtherPhone: normalizeText(formData.authorizedPerson2OtherPhone),
+  });
+
   /**
    * Valide les données d'une étape donnée
    */
@@ -228,6 +272,7 @@ export default function Inscription() {
    */
   const handleSubmit = async () => {
     if (isSubmitting) return; // Protection double-clic
+    const sanitizedFormData = getSanitizedFormData();
     
     // Validation complète de toutes les étapes avant soumission
     for (let step = 1; step <= TOTAL_INSCRIPTION_STEPS; step++) {
@@ -248,19 +293,21 @@ export default function Inscription() {
       // Vérification doublon côté client
       const { data: existing, error: checkError } = await supabase
         .from('inscriptions')
-        .select('id')
-        .eq('child_first_name', formData.childFirstName.trim())
-        .eq('child_last_name', formData.childLastName.trim())
-        .eq('child_birth_date', formData.childBirthDate)
-        .eq('parent_email', formData.parentEmail.trim().toLowerCase())
-        .limit(1);
+        .select('id, child_first_name, child_last_name, child_birth_date, parent_email')
+        .eq('child_birth_date', sanitizedFormData.childBirthDate);
 
       if (checkError) {
         console.error('Erreur vérification doublon:', checkError);
-      } else if (existing && existing.length > 0) {
+      } else if (
+        existing?.some((item) =>
+          normalizeForComparison(item.child_first_name) === normalizeForComparison(sanitizedFormData.childFirstName) &&
+          normalizeForComparison(item.child_last_name) === normalizeForComparison(sanitizedFormData.childLastName) &&
+          normalizeForComparison(item.parent_email) === normalizeForComparison(sanitizedFormData.parentEmail)
+        )
+      ) {
         toast({
           title: "Inscription déjà existante",
-          description: `${formData.childFirstName} ${formData.childLastName} est déjà inscrit(e) avec cette adresse email.`,
+          description: `${sanitizedFormData.childFirstName} ${sanitizedFormData.childLastName} est déjà inscrit(e) avec cette adresse email.`,
           variant: "destructive",
         });
         setIsSubmitting(false);
@@ -271,80 +318,64 @@ export default function Inscription() {
       
       const inscriptionData: any = {
         id: inscriptionId, // UUID généré côté client
-        is_first_inscription: formData.isFirstInscription,
-        has_medication: formData.hasMedication,
-        medication_details: formData.medicationDetails || null,
-        has_allergies: formData.hasAllergies,
-        allergies_details: formData.allergiesDetails || null,
-        food_allergies_details: formData.foodAllergiesDetails || null,
-        child_first_name: formData.childFirstName,
-        child_last_name: formData.childLastName,
-        child_birth_date: formData.childBirthDate || null,
-        child_class: formData.childClass,
-        child_gender: formData.childGender,
-        child_school: formData.childSchool,
+        is_first_inscription: sanitizedFormData.isFirstInscription,
+        has_medication: sanitizedFormData.hasMedication,
+        medication_details: sanitizedFormData.medicationDetails || null,
+        has_allergies: sanitizedFormData.hasAllergies,
+        allergies_details: sanitizedFormData.allergiesDetails || null,
+        food_allergies_details: sanitizedFormData.foodAllergiesDetails || null,
+        child_first_name: sanitizedFormData.childFirstName,
+        child_last_name: sanitizedFormData.childLastName,
+        child_birth_date: sanitizedFormData.childBirthDate || null,
+        child_class: sanitizedFormData.childClass,
+        child_gender: sanitizedFormData.childGender,
+        child_school: sanitizedFormData.childSchool,
         child_age_group: childAgeGroup,
-        quotient_familial: formData.quotientFamilial ? parseInt(formData.quotientFamilial) : null,
-        caf_number: formData.cafNumber || null,
-        parent_first_name: formData.parentFirstName,
-        parent_last_name: formData.parentLastName,
-        parent_email: formData.parentEmail,
-        parent_authority: formData.parentAuthority,
-        parent_mobile: formData.parentMobile,
-        parent_office_phone: formData.parentOfficePhone || null,
-        parent_address: formData.parentAddress,
-        parent2_first_name: formData.parent2FirstName || null,
-        parent2_last_name: formData.parent2LastName || null,
-        parent2_email: formData.parent2Email || null,
-        parent2_authority: formData.parent2Authority || null,
-        parent2_mobile: formData.parent2Mobile || null,
-        parent2_office_phone: formData.parent2OfficePhone || null,
-        social_security_regime: formData.socialSecurityRegime,
-        sejour_preference_1: formData.sejourPreference1 || null,
-        sejour_preference_2: formData.sejourPreference2 || null,
-        sejour_preference_1_alternatif: formData.sejourPreference1Alternatif || null,
-        sejour_preference_2_alternatif: formData.sejourPreference2Alternatif || null,
+        quotient_familial: sanitizedFormData.quotientFamilial ? parseInt(sanitizedFormData.quotientFamilial) : null,
+        caf_number: sanitizedFormData.cafNumber || null,
+        parent_first_name: sanitizedFormData.parentFirstName,
+        parent_last_name: sanitizedFormData.parentLastName,
+        parent_email: sanitizedFormData.parentEmail,
+        parent_authority: sanitizedFormData.parentAuthority,
+        parent_mobile: sanitizedFormData.parentMobile,
+        parent_office_phone: sanitizedFormData.parentOfficePhone || null,
+        parent_address: sanitizedFormData.parentAddress,
+        parent2_first_name: sanitizedFormData.parent2FirstName || null,
+        parent2_last_name: sanitizedFormData.parent2LastName || null,
+        parent2_email: sanitizedFormData.parent2Email || null,
+        parent2_authority: sanitizedFormData.parent2Authority || null,
+        parent2_mobile: sanitizedFormData.parent2Mobile || null,
+        parent2_office_phone: sanitizedFormData.parent2OfficePhone || null,
+        social_security_regime: sanitizedFormData.socialSecurityRegime,
+        sejour_preference_1: sanitizedFormData.sejourPreference1 || null,
+        sejour_preference_2: sanitizedFormData.sejourPreference2 || null,
+        sejour_preference_1_alternatif: sanitizedFormData.sejourPreference1Alternatif || null,
+        sejour_preference_2_alternatif: sanitizedFormData.sejourPreference2Alternatif || null,
         nombre_semaines_demandees: parseInt(numberOfWeeks),
-        demande_specifique: formData.demandeSpecifique || null,
+        demande_specifique: sanitizedFormData.demandeSpecifique || null,
         // Contacts d'urgence
-        urgency_contact_1_first_name: formData.urgencyContact1FirstName || null,
-        urgency_contact_1_last_name: formData.urgencyContact1LastName || null,
-        urgency_contact_1_relation: formData.urgencyContact1Relation || null,
-        urgency_contact_1_mobile: formData.urgencyContact1Mobile || null,
-        urgency_contact_1_other_phone: formData.urgencyContact1OtherPhone || null,
-        urgency_contact_2_first_name: formData.urgencyContact2FirstName || null,
-        urgency_contact_2_last_name: formData.urgencyContact2LastName || null,
-        urgency_contact_2_relation: formData.urgencyContact2Relation || null,
-        urgency_contact_2_mobile: formData.urgencyContact2Mobile || null,
-        urgency_contact_2_other_phone: formData.urgencyContact2OtherPhone || null,
+        urgency_contact_1_first_name: sanitizedFormData.urgencyContact1FirstName || null,
+        urgency_contact_1_last_name: sanitizedFormData.urgencyContact1LastName || null,
+        urgency_contact_1_relation: sanitizedFormData.urgencyContact1Relation || null,
+        urgency_contact_1_mobile: sanitizedFormData.urgencyContact1Mobile || null,
+        urgency_contact_1_other_phone: sanitizedFormData.urgencyContact1OtherPhone || null,
+        urgency_contact_2_first_name: sanitizedFormData.urgencyContact2FirstName || null,
+        urgency_contact_2_last_name: sanitizedFormData.urgencyContact2LastName || null,
+        urgency_contact_2_relation: sanitizedFormData.urgencyContact2Relation || null,
+        urgency_contact_2_mobile: sanitizedFormData.urgencyContact2Mobile || null,
+        urgency_contact_2_other_phone: sanitizedFormData.urgencyContact2OtherPhone || null,
         // Personnes autorisées
-        authorized_person_1_first_name: formData.authorizedPerson1FirstName || null,
-        authorized_person_1_last_name: formData.authorizedPerson1LastName || null,
-        authorized_person_1_relation: formData.authorizedPerson1Relation || null,
-        authorized_person_1_mobile: formData.authorizedPerson1Mobile || null,
-        authorized_person_1_other_phone: formData.authorizedPerson1OtherPhone || null,
-        authorized_person_2_first_name: formData.authorizedPerson2FirstName || null,
-        authorized_person_2_last_name: formData.authorizedPerson2LastName || null,
-        authorized_person_2_relation: formData.authorizedPerson2Relation || null,
-        authorized_person_2_mobile: formData.authorizedPerson2Mobile || null,
-        authorized_person_2_other_phone: formData.authorizedPerson2OtherPhone || null,
+        authorized_person_1_first_name: sanitizedFormData.authorizedPerson1FirstName || null,
+        authorized_person_1_last_name: sanitizedFormData.authorizedPerson1LastName || null,
+        authorized_person_1_relation: sanitizedFormData.authorizedPerson1Relation || null,
+        authorized_person_1_mobile: sanitizedFormData.authorizedPerson1Mobile || null,
+        authorized_person_1_other_phone: sanitizedFormData.authorizedPerson1OtherPhone || null,
+        authorized_person_2_first_name: sanitizedFormData.authorizedPerson2FirstName || null,
+        authorized_person_2_last_name: sanitizedFormData.authorizedPerson2LastName || null,
+        authorized_person_2_relation: sanitizedFormData.authorizedPerson2Relation || null,
+        authorized_person_2_mobile: sanitizedFormData.authorizedPerson2Mobile || null,
+        authorized_person_2_other_phone: sanitizedFormData.authorizedPerson2OtherPhone || null,
       };
-
-      // Debug: vérifier les valeurs des champs médicaux
-      console.log('FormData medical details:', {
-        hasMedication: formData.hasMedication,
-        medicationDetails: formData.medicationDetails,
-        hasAllergies: formData.hasAllergies,
-        allergiesDetails: formData.allergiesDetails,
-        foodAllergiesDetails: formData.foodAllergiesDetails
-      });
-      console.log('Inscription data medical details:', {
-        has_medication: inscriptionData.has_medication,
-        medication_details: inscriptionData.medication_details,
-        has_allergies: inscriptionData.has_allergies,
-        allergies_details: inscriptionData.allergies_details,
-        food_allergies_details: inscriptionData.food_allergies_details
-      });
 
       // INSERT sans .select() - ne nécessite pas de politique SELECT
       const { error } = await supabase
@@ -371,8 +402,8 @@ export default function Inscription() {
       await uploadDocuments(
         inscriptionId, 
         documentsToUpload,
-        formData.childLastName,
-        formData.childFirstName
+        sanitizedFormData.childLastName,
+        sanitizedFormData.childFirstName
       );
 
 
@@ -383,9 +414,9 @@ export default function Inscription() {
         await supabase.functions.invoke('send-inscription-email', {
           body: {
             inscriptionId: inscriptionId.slice(0, 8),
-            parentEmail: formData.parentEmail,
-            parentName: `${formData.parentFirstName} ${formData.parentLastName}`,
-            childName: `${formData.childFirstName} ${formData.childLastName}`,
+            parentEmail: sanitizedFormData.parentEmail,
+            parentName: `${sanitizedFormData.parentFirstName} ${sanitizedFormData.parentLastName}`,
+            childName: `${sanitizedFormData.childFirstName} ${sanitizedFormData.childLastName}`,
             recapUrl: recapUrl,
           },
         });
@@ -404,6 +435,12 @@ export default function Inscription() {
     } catch (error: any) {
       console.error("Erreur soumission inscription:", error);
       const errorMessage = error?.message || error?.error_description || JSON.stringify(error);
+
+      if (errorMessage?.toLowerCase().includes('upload') || errorMessage?.toLowerCase().includes('networkerror')) {
+        setSubmitError(`L'inscription a rencontré un problème lors de l'envoi des documents. ${errorMessage}`);
+      } else {
+        setSubmitError(errorMessage);
+      }
       setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
