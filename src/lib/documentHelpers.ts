@@ -64,12 +64,15 @@ export const uploadDocuments = async (
   documents: DocumentToUpload[],
   childLastName: string,
   childFirstName: string
-): Promise<void> => {
-  const uploadPromises = documents
-    .filter(doc => doc.file !== null)
-    .map(doc => uploadDocument(inscriptionId, doc, childLastName, childFirstName));
-  
-  await Promise.all(uploadPromises);
+): Promise<string[]> => {
+  const uploadedPaths: string[] = [];
+
+  for (const doc of documents.filter((item) => item.file !== null)) {
+    const path = await uploadDocument(inscriptionId, doc, childLastName, childFirstName);
+    if (path) uploadedPaths.push(path);
+  }
+
+  return uploadedPaths;
 };
 
 /**
