@@ -67,9 +67,19 @@ export const uploadDocuments = async (
 ): Promise<string[]> => {
   const uploadedPaths: string[] = [];
 
-  for (const doc of documents.filter((item) => item.file !== null)) {
-    const path = await uploadDocument(inscriptionId, doc, childLastName, childFirstName);
-    if (path) uploadedPaths.push(path);
+  try {
+    for (const doc of documents.filter((item) => item.file !== null)) {
+      const path = await uploadDocument(inscriptionId, doc, childLastName, childFirstName);
+      if (path) uploadedPaths.push(path);
+    }
+  } catch (error) {
+    await Promise.all(
+      uploadedPaths.map((path) =>
+        supabase.storage.from('inscription-documents').remove([path])
+      )
+    );
+
+    throw error;
   }
 
   return uploadedPaths;
