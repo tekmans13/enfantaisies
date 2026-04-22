@@ -22,7 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useSejours } from "@/hooks/use-sejours";
 import { useTarifCalculator } from "@/hooks/use-tarif-calculator";
-import { validateEmail, validatePhone, formatSejourTitreAvecLieu, normalizeText, normalizeForComparison } from "@/lib/formatters";
+import { validateEmail, validatePhone, formatSejourTitreAvecLieu, normalizeText } from "@/lib/formatters";
 import { uploadDocuments, DocumentToUpload } from "@/lib/documentHelpers";
 import { CLASS_TO_AGE_GROUP, TOTAL_INSCRIPTION_STEPS, CLASS_LABELS } from "@/lib/constants";
 import { StepPrealables } from "@/components/inscription/StepPrealables";
@@ -291,30 +291,6 @@ export default function Inscription() {
     setIsSubmitting(true);
     let createdInscriptionId: string | null = null;
     try {
-      // Vérification doublon côté client
-      const { data: existing, error: checkError } = await supabase
-        .from('inscriptions')
-        .select('id, child_first_name, child_last_name, child_birth_date, parent_email')
-        .eq('child_birth_date', sanitizedFormData.childBirthDate);
-
-      if (checkError) {
-        console.error('Erreur vérification doublon:', checkError);
-      } else if (
-        existing?.some((item) =>
-          normalizeForComparison(item.child_first_name) === normalizeForComparison(sanitizedFormData.childFirstName) &&
-          normalizeForComparison(item.child_last_name) === normalizeForComparison(sanitizedFormData.childLastName) &&
-          normalizeForComparison(item.parent_email) === normalizeForComparison(sanitizedFormData.parentEmail)
-        )
-      ) {
-        toast({
-          title: "Inscription déjà existante",
-          description: `${sanitizedFormData.childFirstName} ${sanitizedFormData.childLastName} est déjà inscrit(e) avec cette adresse email.`,
-          variant: "destructive",
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
       const inscriptionId = crypto.randomUUID();
       createdInscriptionId = inscriptionId;
       
@@ -379,12 +355,14 @@ export default function Inscription() {
         authorized_person_2_other_phone: sanitizedFormData.authorizedPerson2OtherPhone || null,
       };
 
-      // INSERT sans .select() - ne nécessite pas de politique SELECT
-      const { error } = await supabase
-        .from('inscriptions')
-        .insert(inscriptionData);
+      const { error: createError } = await supabase.functions.invoke('submit-inscription', {
+        body: {
+          action: 'create',
+          inscription: inscriptionData,
+        },
+      });
 
-      if (error) throw error;
+      if (createError) throw createError;
 
       // Stocker les données de l'inscription dans sessionStorage pour la page recap
       sessionStorage.setItem(`inscription_${inscriptionId}`, JSON.stringify(inscriptionData));
@@ -439,10 +417,12 @@ export default function Inscription() {
       const errorMessage = error?.message || error?.error_description || JSON.stringify(error);
 
       if (createdInscriptionId && (errorMessage?.toLowerCase().includes('upload') || errorMessage?.toLowerCase().includes('networkerror'))) {
-        const { error: rollbackError } = await supabase
-          .from('inscriptions')
-          .delete()
-          .eq('id', createdInscriptionId);
+        const { error: rollbackError } = await supabase.functions.invoke('submit-inscription', {
+          body: {
+            action: 'rollback',
+            inscriptionId: createdInscriptionId,
+          },
+        });
 
         if (rollbackError) {
           console.error('Erreur rollback inscription:', rollbackError);
