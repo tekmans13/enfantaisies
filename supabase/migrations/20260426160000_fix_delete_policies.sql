@@ -1,4 +1,4 @@
-i-- Fix : autoriser explicitement les rôles 'admin' ET 'user' à supprimer
+-- Fix : autoriser explicitement les rôles 'admin' ET 'user' à supprimer
 -- les inscriptions et leurs documents associés. Sans policy DELETE sur
 -- inscription_documents, RLS filtrait silencieusement la requête (0 ligne
 -- supprimée sans erreur) → faux succès côté UI.
@@ -28,4 +28,3 @@ USING (
   has_role(auth.uid(), 'admin'::app_role)
   OR has_role(auth.uid(), 'user'::app_role)
 );
-
