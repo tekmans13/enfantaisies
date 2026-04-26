@@ -350,7 +350,7 @@ export default function Bureau() {
 
   const handleDeleteInscription = async (inscriptionId: string) => {
     try {
-      // Supprimer d'abord les documents associés
+      // Supprimer d'abord les documents associés (sans bloquer si aucun document)
       const { error: docsError } = await supabase
         .from('inscription_documents')
         .delete()
@@ -358,13 +358,21 @@ export default function Bureau() {
 
       if (docsError) throw docsError;
 
-      // Puis supprimer l'inscription
-      const { error: inscriptionError } = await supabase
+      // Puis supprimer l'inscription — on récupère les lignes effectivement supprimées
+      // pour détecter un éventuel filtrage RLS silencieux (0 ligne sans erreur).
+      const { data: deletedRows, error: inscriptionError } = await supabase
         .from('inscriptions')
         .delete()
-        .eq('id', inscriptionId);
+        .eq('id', inscriptionId)
+        .select('id');
 
       if (inscriptionError) throw inscriptionError;
+
+      if (!deletedRows || deletedRows.length === 0) {
+        throw new Error(
+          "Aucune inscription n'a été supprimée. Vous n'avez peut-être pas les droits nécessaires (RLS)."
+        );
+      }
 
       toast({
         title: "Inscription supprimée",
