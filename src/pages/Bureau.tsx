@@ -48,6 +48,9 @@ import { HomeContentManageDialog } from "@/components/HomeContentManageDialog";
 import { exportInscriptionsToExcel } from "@/lib/excelExport";
 import { downloadAllDocuments } from "@/lib/downloadDocuments";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+
+const DEFAULT_BULK_SUBJECT = "Attribution et lien de paiement - Centre Aéré";
 
 export default function Bureau() {
   const navigate = useNavigate();
@@ -74,6 +77,7 @@ export default function Bureau() {
   const [bulkRelanceResults, setBulkRelanceResults] = useState<
     { id: string; label: string; ok: boolean; error?: string }[] | null
   >(null);
+  const [bulkRelanceSubject, setBulkRelanceSubject] = useState<string>(DEFAULT_BULK_SUBJECT);
 
   useEffect(() => {
     checkAdminRole();
@@ -527,7 +531,7 @@ export default function Bureau() {
 
   // Helper réutilisable : envoie le lien de paiement pour UNE inscription.
   // Reproduit exactement la logique de handleSendPayment, sans toast ni setState.
-  const sendPaymentLinkFor = async (inscription: any): Promise<{ ok: true } | { ok: false; error: string }> => {
+  const sendPaymentLinkFor = async (inscription: any, customSubject?: string): Promise<{ ok: true } | { ok: false; error: string }> => {
     try {
       const { data: tarifs } = await supabase
         .from('tarifs')
@@ -572,6 +576,7 @@ export default function Bureau() {
           recapUrl,
           paymentUrl,
           montantTotal,
+          customSubject,
         },
       });
 
@@ -605,6 +610,7 @@ export default function Bureau() {
     }
     setBulkRelanceCandidates(data || []);
     setBulkRelanceResults(null);
+    setBulkRelanceSubject(DEFAULT_BULK_SUBJECT);
   };
 
   const runBulkRelance = async () => {
@@ -615,7 +621,7 @@ export default function Bureau() {
     for (let i = 0; i < bulkRelanceCandidates.length; i++) {
       const ins = bulkRelanceCandidates[i];
       const label = `${ins.child_first_name} ${ins.child_last_name} (${ins.parent_email})`;
-      const r = await sendPaymentLinkFor(ins);
+      const r = await sendPaymentLinkFor(ins, bulkRelanceSubject);
       const anyR = r as { ok: boolean; error?: string };
       results.push({ id: ins.id, label, ok: anyR.ok, error: anyR.error });
       setBulkRelanceProgress({ done: i + 1, total: bulkRelanceCandidates.length });
@@ -1231,7 +1237,19 @@ export default function Bureau() {
             </AlertDialogDescription>
           </AlertDialogHeader>
 
-          <div className="max-h-[50vh] overflow-y-auto border rounded p-3 text-sm space-y-1">
+          {!bulkRelanceResults && (
+            <div className="space-y-1 mb-3">
+              <label className="text-sm font-medium">Objet du mail</label>
+              <Input
+                value={bulkRelanceSubject}
+                onChange={(e) => setBulkRelanceSubject(e.target.value)}
+                disabled={bulkRelanceRunning}
+                placeholder={DEFAULT_BULK_SUBJECT}
+              />
+            </div>
+          )}
+
+          <div className="max-h-[40vh] overflow-y-auto border rounded p-3 text-sm space-y-1">
             {bulkRelanceResults
               ? bulkRelanceResults.map((r) => (
                   <div key={r.id} className="flex items-start gap-2">

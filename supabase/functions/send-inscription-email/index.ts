@@ -28,6 +28,7 @@ interface EmailRequest {
   paymentUrl?: string;
   montantTotal?: number;
   isPaymentConfirmation?: boolean;
+  customSubject?: string;
 }
 
 /** Handler principal de la fonction edge */
@@ -38,7 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { inscriptionId, parentEmail, parentName, childName, recapUrl, paymentUrl, montantTotal, isPaymentConfirmation }: EmailRequest = await req.json();
+    const { inscriptionId, parentEmail, parentName, childName, recapUrl, paymentUrl, montantTotal, isPaymentConfirmation, customSubject }: EmailRequest = await req.json();
 
     console.log("Sending email to:", parentEmail);
 
@@ -129,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
     await client.send({
       from: smtpConfig.from_email,
       to: parentEmail,
-      subject: emailSubject,
+      subject: (customSubject && customSubject.trim()) ? customSubject.trim() : emailSubject,
       content: emailContent,
     });
 
