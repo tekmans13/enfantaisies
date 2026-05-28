@@ -531,7 +531,7 @@ export default function Bureau() {
 
   // Helper réutilisable : envoie le lien de paiement pour UNE inscription.
   // Reproduit exactement la logique de handleSendPayment, sans toast ni setState.
-  const sendPaymentLinkFor = async (inscription: any): Promise<{ ok: true } | { ok: false; error: string }> => {
+  const sendPaymentLinkFor = async (inscription: any, customSubject?: string): Promise<{ ok: true } | { ok: false; error: string }> => {
     try {
       const { data: tarifs } = await supabase
         .from('tarifs')
