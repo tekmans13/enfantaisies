@@ -620,7 +620,7 @@ export default function Bureau() {
     for (let i = 0; i < bulkRelanceCandidates.length; i++) {
       const ins = bulkRelanceCandidates[i];
       const label = `${ins.child_first_name} ${ins.child_last_name} (${ins.parent_email})`;
-      const r = await sendPaymentLinkFor(ins);
+      const r = await sendPaymentLinkFor(ins, bulkRelanceSubject);
       const anyR = r as { ok: boolean; error?: string };
       results.push({ id: ins.id, label, ok: anyR.ok, error: anyR.error });
       setBulkRelanceProgress({ done: i + 1, total: bulkRelanceCandidates.length });
