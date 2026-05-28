@@ -1237,7 +1237,19 @@ export default function Bureau() {
             </AlertDialogDescription>
           </AlertDialogHeader>
 
-          <div className="max-h-[50vh] overflow-y-auto border rounded p-3 text-sm space-y-1">
+          {!bulkRelanceResults && (
+            <div className="space-y-1 mb-3">
+              <label className="text-sm font-medium">Objet du mail</label>
+              <Input
+                value={bulkRelanceSubject}
+                onChange={(e) => setBulkRelanceSubject(e.target.value)}
+                disabled={bulkRelanceRunning}
+                placeholder={DEFAULT_BULK_SUBJECT}
+              />
+            </div>
+          )}
+
+          <div className="max-h-[40vh] overflow-y-auto border rounded p-3 text-sm space-y-1">
             {bulkRelanceResults
               ? bulkRelanceResults.map((r) => (
                   <div key={r.id} className="flex items-start gap-2">
