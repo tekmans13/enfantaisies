@@ -633,7 +633,6 @@ export default function Bureau() {
   };
 
   return (
-  return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8 gap-4">
