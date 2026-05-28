@@ -729,7 +729,6 @@ export default function Bureau() {
               </div>
             </div>
           </Card>
-          </Card>
         </div>
 
         {/* Gestion des séjours par groupe */}
