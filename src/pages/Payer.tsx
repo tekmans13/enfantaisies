@@ -37,7 +37,13 @@ const Payer = () => {
         if (cancelled) return;
 
         if (fnError) {
-          console.error("Edge function error:", fnError);
+          try {
+            const context = (fnError as any).context;
+            const body = context ? await context.json() : null;
+            console.error("Edge function error:", fnError, body);
+          } catch (_) {
+            console.error("Edge function error:", fnError);
+          }
           setError("Impossible de préparer le paiement. Merci de contacter le centre.");
           return;
         }
