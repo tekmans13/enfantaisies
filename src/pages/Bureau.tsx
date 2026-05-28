@@ -56,7 +56,7 @@ export default function Bureau() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [inscriptions, setInscriptions] = useState<any[]>([]);
-  const [stats, setStats] = useState({ total: 0, garcons: 0, filles: 0, enAttente: 0, payes: 0 });
+  const [stats, setStats] = useState({ total: 0, garcons: 0, filles: 0, enAttente: 0, attribuees: 0, payes: 0 });
   const [sejourStats, setSejourStats] = useState<any[]>([]);
   const [sejours, setSejours] = useState<any[]>([]);
   const [editingInscription, setEditingInscription] = useState<any>(null);
@@ -180,9 +180,10 @@ export default function Bureau() {
       const garcons = data.filter(i => i.child_gender === 'garcon').length;
       const filles = data.filter(i => i.child_gender === 'fille').length;
       const enAttente = data.filter(i => i.status === 'en_attente').length;
+      const attribuees = data.filter(i => i.status === 'attribuee' || i.status === 'attribuee_alternatif').length;
       const payes = data.filter(i => i.status === 'paye' || i.status === 'validee').length;
 
-      setStats({ total, garcons, filles, enAttente, payes });
+      setStats({ total, garcons, filles, enAttente, attribuees, payes });
 
       // Calculer les statistiques par séjour
       const sejourMap = new Map<string, { id: string; choix1: number; choix2: number; total: number }>();
@@ -717,15 +718,14 @@ export default function Bureau() {
               </div>
             </div>
           </Card>
-
           <Card className="p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center">
                 <Clock className="w-6 h-6 text-orange-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">En Attente</p>
-                <p className="text-2xl font-bold text-foreground">{stats.enAttente}</p>
+                <p className="text-sm text-muted-foreground">En Attente / Attribué</p>
+                <p className="text-2xl font-bold text-foreground">{stats.enAttente}/{stats.attribuees}</p>
               </div>
             </div>
           </Card>
