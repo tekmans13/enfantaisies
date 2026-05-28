@@ -10,12 +10,13 @@ const corsHeaders = {
 
 interface PaymentRequest {
   inscriptionId: string;
-  parentEmail: string;
-  parentName: string;
-  childName: string;
-  montantTotal: number;
-  nombreSemaines: number;
   origin?: string;
+  // Champs optionnels (rétro-compat, ignorés si présents : on recalcule côté serveur)
+  parentEmail?: string;
+  parentName?: string;
+  childName?: string;
+  montantTotal?: number;
+  nombreSemaines?: number;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -24,26 +25,100 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { inscriptionId, parentEmail, parentName, childName, montantTotal, nombreSemaines, origin }: PaymentRequest = await req.json();
+    const { inscriptionId, origin }: PaymentRequest = await req.json();
+
+    if (!inscriptionId) {
+      throw new Error('inscriptionId requis');
+    }
+
     const baseUrl = origin?.replace(/\/$/, '') || 'https://enfantaisies.lovable.app';
-    
-    // Initialiser le client Supabase
+
+    // Client Supabase service role pour tout récupérer côté serveur
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Récupérer la configuration Stripe depuis la base de données
+    // 1) Inscription
+    const { data: inscription, error: inscError } = await supabase
+      .from('inscriptions')
+      .select('*')
+      .eq('id', inscriptionId)
+      .maybeSingle();
+
+    if (inscError) throw inscError;
+    if (!inscription) throw new Error('Inscription non trouvée');
+
+    // 2) Séjours attribués
+    const sejourIds = [inscription.sejour_attribue_1, inscription.sejour_attribue_2].filter(Boolean);
+    if (sejourIds.length === 0) {
+      throw new Error('Aucun séjour attribué pour cette inscription');
+    }
+
+    const { data: sejoursData, error: sejError } = await supabase
+      .from('sejours')
+      .select('*')
+      .in('id', sejourIds);
+
+    if (sejError) throw sejError;
+    if (!sejoursData || sejoursData.length === 0) {
+      throw new Error('Séjours attribués introuvables');
+    }
+
+    // 3) Tarif applicable (QF)
+    const annee = new Date().getFullYear();
+    const { data: tarifs, error: tarError } = await supabase
+      .from('tarifs')
+      .select('*')
+      .eq('annee', annee)
+      .order('tarif_numero', { ascending: true });
+
+    if (tarError) throw tarError;
+    if (!tarifs || tarifs.length === 0) {
+      throw new Error(`Aucun tarif configuré pour ${annee}`);
+    }
+
+    const qf = inscription.quotient_familial || 999999;
+    const tarif = tarifs.find((t: any) =>
+      qf >= t.qf_min && (t.qf_max === null || qf <= t.qf_max)
+    ) || tarifs[tarifs.length - 1];
+
+    // 4) Calcul du montant total
+    let montantTotal = 0;
+    sejoursData.forEach((sejour: any) => {
+      const dateDebut = new Date(sejour.date_debut);
+      const dateFin = new Date(sejour.date_fin);
+      const joursCalc = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      const nbJours = sejour.nombre_jours ?? joursCalc;
+
+      const isCentreAere = sejour.type === 'centre_aere' || sejour.type === 'animation';
+      const tarifJournalier = isCentreAere
+        ? tarif.tarif_journee_centre_aere
+        : tarif.tarif_journee_sejour;
+
+      montantTotal += Number(tarifJournalier) * nbJours;
+    });
+
+    if (montantTotal <= 0) {
+      throw new Error('Montant à payer invalide');
+    }
+
+    const parentEmail = inscription.parent_email;
+    const parentName = `${inscription.parent_first_name} ${inscription.parent_last_name}`;
+    const childName = `${inscription.child_first_name} ${inscription.child_last_name}`;
+    const nombreSemaines = sejoursData.length;
+
+    // 5) Configuration Stripe
     const { data: stripeConfig, error: configError } = await supabase
       .from('stripe_config')
       .select('secret_key')
       .single();
 
     if (configError || !stripeConfig?.secret_key) {
-      throw new Error('Configuration Stripe non trouvée. Veuillez configurer Stripe dans l\'interface d\'administration.');
+      throw new Error("Configuration Stripe non trouvée.");
     }
 
     const stripeKey = stripeConfig.secret_key;
-    
+
     console.log({
       inscriptionId,
       parentEmail,
@@ -52,14 +127,11 @@ const handler = async (req: Request): Promise<Response> => {
       env: stripeKey.startsWith('sk_test_') ? 'test' : 'live'
     });
 
-    console.log('Stripe key prefix:', stripeKey.slice(0, 8));
-
     const stripe = new Stripe(stripeKey, {
       apiVersion: '2020-08-27',
       httpClient: Stripe.createFetchHttpClient(),
     });
 
-    // Créer une Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -94,12 +166,12 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     console.log('Checkout session id:', session.id);
-    console.log('Checkout URL:', session.url);
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         paymentUrl: session.url,
-        success: true 
+        montantTotal,
+        success: true,
       }),
       {
         status: 200,
@@ -109,9 +181,9 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error('Error creating payment link:', error);
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: error.message,
-        success: false 
+        success: false,
       }),
       {
         status: 500,

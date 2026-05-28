@@ -10,6 +10,7 @@ import RecapInscription from "./pages/RecapInscription";
 import Tarifs from "./pages/Tarifs";
 import Documents from "./pages/Documents";
 import Auth from "./pages/Auth";
+import Payer from "./pages/Payer";
 import Users from "./pages/admin/Users";
 import Configuration from "./pages/admin/Configuration";
 import NotFound from "./pages/NotFound";
@@ -68,6 +69,7 @@ const App = () => (
             } 
           />
           <Route path="/recap-inscription/:id" element={<RecapInscription />} />
+          <Route path="/payer/:id" element={<Payer />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

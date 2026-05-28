@@ -466,31 +466,16 @@ export default function Bureau() {
         montantTotal += Number(tarifJournalier) * nbJours;
       });
 
-      const { data, error } = await supabase.functions.invoke('create-stripe-payment-link', {
-        body: {
-          inscriptionId: inscription.id,
-          parentEmail: inscription.parent_email,
-          parentName: `${inscription.parent_first_name} ${inscription.parent_last_name}`,
-          childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
-          montantTotal,
-          nombreSemaines: sejoursData.length,
-          origin: window.location.origin,
-        },
-      });
-
-      if (error) {
-        const detail = await getEdgeErrorDetail(error);
-        throw new Error(`create-stripe-payment-link: ${detail}`);
-      }
-
-      if (!data?.success) {
-        throw new Error(data?.error || 'Erreur inconnue');
-      }
+      // Plus de création de session Stripe ici : on envoie un lien vers
+      // notre site /payer/<id> qui crée la session AU MOMENT DU CLIC du parent.
+      // Cela évite l'expiration des sessions Stripe (max 24h).
+      const paymentUrl = `${window.location.origin}/payer/${inscription.id}`;
 
       await supabase
         .from('inscriptions')
         .update({ status: 'envoye' })
         .eq('id', inscription.id);
+
 
       const recapUrl = `${window.location.origin}/recap-inscription/${inscription.id}`;
 
@@ -501,7 +486,7 @@ export default function Bureau() {
           parentName: `${inscription.parent_first_name} ${inscription.parent_last_name}`,
           childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
           recapUrl,
-          paymentUrl: data.paymentUrl,
+          paymentUrl,
           montantTotal,
         },
       });
