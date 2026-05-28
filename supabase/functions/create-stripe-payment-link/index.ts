@@ -65,7 +65,9 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // 3) Tarif applicable (QF)
-    const annee = new Date().getFullYear();
+    // Utiliser l'année du séjour attribué plutôt que l'année serveur :
+    // les liens de paiement doivent rester valables même après le changement d'année civile.
+    const annee = new Date(sejoursData[0].date_debut).getFullYear();
     const { data: tarifs, error: tarError } = await supabase
       .from('tarifs')
       .select('*')
