@@ -576,6 +576,7 @@ export default function Bureau() {
           recapUrl,
           paymentUrl,
           montantTotal,
+          customSubject,
         },
       });
 
