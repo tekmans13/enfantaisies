@@ -130,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
     await client.send({
       from: smtpConfig.from_email,
       to: parentEmail,
-      subject: emailSubject,
+      subject: (customSubject && customSubject.trim()) ? customSubject.trim() : emailSubject,
       content: emailContent,
     });
 
