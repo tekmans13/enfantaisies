@@ -48,6 +48,9 @@ import { HomeContentManageDialog } from "@/components/HomeContentManageDialog";
 import { exportInscriptionsToExcel } from "@/lib/excelExport";
 import { downloadAllDocuments } from "@/lib/downloadDocuments";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+
+const DEFAULT_BULK_SUBJECT = "Attribution et lien de paiement - Centre Aéré";
 
 export default function Bureau() {
   const navigate = useNavigate();
