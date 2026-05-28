@@ -1190,6 +1190,104 @@ export default function Bureau() {
         open={showHomeContentDialog}
         onOpenChange={setShowHomeContentDialog}
       />
+
+      <AlertDialog
+        open={bulkRelanceCandidates !== null}
+        onOpenChange={(open) => {
+          if (!open && !bulkRelanceRunning) {
+            setBulkRelanceCandidates(null);
+            setBulkRelanceResults(null);
+            setBulkRelanceProgress({ done: 0, total: 0 });
+          }
+        }}
+      >
+        <AlertDialogContent className="max-w-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {bulkRelanceResults
+                ? "Résultats de la relance"
+                : `Relancer ${bulkRelanceCandidates?.length ?? 0} inscription(s) en statut "envoyé" ?`}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                {!bulkRelanceResults && !bulkRelanceRunning && (
+                  <p>
+                    Un email avec le lien de paiement sera renvoyé à chacun des parents listés ci-dessous.
+                    Le statut reste "envoyé".
+                  </p>
+                )}
+                {bulkRelanceRunning && (
+                  <p>
+                    Envoi en cours : {bulkRelanceProgress.done} / {bulkRelanceProgress.total}
+                  </p>
+                )}
+                {bulkRelanceResults && (
+                  <p>
+                    {bulkRelanceResults.filter((r) => r.ok).length} envoyé(s) /{" "}
+                    {bulkRelanceResults.filter((r) => !r.ok).length} en erreur sur {bulkRelanceResults.length}.
+                  </p>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="max-h-[50vh] overflow-y-auto border rounded p-3 text-sm space-y-1">
+            {bulkRelanceResults
+              ? bulkRelanceResults.map((r) => (
+                  <div key={r.id} className="flex items-start gap-2">
+                    {r.ok ? (
+                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="truncate">{r.label}</div>
+                      {!r.ok && (
+                        <div className="text-xs text-destructive break-words">Erreur : {r.error}</div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              : bulkRelanceCandidates?.map((c) => (
+                  <div key={c.id} className="truncate">
+                    • {c.child_first_name} {c.child_last_name} — {c.parent_email}
+                  </div>
+                ))}
+            {bulkRelanceCandidates?.length === 0 && !bulkRelanceResults && (
+              <div className="text-muted-foreground">Aucune inscription en statut "envoyé".</div>
+            )}
+          </div>
+
+          <AlertDialogFooter>
+            {bulkRelanceResults ? (
+              <AlertDialogAction
+                onClick={() => {
+                  setBulkRelanceCandidates(null);
+                  setBulkRelanceResults(null);
+                  setBulkRelanceProgress({ done: 0, total: 0 });
+                }}
+              >
+                Fermer
+              </AlertDialogAction>
+            ) : (
+              <>
+                <AlertDialogCancel disabled={bulkRelanceRunning}>Annuler</AlertDialogCancel>
+                <AlertDialogAction
+                  disabled={bulkRelanceRunning || !bulkRelanceCandidates?.length}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    runBulkRelance();
+                  }}
+                >
+                  {bulkRelanceRunning
+                    ? `Envoi... (${bulkRelanceProgress.done}/${bulkRelanceProgress.total})`
+                    : "Confirmer l'envoi"}
+                </AlertDialogAction>
+              </>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
