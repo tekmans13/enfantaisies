@@ -28,6 +28,7 @@ interface EmailRequest {
   paymentUrl?: string;
   montantTotal?: number;
   isPaymentConfirmation?: boolean;
+  customSubject?: string;
 }
 
 /** Handler principal de la fonction edge */
