@@ -610,6 +610,7 @@ export default function Bureau() {
     }
     setBulkRelanceCandidates(data || []);
     setBulkRelanceResults(null);
+    setBulkRelanceSubject(DEFAULT_BULK_SUBJECT);
   };
 
   const runBulkRelance = async () => {
