@@ -669,7 +669,7 @@ export default function Bureau() {
             </Button>
             <Button size="sm" onClick={openBulkRelance} variant="outline" className="gap-2">
               <Send className="h-4 w-4" />
-              Relancer les "envoyés"
+              Relance lien
             </Button>
             <Button size="sm" onClick={handleLogout} variant="outline" className="gap-2">
               <LogOut className="h-4 w-4" />
