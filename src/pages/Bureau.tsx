@@ -68,6 +68,12 @@ export default function Bureau() {
   const [deletingInscriptionId, setDeletingInscriptionId] = useState<string | null>(null);
   const [viewingInscriptionId, setViewingInscriptionId] = useState<string | null>(null);
   const [showHomeContentDialog, setShowHomeContentDialog] = useState(false);
+  const [bulkRelanceCandidates, setBulkRelanceCandidates] = useState<any[] | null>(null);
+  const [bulkRelanceRunning, setBulkRelanceRunning] = useState(false);
+  const [bulkRelanceProgress, setBulkRelanceProgress] = useState({ done: 0, total: 0 });
+  const [bulkRelanceResults, setBulkRelanceResults] = useState<
+    { id: string; label: string; ok: boolean; error?: string }[] | null
+  >(null);
 
   useEffect(() => {
     checkAdminRole();
@@ -519,6 +525,107 @@ export default function Bureau() {
     }
   };
 
+  // Helper réutilisable : envoie le lien de paiement pour UNE inscription.
+  // Reproduit exactement la logique de handleSendPayment, sans toast ni setState.
+  const sendPaymentLinkFor = async (inscription: any): Promise<{ ok: true } | { ok: false; error: string }> => {
+    try {
+      const { data: tarifs } = await supabase
+        .from('tarifs')
+        .select('*')
+        .eq('annee', 2025)
+        .order('tarif_numero', { ascending: true });
+      if (!tarifs || tarifs.length === 0) return { ok: false, error: 'Aucun tarif configuré pour 2025' };
+
+      const qf = inscription.quotient_familial || 999999;
+      const tarif = tarifs.find((t: any) =>
+        qf >= t.qf_min && (t.qf_max === null || qf <= t.qf_max)
+      ) || tarifs[tarifs.length - 1];
+
+      const sejourIds = [inscription.sejour_attribue_1, inscription.sejour_attribue_2].filter(Boolean);
+      if (!sejourIds.length) return { ok: false, error: 'Aucun séjour attribué' };
+
+      const { data: sejoursData } = await supabase.from('sejours').select('*').in('id', sejourIds);
+      if (!sejoursData || sejoursData.length === 0) return { ok: false, error: 'Séjours introuvables' };
+
+      let montantTotal = 0;
+      sejoursData.forEach((sejour: any) => {
+        const dateDebut = new Date(sejour.date_debut);
+        const dateFin = new Date(sejour.date_fin);
+        const joursCalc = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        const nbJours = sejour.nombre_jours ?? joursCalc;
+        const isCentreAere = sejour.type === 'centre_aere' || sejour.type === 'animation';
+        const tarifJournalier = isCentreAere ? tarif.tarif_journee_centre_aere : tarif.tarif_journee_sejour;
+        montantTotal += Number(tarifJournalier) * nbJours;
+      });
+
+      const paymentUrl = `${window.location.origin}/payer/${inscription.id}`;
+      const recapUrl = `${window.location.origin}/recap-inscription/${inscription.id}`;
+
+      await supabase.from('inscriptions').update({ status: 'envoye' }).eq('id', inscription.id);
+
+      const { error: emailError } = await supabase.functions.invoke('send-inscription-email', {
+        body: {
+          inscriptionId: inscription.id,
+          parentEmail: inscription.parent_email,
+          parentName: `${inscription.parent_first_name} ${inscription.parent_last_name}`,
+          childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
+          recapUrl,
+          paymentUrl,
+          montantTotal,
+        },
+      });
+
+      if (emailError) {
+        let detail = emailError.message;
+        if (emailError instanceof FunctionsHttpError) {
+          try {
+            const body = await emailError.context.json();
+            detail = body?.error || body?.details || JSON.stringify(body);
+          } catch {
+            try { detail = await emailError.context.text(); } catch { /* noop */ }
+          }
+        }
+        return { ok: false, error: detail };
+      }
+      return { ok: true };
+    } catch (e: any) {
+      return { ok: false, error: e?.message || String(e) };
+    }
+  };
+
+  const openBulkRelance = async () => {
+    const { data, error } = await supabase
+      .from('inscriptions')
+      .select('id, child_first_name, child_last_name, parent_email, parent_first_name, parent_last_name, quotient_familial, sejour_attribue_1, sejour_attribue_2')
+      .eq('status', 'envoye')
+      .order('child_last_name');
+    if (error) {
+      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setBulkRelanceCandidates(data || []);
+    setBulkRelanceResults(null);
+  };
+
+  const runBulkRelance = async () => {
+    if (!bulkRelanceCandidates) return;
+    setBulkRelanceRunning(true);
+    setBulkRelanceProgress({ done: 0, total: bulkRelanceCandidates.length });
+    const results: { id: string; label: string; ok: boolean; error?: string }[] = [];
+    for (let i = 0; i < bulkRelanceCandidates.length; i++) {
+      const ins = bulkRelanceCandidates[i];
+      const label = `${ins.child_first_name} ${ins.child_last_name} (${ins.parent_email})`;
+      const r = await sendPaymentLinkFor(ins);
+      const anyR = r as { ok: boolean; error?: string };
+      results.push({ id: ins.id, label, ok: anyR.ok, error: anyR.error });
+      setBulkRelanceProgress({ done: i + 1, total: bulkRelanceCandidates.length });
+      await new Promise((res) => setTimeout(res, 400));
+    }
+    setBulkRelanceResults(results);
+    setBulkRelanceRunning(false);
+    fetchInscriptions();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
       <div className="max-w-7xl mx-auto">
@@ -553,6 +660,10 @@ export default function Bureau() {
             <Button onClick={() => navigate("/documents")} variant="outline" className="gap-2">
               <FileText className="h-4 w-4" />
               Documents
+            </Button>
+            <Button onClick={openBulkRelance} variant="outline" className="gap-2">
+              <Send className="h-4 w-4" />
+              Relancer les "envoyés"
             </Button>
             <Button onClick={handleLogout} variant="outline" className="gap-2">
               <LogOut className="h-4 w-4" />
@@ -1079,6 +1190,104 @@ export default function Bureau() {
         open={showHomeContentDialog}
         onOpenChange={setShowHomeContentDialog}
       />
+
+      <AlertDialog
+        open={bulkRelanceCandidates !== null}
+        onOpenChange={(open) => {
+          if (!open && !bulkRelanceRunning) {
+            setBulkRelanceCandidates(null);
+            setBulkRelanceResults(null);
+            setBulkRelanceProgress({ done: 0, total: 0 });
+          }
+        }}
+      >
+        <AlertDialogContent className="max-w-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {bulkRelanceResults
+                ? "Résultats de la relance"
+                : `Relancer ${bulkRelanceCandidates?.length ?? 0} inscription(s) en statut "envoyé" ?`}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                {!bulkRelanceResults && !bulkRelanceRunning && (
+                  <p>
+                    Un email avec le lien de paiement sera renvoyé à chacun des parents listés ci-dessous.
+                    Le statut reste "envoyé".
+                  </p>
+                )}
+                {bulkRelanceRunning && (
+                  <p>
+                    Envoi en cours : {bulkRelanceProgress.done} / {bulkRelanceProgress.total}
+                  </p>
+                )}
+                {bulkRelanceResults && (
+                  <p>
+                    {bulkRelanceResults.filter((r) => r.ok).length} envoyé(s) /{" "}
+                    {bulkRelanceResults.filter((r) => !r.ok).length} en erreur sur {bulkRelanceResults.length}.
+                  </p>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="max-h-[50vh] overflow-y-auto border rounded p-3 text-sm space-y-1">
+            {bulkRelanceResults
+              ? bulkRelanceResults.map((r) => (
+                  <div key={r.id} className="flex items-start gap-2">
+                    {r.ok ? (
+                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="truncate">{r.label}</div>
+                      {!r.ok && (
+                        <div className="text-xs text-destructive break-words">Erreur : {r.error}</div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              : bulkRelanceCandidates?.map((c) => (
+                  <div key={c.id} className="truncate">
+                    • {c.child_first_name} {c.child_last_name} — {c.parent_email}
+                  </div>
+                ))}
+            {bulkRelanceCandidates?.length === 0 && !bulkRelanceResults && (
+              <div className="text-muted-foreground">Aucune inscription en statut "envoyé".</div>
+            )}
+          </div>
+
+          <AlertDialogFooter>
+            {bulkRelanceResults ? (
+              <AlertDialogAction
+                onClick={() => {
+                  setBulkRelanceCandidates(null);
+                  setBulkRelanceResults(null);
+                  setBulkRelanceProgress({ done: 0, total: 0 });
+                }}
+              >
+                Fermer
+              </AlertDialogAction>
+            ) : (
+              <>
+                <AlertDialogCancel disabled={bulkRelanceRunning}>Annuler</AlertDialogCancel>
+                <AlertDialogAction
+                  disabled={bulkRelanceRunning || !bulkRelanceCandidates?.length}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    runBulkRelance();
+                  }}
+                >
+                  {bulkRelanceRunning
+                    ? `Envoi... (${bulkRelanceProgress.done}/${bulkRelanceProgress.total})`
+                    : "Confirmer l'envoi"}
+                </AlertDialogAction>
+              </>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
