@@ -69,6 +69,7 @@ const App = () => (
             } 
           />
           <Route path="/recap-inscription/:id" element={<RecapInscription />} />
+          <Route path="/payer/:id" element={<Payer />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
