@@ -638,94 +638,46 @@ export default function Bureau() {
         <div className="flex justify-between items-center mb-8 gap-4">
           <div className="shrink-0">
             <h1 className="text-2xl font-bold text-foreground mb-1">
-              Gestion — Centre Aéré
+              Gestion - Centre Aéré
             </h1>
             <p className="text-sm text-muted-foreground">
               Tableau de bord des inscriptions
             </p>
           </div>
-          <div className="flex items-center gap-1.5 flex-nowrap">
+          <div className="flex gap-2 flex-wrap justify-end">
             {isAdmin && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button size="sm" onClick={() => navigate("/admin/configuration")} variant="outline" className="gap-1.5 px-2.5">
-                      <Settings className="h-4 w-4" />
-                      <span className="hidden lg:inline">Config</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Configuration</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Button size="sm" onClick={() => navigate("/admin/configuration")} variant="outline" className="gap-2">
+                <Settings className="h-4 w-4" />
+                Configuration
+              </Button>
             )}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button size="sm" onClick={() => setShowHomeContentDialog(true)} variant="outline" className="gap-1.5 px-2.5">
-                    <FileText className="h-4 w-4" />
-                    <span className="hidden lg:inline">Accueil</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Page Accueil</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button size="sm" onClick={() => navigate("/tarifs")} variant="outline" className="gap-1.5 px-2.5">
-                    <DollarSign className="h-4 w-4" />
-                    <span className="hidden lg:inline">Tarifs</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Gérer les tarifs</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button size="sm" onClick={() => navigate("/admin/users")} variant="outline" className="gap-1.5 px-2.5">
-                    <UsersIcon className="h-4 w-4" />
-                    <span className="hidden lg:inline">Utilisateurs</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Utilisateurs</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button size="sm" onClick={() => navigate("/documents")} variant="outline" className="gap-1.5 px-2.5">
-                    <FileText className="h-4 w-4" />
-                    <span className="hidden lg:inline">Documents</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Documents</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button size="sm" onClick={openBulkRelance} variant="outline" className="gap-1.5 px-2.5">
-                    <Send className="h-4 w-4" />
-                    <span className="hidden lg:inline">Relancer</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Relancer les &quot;envoyés&quot;</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button size="sm" onClick={handleLogout} variant="outline" className="gap-1.5 px-2.5">
-                    <LogOut className="h-4 w-4" />
-                    <span className="hidden lg:inline">Déconnexion</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Se déconnecter</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Button size="sm" onClick={() => setShowHomeContentDialog(true)} variant="outline" className="gap-2">
+              <FileText className="h-4 w-4" />
+              Page Accueil
+            </Button>
+            <Button size="sm" onClick={() => navigate("/tarifs")} variant="outline" className="gap-2">
+              <DollarSign className="h-4 w-4" />
+              Gérer les tarifs
+            </Button>
+            <Button size="sm" onClick={() => navigate("/admin/users")} variant="outline" className="gap-2">
+              <UsersIcon className="h-4 w-4" />
+              Utilisateurs
+            </Button>
+            <Button size="sm" onClick={() => navigate("/documents")} variant="outline" className="gap-2">
+              <FileText className="h-4 w-4" />
+              Documents
+            </Button>
+            <Button size="sm" onClick={openBulkRelance} variant="outline" className="gap-2">
+              <Send className="h-4 w-4" />
+              Relancer les "envoyés"
+            </Button>
+            <Button size="sm" onClick={handleLogout} variant="outline" className="gap-2">
+              <LogOut className="h-4 w-4" />
+              Se déconnecter
+            </Button>
           </div>
         </div>
+
 
         {/* Statistiques générales */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
