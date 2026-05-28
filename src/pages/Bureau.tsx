@@ -525,6 +525,106 @@ export default function Bureau() {
     }
   };
 
+  // Helper réutilisable : envoie le lien de paiement pour UNE inscription.
+  // Reproduit exactement la logique de handleSendPayment, sans toast ni setState.
+  const sendPaymentLinkFor = async (inscription: any): Promise<{ ok: true } | { ok: false; error: string }> => {
+    try {
+      const { data: tarifs } = await supabase
+        .from('tarifs')
+        .select('*')
+        .eq('annee', 2025)
+        .order('tarif_numero', { ascending: true });
+      if (!tarifs || tarifs.length === 0) return { ok: false, error: 'Aucun tarif configuré pour 2025' };
+
+      const qf = inscription.quotient_familial || 999999;
+      const tarif = tarifs.find((t: any) =>
+        qf >= t.qf_min && (t.qf_max === null || qf <= t.qf_max)
+      ) || tarifs[tarifs.length - 1];
+
+      const sejourIds = [inscription.sejour_attribue_1, inscription.sejour_attribue_2].filter(Boolean);
+      if (!sejourIds.length) return { ok: false, error: 'Aucun séjour attribué' };
+
+      const { data: sejoursData } = await supabase.from('sejours').select('*').in('id', sejourIds);
+      if (!sejoursData || sejoursData.length === 0) return { ok: false, error: 'Séjours introuvables' };
+
+      let montantTotal = 0;
+      sejoursData.forEach((sejour: any) => {
+        const dateDebut = new Date(sejour.date_debut);
+        const dateFin = new Date(sejour.date_fin);
+        const joursCalc = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        const nbJours = sejour.nombre_jours ?? joursCalc;
+        const isCentreAere = sejour.type === 'centre_aere' || sejour.type === 'animation';
+        const tarifJournalier = isCentreAere ? tarif.tarif_journee_centre_aere : tarif.tarif_journee_sejour;
+        montantTotal += Number(tarifJournalier) * nbJours;
+      });
+
+      const paymentUrl = `${window.location.origin}/payer/${inscription.id}`;
+      const recapUrl = `${window.location.origin}/recap-inscription/${inscription.id}`;
+
+      await supabase.from('inscriptions').update({ status: 'envoye' }).eq('id', inscription.id);
+
+      const { error: emailError } = await supabase.functions.invoke('send-inscription-email', {
+        body: {
+          inscriptionId: inscription.id,
+          parentEmail: inscription.parent_email,
+          parentName: `${inscription.parent_first_name} ${inscription.parent_last_name}`,
+          childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
+          recapUrl,
+          paymentUrl,
+          montantTotal,
+        },
+      });
+
+      if (emailError) {
+        let detail = emailError.message;
+        if (emailError instanceof FunctionsHttpError) {
+          try {
+            const body = await emailError.context.json();
+            detail = body?.error || body?.details || JSON.stringify(body);
+          } catch {
+            try { detail = await emailError.context.text(); } catch { /* noop */ }
+          }
+        }
+        return { ok: false, error: detail };
+      }
+      return { ok: true };
+    } catch (e: any) {
+      return { ok: false, error: e?.message || String(e) };
+    }
+  };
+
+  const openBulkRelance = async () => {
+    const { data, error } = await supabase
+      .from('inscriptions')
+      .select('id, child_first_name, child_last_name, parent_email, parent_first_name, parent_last_name, quotient_familial, sejour_attribue_1, sejour_attribue_2')
+      .eq('status', 'envoye')
+      .order('child_last_name');
+    if (error) {
+      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setBulkRelanceCandidates(data || []);
+    setBulkRelanceResults(null);
+  };
+
+  const runBulkRelance = async () => {
+    if (!bulkRelanceCandidates) return;
+    setBulkRelanceRunning(true);
+    setBulkRelanceProgress({ done: 0, total: bulkRelanceCandidates.length });
+    const results: { id: string; label: string; ok: boolean; error?: string }[] = [];
+    for (let i = 0; i < bulkRelanceCandidates.length; i++) {
+      const ins = bulkRelanceCandidates[i];
+      const label = `${ins.child_first_name} ${ins.child_last_name} (${ins.parent_email})`;
+      const r = await sendPaymentLinkFor(ins);
+      results.push({ id: ins.id, label, ok: r.ok, error: r.ok ? undefined : r.error });
+      setBulkRelanceProgress({ done: i + 1, total: bulkRelanceCandidates.length });
+      await new Promise((res) => setTimeout(res, 400));
+    }
+    setBulkRelanceResults(results);
+    setBulkRelanceRunning(false);
+    fetchInscriptions();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
       <div className="max-w-7xl mx-auto">
