@@ -56,7 +56,7 @@ export default function Bureau() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [inscriptions, setInscriptions] = useState<any[]>([]);
-  const [stats, setStats] = useState({ total: 0, garcons: 0, filles: 0, enAttente: 0, payes: 0 });
+  const [stats, setStats] = useState({ total: 0, garcons: 0, filles: 0, enAttente: 0, attribuees: 0, payes: 0 });
   const [sejourStats, setSejourStats] = useState<any[]>([]);
   const [sejours, setSejours] = useState<any[]>([]);
   const [editingInscription, setEditingInscription] = useState<any>(null);
