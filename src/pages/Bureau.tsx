@@ -77,6 +77,7 @@ export default function Bureau() {
   const [bulkRelanceResults, setBulkRelanceResults] = useState<
     { id: string; label: string; ok: boolean; error?: string }[] | null
   >(null);
+  const [bulkRelanceSubject, setBulkRelanceSubject] = useState<string>(DEFAULT_BULK_SUBJECT);
 
   useEffect(() => {
     checkAdminRole();
