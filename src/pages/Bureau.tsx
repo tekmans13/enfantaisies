@@ -688,9 +688,8 @@ export default function Bureau() {
                 <UsersIcon className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total Inscrits</p>
-                <p className="text-2xl font-bold text-foreground">{stats.total}</p>
-                <p className="text-xs text-muted-foreground">{stats.payes} payé{stats.payes > 1 ? 's' : ''}</p>
+                <p className="text-sm text-muted-foreground">Total Inscrits / Total payé</p>
+                <p className="text-2xl font-bold text-foreground">{stats.total}/{stats.payes}</p>
               </div>
             </div>
           </Card>
