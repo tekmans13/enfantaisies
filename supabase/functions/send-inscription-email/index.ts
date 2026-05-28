@@ -39,7 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { inscriptionId, parentEmail, parentName, childName, recapUrl, paymentUrl, montantTotal, isPaymentConfirmation }: EmailRequest = await req.json();
+    const { inscriptionId, parentEmail, parentName, childName, recapUrl, paymentUrl, montantTotal, isPaymentConfirmation, customSubject }: EmailRequest = await req.json();
 
     console.log("Sending email to:", parentEmail);
 
