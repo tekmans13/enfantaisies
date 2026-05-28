@@ -718,17 +718,17 @@ export default function Bureau() {
               </div>
             </div>
           </Card>
-
           <Card className="p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center">
                 <Clock className="w-6 h-6 text-orange-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">En Attente</p>
-                <p className="text-2xl font-bold text-foreground">{stats.enAttente}</p>
+                <p className="text-sm text-muted-foreground">En Attente / Attribué</p>
+                <p className="text-2xl font-bold text-foreground">{stats.enAttente}/{stats.attribuees}</p>
               </div>
             </div>
+          </Card>
           </Card>
         </div>
 
