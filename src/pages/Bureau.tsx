@@ -56,7 +56,7 @@ export default function Bureau() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [inscriptions, setInscriptions] = useState<any[]>([]);
-  const [stats, setStats] = useState({ total: 0, garcons: 0, filles: 0, enAttente: 0 });
+  const [stats, setStats] = useState({ total: 0, garcons: 0, filles: 0, enAttente: 0, payes: 0 });
   const [sejourStats, setSejourStats] = useState<any[]>([]);
   const [sejours, setSejours] = useState<any[]>([]);
   const [editingInscription, setEditingInscription] = useState<any>(null);
@@ -180,8 +180,9 @@ export default function Bureau() {
       const garcons = data.filter(i => i.child_gender === 'garcon').length;
       const filles = data.filter(i => i.child_gender === 'fille').length;
       const enAttente = data.filter(i => i.status === 'en_attente').length;
+      const payes = data.filter(i => i.status === 'paye' || i.status === 'validee').length;
       
-      setStats({ total, garcons, filles, enAttente });
+      setStats({ total, garcons, filles, enAttente, payes });
 
       // Calculer les statistiques par séjour
       const sejourMap = new Map<string, { id: string; choix1: number; choix2: number; total: number }>();
@@ -689,6 +690,7 @@ export default function Bureau() {
               <div>
                 <p className="text-sm text-muted-foreground">Total Inscrits</p>
                 <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-xs text-muted-foreground">{stats.payes} payé{stats.payes > 1 ? 's' : ''}</p>
               </div>
             </div>
           </Card>
