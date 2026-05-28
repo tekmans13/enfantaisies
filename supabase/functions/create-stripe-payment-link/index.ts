@@ -68,7 +68,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Utiliser l'année du séjour attribué plutôt que l'année serveur :
     // les liens de paiement doivent rester valables même après le changement d'année civile.
     const annee = new Date(sejoursData[0].date_debut).getFullYear();
-    const { data: tarifs, error: tarError } = await supabase
+    let { data: tarifs, error: tarError } = await supabase
       .from('tarifs')
       .select('*')
       .eq('annee', annee)
@@ -76,7 +76,20 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (tarError) throw tarError;
     if (!tarifs || tarifs.length === 0) {
-      throw new Error(`Aucun tarif configuré pour ${annee}`);
+      const { data: fallbackTarifs, error: fallbackTarError } = await supabase
+        .from('tarifs')
+        .select('*')
+        .order('annee', { ascending: false })
+        .order('tarif_numero', { ascending: true });
+
+      if (fallbackTarError) throw fallbackTarError;
+      if (!fallbackTarifs || fallbackTarifs.length === 0) {
+        throw new Error(`Aucun tarif configuré pour ${annee}`);
+      }
+
+      const fallbackYear = fallbackTarifs[0].annee;
+      tarifs = fallbackTarifs.filter((tarif: any) => tarif.annee === fallbackYear);
+      console.log(`Aucun tarif pour ${annee}, utilisation des tarifs ${fallbackYear}`);
     }
 
     const qf = inscription.quotient_familial || 999999;
