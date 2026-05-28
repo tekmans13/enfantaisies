@@ -182,18 +182,6 @@ export default function Bureau() {
       const enAttente = data.filter(i => i.status === 'en_attente').length;
       const payes = data.filter(i => i.status === 'paye' || i.status === 'validee').length;
 
-      // DIAGNOSTIC : répartition des statuts
-      const statusBreakdown = data.reduce((acc: Record<string, number>, i: any) => {
-        const s = i.status || '(null)';
-        acc[s] = (acc[s] || 0) + 1;
-        return acc;
-      }, {});
-      console.log('[DIAGNOSTIC] Répartition des statuts:', statusBreakdown);
-      console.log('[DIAGNOSTIC] Inscriptions non payées/envoyées/en_attente:',
-        data.filter(i => !['paye', 'validee', 'envoye', 'en_attente'].includes(i.status))
-          .map(i => ({ id: i.id, nom: `${i.child_first_name} ${i.child_last_name}`, status: i.status }))
-      );
-
       setStats({ total, garcons, filles, enAttente, payes });
 
       // Calculer les statistiques par séjour
