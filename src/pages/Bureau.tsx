@@ -68,6 +68,12 @@ export default function Bureau() {
   const [deletingInscriptionId, setDeletingInscriptionId] = useState<string | null>(null);
   const [viewingInscriptionId, setViewingInscriptionId] = useState<string | null>(null);
   const [showHomeContentDialog, setShowHomeContentDialog] = useState(false);
+  const [bulkRelanceCandidates, setBulkRelanceCandidates] = useState<any[] | null>(null);
+  const [bulkRelanceRunning, setBulkRelanceRunning] = useState(false);
+  const [bulkRelanceProgress, setBulkRelanceProgress] = useState({ done: 0, total: 0 });
+  const [bulkRelanceResults, setBulkRelanceResults] = useState<
+    { id: string; label: string; ok: boolean; error?: string }[] | null
+  >(null);
 
   useEffect(() => {
     checkAdminRole();
