@@ -486,7 +486,7 @@ export default function Bureau() {
           parentName: `${inscription.parent_first_name} ${inscription.parent_last_name}`,
           childName: `${inscription.child_first_name} ${inscription.child_last_name}`,
           recapUrl,
-          paymentUrl: data.paymentUrl,
+          paymentUrl,
           montantTotal,
         },
       });
