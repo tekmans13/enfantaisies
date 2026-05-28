@@ -10,6 +10,7 @@ import RecapInscription from "./pages/RecapInscription";
 import Tarifs from "./pages/Tarifs";
 import Documents from "./pages/Documents";
 import Auth from "./pages/Auth";
+import Payer from "./pages/Payer";
 import Users from "./pages/admin/Users";
 import Configuration from "./pages/admin/Configuration";
 import NotFound from "./pages/NotFound";
