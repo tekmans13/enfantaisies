@@ -690,6 +690,7 @@ export default function Bureau() {
               <div>
                 <p className="text-sm text-muted-foreground">Total Inscrits</p>
                 <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-xs text-muted-foreground">{stats.payes} payé{stats.payes > 1 ? 's' : ''}</p>
               </div>
             </div>
           </Card>
