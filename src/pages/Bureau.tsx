@@ -180,8 +180,9 @@ export default function Bureau() {
       const garcons = data.filter(i => i.child_gender === 'garcon').length;
       const filles = data.filter(i => i.child_gender === 'fille').length;
       const enAttente = data.filter(i => i.status === 'en_attente').length;
+      const payes = data.filter(i => i.status === 'paye' || i.status === 'validee').length;
       
-      setStats({ total, garcons, filles, enAttente });
+      setStats({ total, garcons, filles, enAttente, payes });
 
       // Calculer les statistiques par séjour
       const sejourMap = new Map<string, { id: string; choix1: number; choix2: number; total: number }>();
