@@ -661,6 +661,10 @@ export default function Bureau() {
               <FileText className="h-4 w-4" />
               Documents
             </Button>
+            <Button onClick={openBulkRelance} variant="outline" className="gap-2">
+              <Send className="h-4 w-4" />
+              Relancer les "envoyés"
+            </Button>
             <Button onClick={handleLogout} variant="outline" className="gap-2">
               <LogOut className="h-4 w-4" />
               Se déconnecter
