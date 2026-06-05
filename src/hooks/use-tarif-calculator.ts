@@ -6,7 +6,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateDaysBetween } from '@/lib/formatters';
-import { CURRENT_TARIF_YEAR } from '@/lib/constants';
+
 
 interface Sejour {
   id: string;
@@ -29,12 +29,11 @@ interface Tarif {
  */
 export const useTarifs = () => {
   return useQuery({
-    queryKey: ['tarifs', CURRENT_TARIF_YEAR],
+    queryKey: ['tarifs'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('tarifs')
         .select('*')
-        .eq('annee', CURRENT_TARIF_YEAR)
         .order('qf_min', { ascending: true });
       
       if (error) throw error;

@@ -35,10 +35,9 @@ async function calcMontant(inscription) {
   const { data: tarifs } = await supabase
     .from('tarifs')
     .select('*')
-    .eq('annee', 2025)
     .order('tarif_numero', { ascending: true });
 
-  if (!tarifs?.length) throw new Error('Aucun tarif 2025');
+  if (!tarifs?.length) throw new Error('Aucun tarif configuré');
 
   const qf = inscription.quotient_familial || 999999;
   const tarif =

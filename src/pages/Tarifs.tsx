@@ -28,7 +28,6 @@ const Tarifs = () => {
       const { data, error } = await supabase
         .from('tarifs')
         .select('*')
-        .eq('annee', 2025)
         .order('tarif_numero', { ascending: true });
       
       if (error) throw error;
@@ -89,7 +88,7 @@ const Tarifs = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold">Tarifs 2025</h1>
+            <h1 className="text-3xl font-bold">Tarifs</h1>
             <p className="text-muted-foreground">
               Gestion des tarifs pour les centres aérés et séjours - Tarifs à la semaine (5 jours)
             </p>
