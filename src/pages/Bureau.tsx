@@ -72,6 +72,7 @@ export default function Bureau() {
   const [viewingInscriptionId, setViewingInscriptionId] = useState<string | null>(null);
   const [showHomeContentDialog, setShowHomeContentDialog] = useState(false);
   const [bulkRelanceCandidates, setBulkRelanceCandidates] = useState<any[] | null>(null);
+  const [bulkRelanceSelected, setBulkRelanceSelected] = useState<Set<string>>(new Set());
   const [bulkRelanceRunning, setBulkRelanceRunning] = useState(false);
   const [bulkRelanceProgress, setBulkRelanceProgress] = useState({ done: 0, total: 0 });
   const [bulkRelanceResults, setBulkRelanceResults] = useState<
@@ -611,22 +612,25 @@ export default function Bureau() {
       return;
     }
     setBulkRelanceCandidates(data || []);
+    setBulkRelanceSelected(new Set((data || []).map((d: any) => d.id)));
     setBulkRelanceResults(null);
     setBulkRelanceSubject(DEFAULT_BULK_SUBJECT);
   };
 
   const runBulkRelance = async () => {
     if (!bulkRelanceCandidates) return;
+    const toSend = bulkRelanceCandidates.filter((c) => bulkRelanceSelected.has(c.id));
+    if (toSend.length === 0) return;
     setBulkRelanceRunning(true);
-    setBulkRelanceProgress({ done: 0, total: bulkRelanceCandidates.length });
+    setBulkRelanceProgress({ done: 0, total: toSend.length });
     const results: { id: string; label: string; ok: boolean; error?: string }[] = [];
-    for (let i = 0; i < bulkRelanceCandidates.length; i++) {
-      const ins = bulkRelanceCandidates[i];
+    for (let i = 0; i < toSend.length; i++) {
+      const ins = toSend[i];
       const label = `${ins.child_first_name} ${ins.child_last_name} (${ins.parent_email})`;
       const r = await sendPaymentLinkFor(ins, bulkRelanceSubject);
       const anyR = r as { ok: boolean; error?: string };
       results.push({ id: ins.id, label, ok: anyR.ok, error: anyR.error });
-      setBulkRelanceProgress({ done: i + 1, total: bulkRelanceCandidates.length });
+      setBulkRelanceProgress({ done: i + 1, total: toSend.length });
       await new Promise((res) => setTimeout(res, 400));
     }
     setBulkRelanceResults(results);
@@ -1214,7 +1218,7 @@ export default function Bureau() {
             <AlertDialogTitle>
               {bulkRelanceResults
                 ? "Résultats de la relance"
-                : `Relancer ${bulkRelanceCandidates?.length ?? 0} inscription(s) en statut "envoyé" ?`}
+                : `Relancer ${bulkRelanceSelected.size} / ${bulkRelanceCandidates?.length ?? 0} inscription(s) en statut "envoyé" ?`}
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-2">
@@ -1252,27 +1256,70 @@ export default function Bureau() {
           )}
 
           <div className="max-h-[40vh] overflow-y-auto border rounded p-3 text-sm space-y-1">
-            {bulkRelanceResults
-              ? bulkRelanceResults.map((r) => (
-                  <div key={r.id} className="flex items-start gap-2">
-                    {r.ok ? (
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+            {bulkRelanceResults ? (
+              bulkRelanceResults.map((r) => (
+                <div key={r.id} className="flex items-start gap-2">
+                  {r.ok ? (
+                    <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                  ) : (
+                    <XCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="truncate">{r.label}</div>
+                    {!r.ok && (
+                      <div className="text-xs text-destructive break-words">Erreur : {r.error}</div>
                     )}
-                    <div className="flex-1 min-w-0">
-                      <div className="truncate">{r.label}</div>
-                      {!r.ok && (
-                        <div className="text-xs text-destructive break-words">Erreur : {r.error}</div>
-                      )}
-                    </div>
                   </div>
-                ))
-              : bulkRelanceCandidates?.map((c) => (
-                  <div key={c.id} className="truncate">
-                    • {c.child_first_name} {c.child_last_name} — {c.parent_email}
+                </div>
+              ))
+            ) : (
+              <>
+                {(bulkRelanceCandidates?.length ?? 0) > 0 && (
+                  <div className="flex items-center gap-2 pb-2 mb-2 border-b">
+                    <Checkbox
+                      id="bulk-relance-select-all"
+                      checked={
+                        bulkRelanceCandidates && bulkRelanceCandidates.length > 0 &&
+                        bulkRelanceSelected.size === bulkRelanceCandidates.length
+                      }
+                      onCheckedChange={(checked) => {
+                        if (!bulkRelanceCandidates) return;
+                        setBulkRelanceSelected(
+                          checked ? new Set(bulkRelanceCandidates.map((c) => c.id)) : new Set()
+                        );
+                      }}
+                      disabled={bulkRelanceRunning}
+                    />
+                    <label htmlFor="bulk-relance-select-all" className="font-medium cursor-pointer">
+                      Tout sélectionner ({bulkRelanceSelected.size}/{bulkRelanceCandidates?.length})
+                    </label>
+                  </div>
+                )}
+                {bulkRelanceCandidates?.map((c) => (
+                  <div key={c.id} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`bulk-relance-${c.id}`}
+                      checked={bulkRelanceSelected.has(c.id)}
+                      onCheckedChange={(checked) => {
+                        setBulkRelanceSelected((prev) => {
+                          const next = new Set(prev);
+                          if (checked) next.add(c.id);
+                          else next.delete(c.id);
+                          return next;
+                        });
+                      }}
+                      disabled={bulkRelanceRunning}
+                    />
+                    <label
+                      htmlFor={`bulk-relance-${c.id}`}
+                      className="truncate cursor-pointer flex-1"
+                    >
+                      {c.child_first_name} {c.child_last_name} — {c.parent_email}
+                    </label>
                   </div>
                 ))}
+              </>
+            )}
             {bulkRelanceCandidates?.length === 0 && !bulkRelanceResults && (
               <div className="text-muted-foreground">Aucune inscription en statut "envoyé".</div>
             )}
@@ -1293,7 +1340,7 @@ export default function Bureau() {
               <>
                 <AlertDialogCancel disabled={bulkRelanceRunning}>Annuler</AlertDialogCancel>
                 <AlertDialogAction
-                  disabled={bulkRelanceRunning || !bulkRelanceCandidates?.length}
+                  disabled={bulkRelanceRunning || bulkRelanceSelected.size === 0}
                   onClick={(e) => {
                     e.preventDefault();
                     runBulkRelance();
@@ -1301,7 +1348,7 @@ export default function Bureau() {
                 >
                   {bulkRelanceRunning
                     ? `Envoi... (${bulkRelanceProgress.done}/${bulkRelanceProgress.total})`
-                    : "Confirmer l'envoi"}
+                    : `Confirmer l'envoi (${bulkRelanceSelected.size})`}
                 </AlertDialogAction>
               </>
             )}
