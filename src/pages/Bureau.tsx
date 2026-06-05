@@ -72,6 +72,7 @@ export default function Bureau() {
   const [viewingInscriptionId, setViewingInscriptionId] = useState<string | null>(null);
   const [showHomeContentDialog, setShowHomeContentDialog] = useState(false);
   const [bulkRelanceCandidates, setBulkRelanceCandidates] = useState<any[] | null>(null);
+  const [bulkRelanceSelected, setBulkRelanceSelected] = useState<Set<string>>(new Set());
   const [bulkRelanceRunning, setBulkRelanceRunning] = useState(false);
   const [bulkRelanceProgress, setBulkRelanceProgress] = useState({ done: 0, total: 0 });
   const [bulkRelanceResults, setBulkRelanceResults] = useState<
@@ -611,22 +612,25 @@ export default function Bureau() {
       return;
     }
     setBulkRelanceCandidates(data || []);
+    setBulkRelanceSelected(new Set((data || []).map((d: any) => d.id)));
     setBulkRelanceResults(null);
     setBulkRelanceSubject(DEFAULT_BULK_SUBJECT);
   };
 
   const runBulkRelance = async () => {
     if (!bulkRelanceCandidates) return;
+    const toSend = bulkRelanceCandidates.filter((c) => bulkRelanceSelected.has(c.id));
+    if (toSend.length === 0) return;
     setBulkRelanceRunning(true);
-    setBulkRelanceProgress({ done: 0, total: bulkRelanceCandidates.length });
+    setBulkRelanceProgress({ done: 0, total: toSend.length });
     const results: { id: string; label: string; ok: boolean; error?: string }[] = [];
-    for (let i = 0; i < bulkRelanceCandidates.length; i++) {
-      const ins = bulkRelanceCandidates[i];
+    for (let i = 0; i < toSend.length; i++) {
+      const ins = toSend[i];
       const label = `${ins.child_first_name} ${ins.child_last_name} (${ins.parent_email})`;
       const r = await sendPaymentLinkFor(ins, bulkRelanceSubject);
       const anyR = r as { ok: boolean; error?: string };
       results.push({ id: ins.id, label, ok: anyR.ok, error: anyR.error });
-      setBulkRelanceProgress({ done: i + 1, total: bulkRelanceCandidates.length });
+      setBulkRelanceProgress({ done: i + 1, total: toSend.length });
       await new Promise((res) => setTimeout(res, 400));
     }
     setBulkRelanceResults(results);
